@@ -1,0 +1,299 @@
+{
+  "nav": {
+    "products": "产品",
+    "services": "服务",
+    "contact": "联系",
+    "searchPlaceholder": "搜索车型...",
+    "searchLabelMobile": "搜索车型",
+    "languageLabelMobile": "语言设置",
+    "openMenu": "打开菜单",
+    "closeMenu": "关闭菜单",
+    "languageSelectorAriaLabel": "选择语言"
+  },
+  "footer": {
+    "products": {
+      "title": "产品",
+      "brandSelect": "品牌选择",
+      "proGroup": "APSONIC Pro",
+      "emotoGroup": "APSONIC-EMOTO",
+      "categories": {
+        "underbone": "弯梁车",
+        "street": "街车",
+        "sport": "运动车",
+        "scooter": "踏板车",
+        "atv": "ATV",
+        "tricycle": "三轮车",
+        "proStreet": "街车",
+        "proOffroad": "越野车",
+        "emotoTricycle": "三轮车"
+      }
+    },
+    "services": {
+      "title": "服务",
+      "manuals": "产品手册",
+      "networkLookup": "售后服务网络查询"
+    },
+    "about": {
+      "title": "关于",
+      "brandIntro": "品牌介绍",
+      "brandCulture": "品牌文化",
+      "history": "发展历程",
+      "news": "新闻资讯",
+      "social": "社会贡献"
+    },
+    "contact": {
+      "title": "联系我们",
+      "inquiry": "商务咨询"
+    },
+    "copyright": "APSONIC.Africa"
+  },
+  "sidebar": {
+    "help": "帮助",
+    "storeLocator": "门店查询"
+  },
+  "auth": {
+    "portalBadge": "企业门户",
+    "slogan": "好质量 好生活",
+    "title": "欢迎回来",
+    "subtitle": "登录以管理产品",
+    "emailLabel": "电子邮箱",
+    "emailPlaceholder": "请输入电子邮箱",
+    "passwordLabel": "密码",
+    "passwordPlaceholder": "请输入密码",
+    "submit": "登录",
+    "loading": "登录中...",
+    "backToHome": "← 返回官方主页",
+    "footerCopyright": "© {year} APSONIC. 版权所有。",
+    "validation": {
+      "usernameRequired": "请输入电子邮箱或用户名",
+      "passwordMinLength": "密码至少需要6个字符"
+    },
+    "errors": {
+      "invalidCredentials": "登录失败，请检查您的凭据",
+      "connectionError": "无法连接到服务器，请重试"
+    }
+  },
+  "contact": {
+    "heroTitle": "让我们开始",
+    "heroTitleHighlight": "对话",
+    "heroDescription": "从寻找最近的经销商到技术支持，我们的全球团队随时准备为您提供帮助。",
+    "form": {
+      "firstNameLabel": "名",
+      "firstNamePlaceholder": "请输入您的名",
+      "lastNameLabel": "姓",
+      "lastNamePlaceholder": "请输入您的姓",
+      "emailLabel": "电子邮箱",
+      "emailPlaceholder": "you@company.com",
+      "phoneLabel": "电话号码（可选）",
+      "phonePlaceholder": "+233 ...",
+      "departmentLabel": "部门",
+      "departmentOptions": {
+        "general": "一般咨询",
+        "sales": "销售与车队",
+        "dealership": "经销商申请",
+        "support": "技术支持",
+        "media": "媒体与公关"
+      },
+      "subjectLabel": "主题",
+      "subjectPlaceholder": "我们可以如何帮助您？",
+      "messageLabel": "留言",
+      "messagePlaceholder": "请详细说明您的咨询内容...",
+      "submit": "发送消息",
+      "successTitle": "消息发送成功",
+      "successDescription": "感谢您联系Apsonic。我们的团队成员将审核您的请求，并在24小时内回复您。",
+      "sendAnother": "发送另一条消息",
+      "genericError": "出现了错误。请稍后再试。"
+    },
+    "validation": {
+      "firstNameRequired": "请输入名",
+      "lastNameRequired": "请输入姓",
+      "emailRequired": "请输入电子邮箱",
+      "emailInvalid": "电子邮箱格式不正确",
+      "phoneInvalid": "电话号码格式不正确",
+      "departmentRequired": "请选择部门",
+      "subjectRequired": "请输入主题",
+      "messageMinLength": "留言内容至少需要20个字符"
+    },
+    "formSectionSubtitle": "在线留言",
+    "formSectionTitle": "给我们留言",
+    "formSectionDescription": "请填写以下表单，我们的专业团队将在24小时内与您联系，为您提供量身定制的支持与解答。",
+    "infoTitle": "联络资讯",
+    "infoSubtitle": "与我们的专家交流",
+    "supportTitle": "客户服务支持",
+    "supportDesc": "有关摩托车质保、售后维护及常见技术问题的咨询。",
+    "salesTitle": "销售与大客户业务",
+    "salesDesc": "有关大批量订单采购、企业车队定制或经销商招商的咨询。",
+    "hoursTitle": "工作时间",
+    "hoursDesc": "周一至周五: 上午8:00 - 下午5:30",
+    "supportStatus": "APSONIC 客服已上线"
+  },
+  "products": {
+    "heading": "全系车型",
+    "breadcrumbHome": "首页",
+    "breadcrumbProducts": "全系车型",
+    "searchPlaceholder": "快速检索车型...",
+    "filterAll": "不限",
+    "filterAllDisp": "不限",
+    "filterTypeLabel": "类型选择",
+    "filterDispLabel": "排量选择",
+    "filterBrandLabel": "品牌选择",
+    "filterExpand": "筛选车型",
+    "filterCollapse": "收起筛选",
+    "noResults": "暂无符合条件的车型",
+    "categories": {
+      "underbone": "弯梁车",
+      "standard": "骑士车",
+      "street": "街车",
+      "offroad": "越野车",
+      "scooter": "踏板车",
+      "atv": "ATV",
+      "tricycle": "三轮车"
+    }
+  },
+  "services": {
+    "heroTitle": "服务与支持",
+    "heroSubtitle": "我们的特约服务网点与原厂备件网络，为您提供全天候的出行保障。",
+    "heroHighlight": "一路向前，无忧出行",
+    "coreServices": "核心服务",
+    "careSpares": "特约维保与原厂备件",
+    "branches": "分支机构",
+    "officialOffices": "官方联络中心",
+    "faq": "常见问题",
+    "faqSubtitle": "服务与保修政策解析",
+    "featureCards": {
+      "locations": {
+        "title": "两轮车",
+        "description": "车型手册下载与售后服务网点查询",
+        "cta": "立即查看"
+      },
+      "parts": {
+        "title": "三轮车",
+        "description": "车型手册下载与售后服务网点查询",
+        "cta": "立即查看"
+      }
+    }
+  },
+  "serviceDetail": {
+    "back": "返回服务主页",
+    "tag": "售后支持中心",
+    "desc": "下载各车型产品手册与装车视频。我们确保每一辆APSONIC摩托车都能获得全方位保障。",
+    "manuals": "产品手册",
+    "videos": "视频教程",
+    "gallery": "图纸分解",
+    "galleryDesc": "查看高清分解图解以帮助您定位和识别原厂部件。",
+    "download": "下载手册",
+    "inspect": "预览图解",
+    "updated": "更新于"
+  },
+  "metadata": {
+    "products": {
+      "title": "全系车型 - APSONIC",
+      "description": "浏览APSONIC全系车型：骑士车、街车、越野车、弯梁车、踏板车、ATV及三轮车。"
+    },
+    "services": {
+      "title": "服务与支持 - APSONIC",
+      "description": "寻找APSONIC服务中心、备件支持，以及解答我们在西非经销商网络中的常见问题。"
+    },
+    "contact": {
+      "title": "联系我们 - APSONIC",
+      "description": "与APSONIC团队取得联系 - 我们的专员将在24小时内回复，协助解决您的销售、服务和技术咨询。"
+    },
+    "locations": {
+      "title": "两轮车服务支持 - APSONIC",
+      "description": "APSONIC两轮摩托车的产品手册、保养指南和技术支持。"
+    },
+    "parts": {
+      "title": "三轮车服务支持 - APSONIC",
+      "description": "APSONIC三轮摩托车的产品手册、保养指南和技术支持。"
+    }
+  },
+  "productDetail": {
+    "keyFeaturesTitle": "核心性能特点",
+    "keyFeaturesSubtitleHighlight": "前十项",
+    "keyFeaturesSubtitleRest": "核心卖点",
+    "reviewsTitle": "看看我们的用户怎么说：",
+    "reviewsTitleHighlight": "用户",
+    "moreReviews": "查看更多评论",
+    "techSpecsTitle": "技术参数",
+    "fullParameters": "完整参数",
+    "hideParameters": "隐藏参数",
+    "specs": {
+      "displacement": "排量 (ML)",
+      "wheelbase": "轴距 (MM)",
+      "boreStroke": "缸径X行程 (MM)",
+      "dimensions": "外形尺寸 (MM)",
+      "compressionRatio": "压缩比",
+      "minGroundClearance": "最小离地间隙 (MM)",
+      "maxPower": "最大功率 (KW/RPM)",
+      "weight": "净重 (KG)",
+      "maxTorque": "最大扭矩 (N.m/RPM)",
+      "brake": "制动方式",
+      "maxSpeed": "最大时速 (KM/H)",
+      "tyreSize": "轮胎规格",
+      "ignition": "点火方式",
+      "fuelTankCapacity": "油箱容量 (L)",
+      "starter": "启动方式",
+      "clutchType": "离合器类型",
+      "engine": "发动机",
+      "frame": "车架",
+      "headlights": "前大灯",
+      "rearAbsorber": "后减震器",
+      "pedal": "踏板",
+      "maxLadenMass": "最大载重量",
+      "multi": "多",
+      "functional": "功能",
+      "andFoldable": "且可折叠",
+      "led": "LED"
+    },
+    "reviews": {
+      "items": {
+        "Muhammad": {
+          "author": "穆罕默德",
+          "content": "满足长途行驶需求。降低故障率和维护成本。"
+        },
+        "Rustam": {
+          "author": "鲁斯塔姆",
+          "content": "非常棒的摩托车，很满意，非常酷而且品质极佳。满足长途行驶需求。降低故障率和维护成本。"
+        },
+        "Ahmed": {
+          "author": "艾哈迈德",
+          "content": "希望有更多车型可以选择，真的很喜欢你们的产品。满足长途行驶需求。降低故障率和维护成本。"
+        },
+        "Zainab's father, usually Zain": {
+          "author": "扎伊娜布的父亲（通常叫扎伊）",
+          "content": "APSONIC非常有名，甚至赞助了非洲杯。满足长途行驶需求。降低故障率和维护成本。"
+        }
+      }
+    },
+    "hero": {
+      "slogan1": "即使重载",
+      "slogan2": "依然保持",
+      "slogan3": "路面主宰"
+    },
+    "storySplit": {
+      "title": "“强大”的承载能力令人瞩目",
+      "description": "全新开发的四后悬挂加强型车架，配有15.5L加大油箱、加粗货架和加长座垫，加上独特的贴花，彰显出该车型强劲的承载能力。"
+    },
+    "aesthetic": {
+      "title": "质感美学设计",
+      "subtitle": "让我们共同享受",
+      "subtitleHighlight": "享受"
+    },
+    "specBanners": {
+      "frame": {
+        "titleLine1": "车架",
+        "description": "四后减震车架，承载能力比普通GN车架更强。",
+        "metricLabel": "最大载重质量"
+      },
+      "rear-carrier": {
+        "titleLine1": "后载物架",
+        "titleLine2": "后减震器",
+        "description": "加粗后载物架和四后减震器设计，更适合重载行驶。"
+      },
+      "engine": {
+        "titleLine1": "发动机",
+        "description": "能够轻松应对重载、爬坡等复杂工况的强劲发动机。"
+      }
+    }
+  }
+}

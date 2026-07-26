@@ -1,0 +1,299 @@
+{
+  "nav": {
+    "products": "Produits",
+    "services": "Services",
+    "contact": "Contact",
+    "searchPlaceholder": "Rechercher un modèle...",
+    "searchLabelMobile": "Rechercher un modèle",
+    "languageLabelMobile": "Langue",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu",
+    "languageSelectorAriaLabel": "Choisir la langue"
+  },
+  "footer": {
+    "products": {
+      "title": "Produits",
+      "brandSelect": "Choisir une marque",
+      "proGroup": "APSONIC Pro",
+      "emotoGroup": "APSONIC-EMOTO",
+      "categories": {
+        "underbone": "Cyclomoteur",
+        "street": "Rue",
+        "sport": "Sport",
+        "scooter": "Scooter",
+        "atv": "Quad",
+        "tricycle": "Tricycle",
+        "proStreet": "Rue",
+        "proOffroad": "Tout-terrain",
+        "emotoTricycle": "Tricycle"
+      }
+    },
+    "services": {
+      "title": "Services",
+      "manuals": "Manuels produits",
+      "networkLookup": "Recherche du réseau après-vente"
+    },
+    "about": {
+      "title": "À propos",
+      "brandIntro": "Présentation de la marque",
+      "brandCulture": "Culture de marque",
+      "history": "Notre histoire",
+      "news": "Actualités",
+      "social": "Engagement social"
+    },
+    "contact": {
+      "title": "Contact",
+      "inquiry": "Demande commerciale"
+    },
+    "copyright": "APSONIC.Africa"
+  },
+  "sidebar": {
+    "help": "Aide",
+    "storeLocator": "Localisateur de magasins"
+  },
+  "auth": {
+    "portalBadge": "Portail Entreprise",
+    "slogan": "Bonne qualité pour une meilleure vie",
+    "title": "Bon retour",
+    "subtitle": "Connectez-vous pour gérer les produits",
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "Entrez votre e-mail",
+    "passwordLabel": "Mot de passe",
+    "passwordPlaceholder": "Entrez votre mot de passe",
+    "submit": "Se connecter",
+    "loading": "Connexion en cours...",
+    "backToHome": "← Retour à l'accueil",
+    "footerCopyright": "© {year} APSONIC. Tous droits réservés.",
+    "validation": {
+      "usernameRequired": "L'e-mail ou le nom d'utilisateur est requis",
+      "passwordMinLength": "Le mot de passe doit contenir au moins 6 caractères"
+    },
+    "errors": {
+      "invalidCredentials": "Identifiants invalides, veuillez vérifier et réessayer",
+      "connectionError": "Impossible de se connecter au serveur, veuillez réessayer"
+    }
+  },
+  "contact": {
+    "heroTitle": "Commençons une",
+    "heroTitleHighlight": "conversation",
+    "heroDescription": "De la recherche du concessionnaire le plus proche au support technique, notre équipe mondiale est prête à vous aider.",
+    "form": {
+      "firstNameLabel": "Prénom",
+      "firstNamePlaceholder": "Entrez votre prénom",
+      "lastNameLabel": "Nom",
+      "lastNamePlaceholder": "Entrez votre nom",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "vous@entreprise.com",
+      "phoneLabel": "Numéro de téléphone (facultatif)",
+      "phonePlaceholder": "+233 ...",
+      "departmentLabel": "Département",
+      "departmentOptions": {
+        "general": "Demande générale",
+        "sales": "Ventes et flotte",
+        "dealership": "Candidature de concession",
+        "support": "Support technique",
+        "media": "Médias et RP"
+      },
+      "subjectLabel": "Sujet",
+      "subjectPlaceholder": "Comment pouvons-nous vous aider ?",
+      "messageLabel": "Message",
+      "messagePlaceholder": "Merci de décrire votre demande en détail...",
+      "submit": "Envoyer le message",
+      "successTitle": "Message envoyé avec succès",
+      "successDescription": "Merci d'avoir contacté Apsonic. Notre équipe examinera votre demande et vous répondra dans les 24 heures.",
+      "sendAnother": "Envoyer un autre message",
+      "genericError": "Une erreur s'est produite. Veuillez réessayer plus tard."
+    },
+    "validation": {
+      "firstNameRequired": "Le prénom est requis",
+      "lastNameRequired": "Le nom est requis",
+      "emailRequired": "L'e-mail est requis",
+      "emailInvalid": "Le format de l'e-mail est invalide",
+      "phoneInvalid": "Le format du numéro de téléphone est invalide",
+      "departmentRequired": "Veuillez sélectionner un département",
+      "subjectRequired": "Le sujet est requis",
+      "messageMinLength": "Le message doit contenir au moins 20 caractères"
+    },
+    "formSectionSubtitle": "Demande en ligne",
+    "formSectionTitle": "Envoyez-nous un message",
+    "formSectionDescription": "Remplissez le formulaire ci-dessous et notre équipe de spécialistes vous répondra dans les 24 heures avec un accompagnement personnalisé.",
+    "infoTitle": "Informations de Contact",
+    "infoSubtitle": "Connectez-vous avec nos experts",
+    "supportTitle": "Support Client",
+    "supportDesc": "Pour la garantie de votre moto, le diagnostic local et les questions techniques.",
+    "salesTitle": "Ventes & Flottes",
+    "salesDesc": "Pour l'approvisionnement en gros, les flottes d'entreprise et les concessions.",
+    "hoursTitle": "Heures d'ouverture",
+    "hoursDesc": "Lundi - Vendredi: 8h00 - 17h30",
+    "supportStatus": "Support APSONIC en ligne"
+  },
+  "products": {
+    "heading": "Tous les Modèles",
+    "breadcrumbHome": "Accueil",
+    "breadcrumbProducts": "Tous les Modèles",
+    "searchPlaceholder": "Rechercher un modèle...",
+    "filterAll": "Tous",
+    "filterAllDisp": "Tous",
+    "filterTypeLabel": "Type",
+    "filterDispLabel": "Cylindrée",
+    "filterBrandLabel": "Marque",
+    "filterExpand": "Filtrer",
+    "filterCollapse": "Réduire",
+    "noResults": "Aucun modèle ne correspond à vos filtres.",
+    "categories": {
+      "underbone": "Underbone",
+      "standard": "Standard",
+      "street": "Street",
+      "offroad": "Tout-Terrain",
+      "scooter": "Scooter",
+      "atv": "ATV",
+      "tricycle": "Tricycle"
+    }
+  },
+  "services": {
+    "heroTitle": "Service & Support",
+    "heroSubtitle": "Nos centres de diagnostic et notre réseau de pièces garantissent votre mobilité au quotidien.",
+    "heroHighlight": "Aller de l'avant, l'esprit libre",
+    "coreServices": "Services Principaux",
+    "careSpares": "Maintenance & Pièces d'Origine",
+    "branches": "Bureaux",
+    "officialOffices": "Bureaux Officiels",
+    "faq": "FAQ",
+    "faqSubtitle": "Politique de service et garantie",
+    "featureCards": {
+      "locations": {
+        "title": "Deux-roues",
+        "description": "Téléchargement des manuels et recherche du réseau de service après-vente",
+        "cta": "Voir maintenant"
+      },
+      "parts": {
+        "title": "Tricycles",
+        "description": "Téléchargement des manuels et recherche du réseau de service après-vente",
+        "cta": "Voir maintenant"
+      }
+    }
+  },
+  "serviceDetail": {
+    "back": "Retour aux Services",
+    "tag": "Centre de Support",
+    "desc": "Téléchargez les manuels, vidéos de maintenance et schémas structurels officiels pour tous nos modèles.",
+    "manuals": "Manuels de Produits",
+    "videos": "Guides de Montage",
+    "gallery": "Vues Éclatées",
+    "galleryDesc": "Parcourez les catalogues de pièces HD pour identifier les composants d'origine.",
+    "download": "Télécharger",
+    "inspect": "Inspecter",
+    "updated": "Mis à jour"
+  },
+  "metadata": {
+    "products": {
+      "title": "Motos & Véhicules - APSONIC",
+      "description": "Découvrez toute la gamme APSONIC : motos standard, street, tout-terrain, underbone, scooters, quads et tricycles."
+    },
+    "services": {
+      "title": "Service & Support - APSONIC",
+      "description": "Trouvez les centres de service, les pièces d'origine et les réponses à vos questions sur notre réseau de concessionnaires APSONIC."
+    },
+    "contact": {
+      "title": "Contactez-nous - APSONIC",
+      "description": "Contactez l'équipe APSONIC - nos conseillers vous répondent sous 24 heures pour vos demandes de ventes, services et techniques."
+    },
+    "locations": {
+      "title": "Support Deux-roues - APSONIC",
+      "description": "Manuels, guides d'entretien et support pour les modèles deux-roues APSONIC."
+    },
+    "parts": {
+      "title": "Support Tricycle - APSONIC",
+      "description": "Manuels, guides d'entretien et support pour les modèles tricycles APSONIC."
+    }
+  },
+  "productDetail": {
+    "keyFeaturesTitle": "Principales Caractéristiques de Performance",
+    "keyFeaturesSubtitleHighlight": "Top",
+    "keyFeaturesSubtitleRest": "dix points de vente",
+    "reviewsTitle": "Découvrez les avis de nos utilisateurs :",
+    "reviewsTitleHighlight": "utilisateurs",
+    "moreReviews": "Plus d'avis",
+    "techSpecsTitle": "Spécifications Techniques",
+    "fullParameters": "Tous les paramètres",
+    "hideParameters": "Masquer les paramètres",
+    "specs": {
+      "displacement": "CYLINDRÉE (ML)",
+      "wheelbase": "EMPATTEMENT (MM)",
+      "boreStroke": "ALÉSAGE X COURSE (MM)",
+      "dimensions": "DIMENSIONS L X L X H (MM)",
+      "compressionRatio": "TAUX DE COMPRESSION",
+      "minGroundClearance": "GARDE AU SOL MIN (MM)",
+      "maxPower": "PUISSANCE MAX (KW/TR/MIN)",
+      "weight": "POIDS NET (KG)",
+      "maxTorque": "COUPLE MAX (N.M/TR/MIN)",
+      "brake": "FREIN",
+      "maxSpeed": "VITESSE MAX (KM/H)",
+      "tyreSize": "TAILLE DES PNEUS",
+      "ignition": "ALLUMAGE",
+      "fuelTankCapacity": "CAPACITÉ DU RÉSERVOIR (L)",
+      "starter": "DÉMARREUR",
+      "clutchType": "TYPE D'EMBRAYAGE",
+      "engine": "Moteur",
+      "frame": "Cadre",
+      "headlights": "Phares",
+      "rearAbsorber": "Absorbeur arrière",
+      "pedal": "Pédale",
+      "maxLadenMass": "Masse de charge maximale",
+      "multi": "Multi",
+      "functional": "fonctionnel",
+      "andFoldable": "et pliable",
+      "led": "LED"
+    },
+    "reviews": {
+      "items": {
+        "Muhammad": {
+          "author": "Muhammad",
+          "content": "Répond aux besoins à longue distance. Réduit le taux de panne et les coûts de maintenance."
+        },
+        "Rustam": {
+          "author": "Rustam",
+          "content": "Une moto vraiment géniale, très satisfait, super cool et de très haute qualité. Répond aux besoins à longue distance. Réduit le taux de panne et les coûts de maintenance."
+        },
+        "Ahmed": {
+          "author": "Ahmed",
+          "content": "J'espère qu'il y aura plus de modèles à choisir, j'aime beaucoup vos produits. Répond aux besoins à longue distance. Réduit le taux de panne et les coûts de maintenance."
+        },
+        "Zainab's father, usually Zain": {
+          "author": "Le père de Zainab, généralement Zain",
+          "content": "APSONIC est vraiment célèbre et a même parrainé la Coupe d'Afrique. Répond aux besoins à longue distance. Réduit le taux de panne et les coûts de maintenance."
+        }
+      }
+    },
+    "hero": {
+      "slogan1": "Même chargé",
+      "slogan2": "reste le maître",
+      "slogan3": "de la route"
+    },
+    "storySplit": {
+      "title": "Une capacité de charge \"forte\" et impressionnante",
+      "description": "Le tout nouveau cadre renforcé à quatre suspensions arrière, associé à un grand réservoir de carburant de 15,5L, des porte-bagages plus épais et une selle plus longue, ainsi que des décalcomanies uniques, met en valeur la forte capacité de charge du modèle."
+    },
+    "aesthetic": {
+      "title": "Design esthétique texturé",
+      "subtitle": "Profitons-en ensemble",
+      "subtitleHighlight": "ensemble"
+    },
+    "specBanners": {
+      "frame": {
+        "titleLine1": "Cadre",
+        "description": "Cadre à quatre amortisseurs arrière, capacité de charge plus forte qu'un cadre GN ordinaire.",
+        "metricLabel": "Masse de charge maximale"
+      },
+      "rear-carrier": {
+        "titleLine1": "Porte-bagages arrière",
+        "titleLine2": "Amortisseur arrière",
+        "description": "Le porte-bagages arrière épaissi et la conception à quatre amortisseurs arrière le rendent plus adapté aux charges lourdes."
+      },
+      "engine": {
+        "titleLine1": "Moteur",
+        "description": "Un moteur capable de gérer facilement des conditions de travail complexes telles que des charges lourdes et des pentes ascendantes."
+      }
+    }
+  }
+}

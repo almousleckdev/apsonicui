@@ -1,0 +1,119 @@
+"use client";
+
+import React from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { Section } from "@/components/ui/Section";
+import { Container } from "@/components/ui/Container";
+import { cn } from "@/lib/utils";
+import { MdArrowForward } from "react-icons/md";
+import { motion, useReducedMotion } from "framer-motion";
+import { STAGGER_CONTAINER, ANIMATION_VARIANTS, HOVER_PRESETS } from "@/lib/constants/animations";
+
+export interface FeatureCard {
+  id: string;
+  image: string;
+  imageScale?: number;
+  title: string;
+  subtitle?: string;
+  description: string;
+  ctaText: string;
+  href: string;
+}
+
+export interface FeatureCardsProps {
+  cards: FeatureCard[];
+  className?: string;
+}
+
+/**
+ * FeatureCards - Refined & Compact
+ * Vertical layout, Image Top, Text Below.
+ * Removed bulky icons but added strong hover states to indicate clickability.
+ * Updated to max-w-7xl for larger cards.
+ */
+export const FeatureCards: React.FC<FeatureCardsProps> = ({
+  cards,
+  className,
+}) => {
+  const reduceMotion = useReducedMotion();
+
+  return (
+    <Section className={className} backgroundColor="#FFFFFF" padding="large">
+      <Container maxWidth="wide">
+        <motion.div
+          variants={STAGGER_CONTAINER}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.05 }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-7xl mx-auto pb-12"
+        >
+          {cards.map((card) => (
+            <motion.div
+              key={card.id}
+              variants={ANIMATION_VARIANTS.fadeUp}
+              whileHover={reduceMotion ? {} : HOVER_PRESETS.card.hover}
+              whileTap={reduceMotion ? {} : HOVER_PRESETS.card.tap}
+              transition={{ type: "spring", stiffness: 350, damping: 25 }}
+              className="h-full"
+            >
+              <Link
+                href={card.href}
+                className="group relative block h-full"
+              >
+                <div
+                  className={cn(
+                    "bg-white rounded-[32px] p-8 h-full flex flex-col items-center text-center border border-gray-100/50 shadow-sm transition-shadow duration-300",
+                    "hover:shadow-xl",
+                  )}
+                >
+                  {/* Image Section - Top Centered & Consistent */}
+                  <div className="relative w-full h-[280px] mb-8 overflow-hidden rounded-2xl bg-white">
+                    <div className="relative w-full h-full">
+                      <Image
+                        src={card.image}
+                        alt={card.title}
+                        fill
+                        className="object-contain object-center"
+                        style={
+                          card.imageScale
+                            ? {
+                                transform: `scale(${card.imageScale})`,
+                                transformOrigin: "center",
+                              }
+                            : undefined
+                        }
+                        sizes="(max-width: 768px) 100vw, 400px"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Content Section */}
+                  <div className="flex flex-col items-center mt-auto">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-1 tracking-tight group-hover:text-[#1FA84F] transition-colors">
+                      {card.title}
+                    </h3>
+                    {card.subtitle && (
+                      <span className="block text-base font-medium text-gray-400 mb-4">
+                        {card.subtitle}
+                      </span>
+                    )}
+                    <p className="text-sm text-gray-500 max-w-[280px] leading-relaxed mb-6">
+                      {card.description}
+                    </p>
+
+                    {/* Attractive Click Indicator */}
+                    <div className="inline-flex items-center gap-2 text-gray-900 font-bold text-sm opacity-0 group-hover:opacity-100 -translate-y-2 group-hover:translate-y-0 transition-all duration-300">
+                      <span>{card.ctaText}</span>
+                      <MdArrowForward className="text-lg text-[#1FA84F]" />
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </motion.div>
+          ))}
+        </motion.div>
+      </Container>
+    </Section>
+  );
+};

@@ -1,0 +1,299 @@
+{
+  "nav": {
+    "products": "Products",
+    "services": "Services",
+    "contact": "Contact Us",
+    "searchPlaceholder": "Search models...",
+    "searchLabelMobile": "Search Models",
+    "languageLabelMobile": "Language",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "languageSelectorAriaLabel": "Select language"
+  },
+  "footer": {
+    "products": {
+      "title": "Products",
+      "brandSelect": "Choose a Brand",
+      "proGroup": "APSONIC Pro",
+      "emotoGroup": "APSONIC-EMOTO",
+      "categories": {
+        "underbone": "Underbone",
+        "street": "Street",
+        "sport": "Sport",
+        "scooter": "Scooter",
+        "atv": "ATV",
+        "tricycle": "Tricycle",
+        "proStreet": "Street",
+        "proOffroad": "Off-Road",
+        "emotoTricycle": "Tricycle"
+      }
+    },
+    "services": {
+      "title": "Services",
+      "manuals": "Product Manuals",
+      "networkLookup": "After-Sales Network Lookup"
+    },
+    "about": {
+      "title": "About",
+      "brandIntro": "Brand Introduction",
+      "brandCulture": "Brand Culture",
+      "history": "Our History",
+      "news": "News",
+      "social": "Social Contribution"
+    },
+    "contact": {
+      "title": "Contact",
+      "inquiry": "Business Inquiry"
+    },
+    "copyright": "APSONIC.Africa"
+  },
+  "sidebar": {
+    "help": "Help",
+    "storeLocator": "Store Locator"
+  },
+  "auth": {
+    "portalBadge": "Enterprise Portal",
+    "slogan": "Good Quality, Good Life",
+    "title": "Welcome Back",
+    "subtitle": "Sign in to manage products",
+    "emailLabel": "Email",
+    "emailPlaceholder": "Enter your email",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "submit": "Sign In",
+    "loading": "Signing in...",
+    "backToHome": "← Back to homepage",
+    "footerCopyright": "© {year} APSONIC. All Rights Reserved.",
+    "validation": {
+      "usernameRequired": "Email or username is required",
+      "passwordMinLength": "Password must be at least 6 characters"
+    },
+    "errors": {
+      "invalidCredentials": "Invalid credentials, please check and try again",
+      "connectionError": "Unable to connect to the server, please try again"
+    }
+  },
+  "contact": {
+    "heroTitle": "Let's Start a",
+    "heroTitleHighlight": "Conversation",
+    "heroDescription": "From finding the nearest dealer to technical support, our global team is ready to help.",
+    "form": {
+      "firstNameLabel": "First Name",
+      "firstNamePlaceholder": "Enter your first name",
+      "lastNameLabel": "Last Name",
+      "lastNamePlaceholder": "Enter your last name",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@company.com",
+      "phoneLabel": "Phone Number (optional)",
+      "phonePlaceholder": "+233 ...",
+      "departmentLabel": "Department",
+      "departmentOptions": {
+        "general": "General Inquiry",
+        "sales": "Sales & Fleet",
+        "dealership": "Dealership Application",
+        "support": "Technical Support",
+        "media": "Media & PR"
+      },
+      "subjectLabel": "Subject",
+      "subjectPlaceholder": "How can we help you?",
+      "messageLabel": "Message",
+      "messagePlaceholder": "Please describe your inquiry in detail...",
+      "submit": "Send Message",
+      "successTitle": "Message Sent Successfully",
+      "successDescription": "Thank you for contacting Apsonic. Our team will review your request and respond within 24 hours.",
+      "sendAnother": "Send Another Message",
+      "genericError": "Something went wrong. Please try again later."
+    },
+    "validation": {
+      "firstNameRequired": "First name is required",
+      "lastNameRequired": "Last name is required",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Email format is invalid",
+      "phoneInvalid": "Phone number format is invalid",
+      "departmentRequired": "Department is required",
+      "subjectRequired": "Subject is required",
+      "messageMinLength": "Message must be at least 20 characters"
+    },
+    "formSectionSubtitle": "Online Inquiry",
+    "formSectionTitle": "Send Us a Message",
+    "formSectionDescription": "Fill out the form below and our specialist team will get back to you within 24 hours with tailored support and answers.",
+    "infoTitle": "Contact Information",
+    "infoSubtitle": "Connect with our experts",
+    "supportTitle": "Customer Support",
+    "supportDesc": "For motorcycle warranty, local diagnostics, and technical queries.",
+    "salesTitle": "Sales & Fleet Sales",
+    "salesDesc": "For bulk procurement, corporate fleet accounts, and dealership queries.",
+    "hoursTitle": "Business Hours",
+    "hoursDesc": "Monday - Friday: 8:00 AM - 5:30 PM",
+    "supportStatus": "APSONIC support is online"
+  },
+  "products": {
+    "heading": "All Models",
+    "breadcrumbHome": "Home",
+    "breadcrumbProducts": "All Models",
+    "searchPlaceholder": "Search models...",
+    "filterAll": "All",
+    "filterAllDisp": "All",
+    "filterTypeLabel": "Type",
+    "filterDispLabel": "Displacement",
+    "filterBrandLabel": "Brand",
+    "filterExpand": "Filter",
+    "filterCollapse": "Collapse",
+    "noResults": "No models match your filters.",
+    "categories": {
+      "underbone": "Underbone",
+      "standard": "Standard",
+      "street": "Street",
+      "offroad": "Off-Road",
+      "scooter": "Scooter",
+      "atv": "ATV",
+      "tricycle": "Tricycle"
+    }
+  },
+  "services": {
+    "heroTitle": "Service & Support",
+    "heroSubtitle": "Our authorized diagnostics and parts network ensure your motorcycle is always road-ready.",
+    "heroHighlight": "Go Forward, Worry Free",
+    "coreServices": "Core Services",
+    "careSpares": "Authorized Care & Spares",
+    "branches": "Branches",
+    "officialOffices": "Official Offices",
+    "faq": "FAQ center",
+    "faqSubtitle": "Service and Warranty policy",
+    "featureCards": {
+      "locations": {
+        "title": "Two-Wheelers",
+        "description": "Model manuals and after-sales service network lookup",
+        "cta": "View Now"
+      },
+      "parts": {
+        "title": "Tricycles",
+        "description": "Model manuals and after-sales service network lookup",
+        "cta": "View Now"
+      }
+    }
+  },
+  "serviceDetail": {
+    "back": "Back to Services",
+    "tag": "Support Center",
+    "desc": "Download user guides, assembly videos, and exploded schematics for all models. We ensure every APSONIC motorcycle receives comprehensive coverage.",
+    "manuals": "Product Manuals",
+    "videos": "Assembly Guides",
+    "gallery": "Exploded Schematics",
+    "galleryDesc": "Browse HD parts catalogs to isolate, recognize, and order specific components.",
+    "download": "Download",
+    "inspect": "Inspect",
+    "updated": "Updated"
+  },
+  "metadata": {
+    "products": {
+      "title": "Motorcycles & Vehicles - APSONIC",
+      "description": "Browse the full APSONIC lineup - standard, street, off-road, underbone, and scooter motorcycles, ATVs, and tricycles."
+    },
+    "services": {
+      "title": "Service & Support - APSONIC",
+      "description": "Find APSONIC service centers, parts support, and answers to frequently asked questions across our West Africa dealer network."
+    },
+    "contact": {
+      "title": "Contact Us - APSONIC",
+      "description": "Get in touch with the APSONIC team - our specialists respond within 24 hours to help with sales, service, and support inquiries."
+    },
+    "locations": {
+      "title": "Two-Wheeler Service Support - APSONIC",
+      "description": "Manuals, service videos, and support resources for APSONIC two-wheeler models."
+    },
+    "parts": {
+      "title": "Tricycle Service Support - APSONIC",
+      "description": "Manuals, service videos, and support resources for APSONIC tricycle models."
+    }
+  },
+  "productDetail": {
+    "keyFeaturesTitle": "Key Performance Features",
+    "keyFeaturesSubtitleHighlight": "Top",
+    "keyFeaturesSubtitleRest": "ten selling points",
+    "reviewsTitle": "Let's see what users have to say:",
+    "reviewsTitleHighlight": "users",
+    "moreReviews": "More reviews",
+    "techSpecsTitle": "Technical Specs",
+    "fullParameters": "Full parameters",
+    "hideParameters": "Hide parameters",
+    "specs": {
+      "displacement": "DISPLACEMENT(ML)",
+      "wheelbase": "Wheelbase(MM)",
+      "boreStroke": "BORE(MM)XSTROKE(MM)",
+      "dimensions": "L(MM)XW(MM)XH(MM)",
+      "compressionRatio": "COMPRESSION RATIO",
+      "minGroundClearance": "MIN GROUND CLEARANCE(MM)",
+      "maxPower": "MAX POWER(KW/RPM)",
+      "weight": "N.W(KG)",
+      "maxTorque": "MAX TORQUE(N.m/RPM)",
+      "brake": "BRAKE",
+      "maxSpeed": "MAX SPEED(KM/H)",
+      "tyreSize": "TYRE SIZE",
+      "ignition": "IGNITION",
+      "fuelTankCapacity": "FUEL TANK CAPACITY(L)",
+      "starter": "STARTER",
+      "clutchType": "CLUTCH TYPE",
+      "engine": "Engine",
+      "frame": "Frame",
+      "headlights": "Headlights",
+      "rearAbsorber": "Rear absorber",
+      "pedal": "Pedal",
+      "maxLadenMass": "Maximum laden mass",
+      "multi": "Multi",
+      "functional": "functional",
+      "andFoldable": "and foldable",
+      "led": "LED"
+    },
+    "reviews": {
+      "items": {
+        "Muhammad": {
+          "author": "Muhammad",
+          "content": "Meets long-range needs. Reduce failure rate and maintenance costs."
+        },
+        "Rustam": {
+          "author": "Rustam",
+          "content": "A really great motorcycle, very satisfied, super cool and very high-quality. Meets long-range needs. Reduce failure rate and maintenance costs."
+        },
+        "Ahmed": {
+          "author": "Ahmed",
+          "content": "Hope there could be more models to choose from, really like your products. Meets long-range needs. Reduce failure rate and maintenance costs."
+        },
+        "Zainab's father, usually Zain": {
+          "author": "Zainab's father, usually Zain",
+          "content": "APSONIC is really famous and even sponsored the Africa Cup. Meets long-range needs. Reduce failure rate and maintenance costs."
+        }
+      }
+    },
+    "hero": {
+      "slogan1": "Even loaded",
+      "slogan2": "stays the master",
+      "slogan3": "of the road"
+    },
+    "storySplit": {
+      "title": "'Strong' impressive load-bearing ability",
+      "description": "The all-new developed four-rear-suspension reinforced frame, paired with a 15.5L enlarged fuel tank, thicker cargo racks, and a longer seat, along with unique decals, highlights the model's strong carrying capacity."
+    },
+    "aesthetic": {
+      "title": "Textured aesthetic design",
+      "subtitle": "Let's enjoy it together",
+      "subtitleHighlight": "enjoy"
+    },
+    "specBanners": {
+      "frame": {
+        "titleLine1": "Frame",
+        "description": "Four rear shock absorbing frame, stronger load-bearing capacity than ordinary GN frame.",
+        "metricLabel": "Maximum laden mass"
+      },
+      "rear-carrier": {
+        "titleLine1": "Rear carrier",
+        "titleLine2": "Rear absorber",
+        "description": "The thickened rear carrier and four rear shock absorbers design make it more suitable for heavy loads."
+      },
+      "engine": {
+        "titleLine1": "Engine",
+        "description": "An engine that can easily handle complex working conditions such as heavy loads and climbing slopes."
+      }
+    }
+  }
+}

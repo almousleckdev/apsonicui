@@ -1,0 +1,69 @@
+[
+  {
+    "id": "canton-fair-137",
+    "title": "Les produits innovants d'APSONIC font leurs débuts à la 137e Foire de Canton",
+    "excerpt": "APSONIC a présenté ses dernières technologies de moteur et de nouveaux modèles de motos à la prestigieuse Foire de Canton, attirant l'attention mondiale. Des visiteurs de plus de 50 pays ont manifesté un vif intérêt pour la technologie DuraCore™.",
+    "date": "2025-10-15",
+    "category": "Événement",
+    "thumbnail": "/images/news/2552aa1d3cea7ea23bf66b5d5720e1fe.jpg",
+    "authorName": "Apsonic News",
+    "authorImage": "/images/about-hero.png",
+    "content": [
+      {
+        "type": "paragraph",
+        "content": "La 137e Foire de Canton a vu le lancement en grande pompe de la nouvelle gamme de motos lourdes d'APSONIC. Ces modèles innovants sont spécialement conçus pour répondre aux besoins croissants de la logistique moderne et du transport personnel en Afrique."
+      },
+      {
+        "type": "image",
+        "content": "/images/news/2552aa1d3cea7ea23bf66b5d5720e1fe.jpg",
+        "caption": "Le stand d'APSONIC à la 137e Foire de Canton, présentant les nouveaux modèles de motos"
+      },
+      {
+        "type": "paragraph",
+        "content": "Des visiteurs de plus de 50 pays ont visité le pavillon d'APSONIC, montrant un vif intérêt pour la technologie de moteur DuraCore™. Cette innovation promet une dissipation thermique et une efficacité énergétique exceptionnelles, adaptées au climat africain."
+      }
+    ]
+  },
+  {
+    "id": "africa-cup-support",
+    "title": "APSONIC soutient la Coupe d'Afrique et les travaux d'entretien en Côte d'Ivoire",
+    "excerpt": "Contribuant aux communautés, APSONIC a fourni des véhicules et son soutien pour l'entretien urbain pendant la Coupe d'Afrique. Nous nous sommes associés aux autorités locales ivoiriennes pour assurer le bon déroulement des opérations.",
+    "date": "2025-08-20",
+    "category": "Communauté",
+    "thumbnail": "/images/news/非洲杯大屏幕1.png",
+    "authorName": "Relations d'Entreprise",
+    "authorImage": "/images/about-hero.png",
+    "content": [
+      {
+        "type": "paragraph",
+        "content": "APSONIC est fier d'annoncer un partenariat stratégique avec les autorités locales ivoiriennes pour assurer le bon déroulement de la Coupe d'Afrique des Nations 2025. Nous avons fait don d'une flotte de motos pour l'entretien de la ville."
+      },
+      {
+        "type": "image",
+        "content": "/images/news/非洲杯大屏幕1.png",
+        "caption": "Présentation de la marque APSONIC sur place lors de la Coupe d'Afrique"
+      }
+    ]
+  },
+  {
+    "id": "sailing-team-debut",
+    "title": "L'équipe de voile d'APSONIC fait ses débuts dans une compétition de classe mondiale",
+    "excerpt": "L'équipe de voile d'APSONIC a participé à sa première régate internationale de classe mondiale, mettant en valeur l'esprit d'équipe et la collaboration. Ce début marque une étape majeure dans le parcours mondial de notre marque.",
+    "date": "2025-07-10",
+    "category": "Sports",
+    "thumbnail": "/images/news/2d2060836b523eaf2074ccc2c5fff84.jpg",
+    "authorName": "Division Voile",
+    "authorImage": "/images/about-hero.png",
+    "content": [
+      {
+        "type": "paragraph",
+        "content": "L'esprit de progrès d'APSONIC prend le large : notre équipe a fait ses débuts internationaux dans une régate de classe mondiale, montrant que l'union fait la force."
+      },
+      {
+        "type": "image",
+        "content": "/images/news/2d2060836b523eaf2074ccc2c5fff84.jpg",
+        "caption": "L'équipe de voile d'APSONIC en pleine course"
+      }
+    ]
+  }
+]

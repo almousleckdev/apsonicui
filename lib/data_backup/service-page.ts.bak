@@ -1,0 +1,48 @@
+import type { FeatureCard } from "@/components/service";
+
+// Translated text (title/description/ctaText) comes from the "services"
+// namespace - see messages/README.md for the data-file-as-function-of-t pattern.
+// Non-text fields (id/image/href) are fixed regardless of locale.
+export function getFeatureCards(t: (key: string) => string): FeatureCard[] {
+  return [
+    {
+      id: "locations-manuals",
+      image: "/products/AP110-A-PLUS(白).png",
+      imageScale: 0.75,
+      title: t("featureCards.locations.title"),
+      description: t("featureCards.locations.description"),
+      ctaText: t("featureCards.locations.cta"),
+      href: "/services/locations",
+    },
+    {
+      id: "parts-tricycles",
+      image: "/dropdown/44.jpg",
+      title: t("featureCards.parts.title"),
+      description: t("featureCards.parts.description"),
+      ctaText: t("featureCards.parts.cta"),
+      href: "/services/parts",
+    },
+  ];
+}
+
+
+
+// Service coverage data
+export const SERVICE_COVERAGE_COUNTRIES = [
+  { flag: "🇬🇭", name: "Ghana GH" },
+  { flag: "🇹🇬", name: "Togo TG" },
+  { flag: "🇧🇯", name: "Benin BJ" },
+  { flag: "🇨🇮", name: "Ivory Coast CI" },
+  { flag: "🇧🇫", name: "Burkina Faso BF" },
+  { flag: "🇲🇱", name: "Mali ML" },
+  { flag: "🇬🇳", name: "Guinea GN" },
+  { flag: "🇰🇪", name: "Kenya KE" },
+  { flag: "🇺🇬", name: "Uganda UG" },
+  { flag: "🇹🇿", name: "Tanzania TZ" },
+];
+
+export const SERVICE_COVERAGE_STATS = {
+  servicePoints: "4,500+",
+  subsidiaries: "15",
+  dealers: "125+",
+};

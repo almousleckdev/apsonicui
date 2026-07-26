@@ -1,0 +1,69 @@
+[
+  {
+    "id": "canton-fair-137",
+    "title": "APSONIC Innovative Products Debut at the 137th Canton Fair",
+    "excerpt": "APSONIC showcased its latest engine technologies and new motorcycle models at the prestigious Canton Fair, attracting global attention. Visitors from over 50 countries showed great interest in the DuraCore™ engine technology.",
+    "date": "2025-10-15",
+    "category": "Event",
+    "thumbnail": "/images/news/2552aa1d3cea7ea23bf66b5d5720e1fe.jpg",
+    "authorName": "Apsonic News",
+    "authorImage": "/images/about-hero.png",
+    "content": [
+      {
+        "type": "paragraph",
+        "content": "The 137th China Import and Export Fair (Canton Fair) witnessed the grand launch of APSONIC's latest heavy-duty motorcycle lineup. These innovative models are carefully engineered to meet the growing demands of modern logistics and personal transit across Africa."
+      },
+      {
+        "type": "image",
+        "content": "/images/news/2552aa1d3cea7ea23bf66b5d5720e1fe.jpg",
+        "caption": "The APSONIC booth at the 137th Canton Fair, presenting the newest product models"
+      },
+      {
+        "type": "paragraph",
+        "content": "Visitors from over 50 countries visited the APSONIC pavilion, showing deep curiosity in the DuraCore™ engine technology. This innovation promises superior thermal dissipation and fuel efficiency, tailor-made for harsh African conditions."
+      }
+    ]
+  },
+  {
+    "id": "africa-cup-support",
+    "title": "APSONIC Supports Africa Cup and Côte d'Ivoire Maintenance Works",
+    "excerpt": "Contributing to communities, APSONIC provided vehicles and support for urban maintenance during the Africa Cup celebrations. We partnered with local Ivorian authorities to ensure smooth operations.",
+    "date": "2025-08-20",
+    "category": "Community",
+    "thumbnail": "/images/news/非洲杯大屏幕1.png",
+    "authorName": "Corporate Relations",
+    "authorImage": "/images/about-hero.png",
+    "content": [
+      {
+        "type": "paragraph",
+        "content": "APSONIC is proud to announce a strategic partnership with local Ivorian authorities to ensure smooth logistics during the 2025 Africa Cup of Nations. As part of community feedback, we donated a fleet of specialized cargo motorcycles."
+      },
+      {
+        "type": "image",
+        "content": "/images/news/非洲杯大屏幕1.png",
+        "caption": "APSONIC brand displays on site during the Africa Cup celebrations"
+      }
+    ]
+  },
+  {
+    "id": "sailing-team-debut",
+    "title": "APSONIC Sailing Team Makes Debut in World-Class Competition",
+    "excerpt": "The APSONIC Sailing Team participated in its first world-class international sailing regatta, showcasing team spirit and collaboration. This debut marks a major milestone in our brand's global journey.",
+    "date": "2025-07-10",
+    "category": "Sports",
+    "thumbnail": "/images/news/2d2060836b523eaf2074ccc2c5fff84.jpg",
+    "authorName": "Sailing Division",
+    "authorImage": "/images/about-hero.png",
+    "content": [
+      {
+        "type": "paragraph",
+        "content": "APSONIC's 'Go Forward' spirit moves to the oceans as our team participated in its first world-class international regatta, proving that with unity, no horizon is too distant."
+      },
+      {
+        "type": "image",
+        "content": "/images/news/2d2060836b523eaf2074ccc2c5fff84.jpg",
+        "caption": "The APSONIC Sailing Team competing at sea"
+      }
+    ]
+  }
+]

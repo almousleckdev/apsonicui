@@ -1,0 +1,324 @@
+"use client";
+
+import React, { useState } from "react";
+import Image from "next/image";
+import { motion } from "framer-motion";
+import { MdFileDownload } from "react-icons/md";
+import { ScrollReveal } from "@/components/ui/ScrollReveal";
+import {
+  MotorcyclePDFIcon,
+  MotorcycleImageIcon,
+  MotorcycleVideoIcon,
+} from "@/components/ui/MotorcycleIcons";
+import { VideoPlayer } from "@/components/ui/VideoPlayer";
+import { CategoryData } from "@/lib/data/service-detail-data";
+import { cn } from "@/lib/utils";
+import {
+  ANIMATION_VARIANTS,
+} from "@/lib/constants/animations";
+import { ImageLightbox } from "@/components/ui/ImageLightbox";
+import { Button } from "@/components/ui/Button";
+
+interface ServiceDetailPageProps {
+  title: string;
+  data: Record<string, CategoryData>;
+  heroImage: string;
+  heroColor?: string;
+  accentColor?: string;
+}
+
+export const ServiceDetailPage: React.FC<ServiceDetailPageProps> = ({
+  title,
+  data,
+  heroImage,
+  heroColor = "#0a1126",
+  accentColor = "#3b82f6", // blue-500
+}) => {
+  const categories = Object.keys(data);
+  const [selectedCategory, setSelectedCategory] = useState<string>(categories[0]);
+  const [lightbox, setLightbox] = React.useState<{
+    isOpen: boolean;
+    src: string;
+    alt: string;
+  }>({
+    isOpen: false,
+    src: "",
+    alt: "",
+  });
+
+  const currentData = data[selectedCategory];
+
+  const openLightbox = (src: string, alt: string) => {
+    setLightbox({ isOpen: true, src, alt });
+  };
+
+  return (
+    <main className="min-h-screen bg-white">
+      {/* Hero Section - Full Height */}
+      <div 
+        className="relative h-screen w-full overflow-hidden flex items-center justify-center text-center"
+        style={{ backgroundColor: heroColor }}
+      >
+        {/* Background Pattern */}
+        <div className="absolute inset-0 z-0">
+          <div 
+            className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full blur-[120px]" 
+            style={{ backgroundColor: `${accentColor}33` }} // 20% opacity
+          />
+          <div 
+            className="absolute bottom-[-20%] right-[-10%] w-[400px] h-[400px] rounded-full blur-[100px]" 
+            style={{ backgroundColor: `${accentColor}1A` }} // 10% opacity
+          />
+          <Image
+            src={heroImage}
+            alt="Background"
+            fill
+            sizes="100vw"
+            className="object-contain opacity-10 scale-150 rotate-[-10deg]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        </div>
+
+        <div className="relative z-10 container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <div 
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full border mb-6"
+              style={{ backgroundColor: `${accentColor}1A`, borderColor: `${accentColor}33` }}
+            >
+              <span className="text-xs font-bold uppercase tracking-widest" style={{ color: accentColor }}>
+                服务与支持中心
+              </span>
+            </div>
+            <h1 className="text-5xl md:text-8xl font-black text-white mb-8 tracking-tighter">
+              {title}
+            </h1>
+            <p className="text-gray-400 max-w-3xl mx-auto text-lg md:text-2xl font-light leading-relaxed">
+              下载各车型产品手册，装车视频。我们确保每一辆APSONIC摩托车都能获得最全方面的售后保障。
+            </p>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Category Tabs */}
+      {categories.length > 1 && (
+        <div className="sticky top-0 z-40 bg-white/90 border-b border-gray-100 backdrop-blur-xl">
+          <div className="container mx-auto px-4">
+            <div className="flex gap-12 overflow-x-auto no-scrollbar justify-center">
+              {categories.map((key) => (
+                <button
+                  key={key}
+                  onClick={() => setSelectedCategory(key)}
+                  className={cn(
+                    "px-4 py-8 font-black text-sm uppercase tracking-widest transition-all relative",
+                    selectedCategory === key
+                      ? "text-brand-green"
+                      : "text-gray-400 hover:text-gray-900",
+                  )}
+                >
+                  {data[key].title}
+                  {selectedCategory === key && (
+                    <motion.div
+                      layoutId="activeTab"
+                      className="absolute bottom-0 inset-x-0 h-1 bg-brand-green rounded-full shadow-[0_0_12px_rgba(40,167,69,0.5)]"
+                    />
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div key={selectedCategory} className="container mx-auto px-4 py-20">
+        {/* PDF Downloads Section */}
+        <ScrollReveal
+          variant="fadeUp"
+          delay={0.1}
+          duration={0.6}
+          amount={0.1}
+          once={false}
+        >
+          <div className="mb-24">
+            <div className="flex items-center gap-4 mb-14">
+              <div className="w-14 h-14 rounded-2xl bg-brand-green/10 flex items-center justify-center">
+                <MotorcyclePDFIcon size={32} className="text-brand-green" />
+              </div>
+              <div>
+                <h2 className="text-3xl font-black text-gray-900 tracking-tight">
+                  产品手册
+                </h2>
+              </div>
+            </div>
+            <motion.div
+              variants={ANIMATION_VARIANTS.staggerContainer}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: false, amount: 0.05 }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10"
+            >
+              {currentData.manuals.map((manual) => (
+                <motion.div
+                  key={manual.id}
+                  variants={ANIMATION_VARIANTS.fadeUp}
+                  className="rounded-[32px] p-8 transition-all group border border-transparent hover:border-gray-100 hover:shadow-xl bg-transparent"
+                >
+                  <div
+                    onClick={() => openLightbox(manual.imageUrl, manual.title)}
+                    className="relative aspect-[4/3] mb-6 rounded-2xl overflow-hidden flex items-center justify-center p-4 cursor-zoom-in"
+                  >
+                    <Image
+                      src={manual.imageUrl}
+                      alt={manual.title}
+                      fill
+                      className="object-contain transition-transform duration-700 group-hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, 400px"
+                    />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-brand-green transition-colors">
+                    {manual.title}
+                  </h3>
+                  <p className="text-gray-500 mb-6 leading-relaxed line-clamp-2 text-sm">
+                    {manual.description}
+                  </p>
+
+                  <div className="flex items-center justify-between pt-6 border-t border-gray-100">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-1">
+                        Updated
+                      </span>
+                      <span className="text-sm font-semibold text-gray-900">
+                        {manual.updated}
+                      </span>
+                    </div>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      icon={<MdFileDownload className="text-lg" />}
+                      iconPosition="right"
+                      onClick={() => window.open(manual.pdfUrl, '_blank')}
+                      className="rounded-xl px-6 h-11"
+                    >
+                      下载手册
+                    </Button>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+        </ScrollReveal>
+
+        {/* Video Section */}
+        {currentData.videos && currentData.videos.length > 0 && (
+          <ScrollReveal
+            variant="scaleIn"
+            delay={0.1}
+            duration={0.6}
+            amount={0.1}
+            once={false}
+          >
+            <div className="mb-24">
+              <div className="flex items-center gap-4 mb-14">
+                <div className="w-14 h-14 rounded-2xl bg-brand-green/10 flex items-center justify-center">
+                  <MotorcycleVideoIcon size={32} className="text-brand-green" />
+                </div>
+                <div>
+                  <h2 className="text-3xl font-black text-gray-900 tracking-tight">
+                    视频教程
+                  </h2>
+                  <p className="text-gray-500 text-sm">掌握您的车辆维护技巧</p>
+                </div>
+              </div>
+              <motion.div
+                variants={ANIMATION_VARIANTS.staggerContainer}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: false, amount: 0.05 }}
+                className="grid grid-cols-1 md:grid-cols-2 gap-10"
+              >
+                {currentData.videos.map((video) => (
+                  <motion.div key={video.id} variants={ANIMATION_VARIANTS.fadeUp}>
+                    <VideoPlayer
+                      youtubeId={video.youtubeId}
+                      thumbnail={video.thumbnail}
+                      title={video.title}
+                      description={video.description}
+                    />
+                  </motion.div>
+                ))}
+              </motion.div>
+            </div>
+          </ScrollReveal>
+        )}
+
+        {/* Image Gallery */}
+        {currentData.images && currentData.images.length > 0 && (
+          <ScrollReveal
+            variant="fadeIn"
+            delay={0.1}
+            duration={0.6}
+            amount={0.1}
+            once={false}
+          >
+            <div className="rounded-[64px] p-12 lg:p-24 relative overflow-hidden border border-gray-100">
+              <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-brand-green/5 rounded-full blur-[80px]" />
+
+              <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10 mb-16 relative z-10">
+                <div className="max-w-xl">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-14 h-14 rounded-[20px] bg-brand-green flex items-center justify-center shadow-lg shadow-brand-green/20">
+                      <MotorcycleImageIcon size={32} className="text-white" />
+                    </div>
+                    <h2 className="text-4xl font-black text-gray-900 tracking-tighter">
+                      实物图解
+                    </h2>
+                  </div>
+                  <p className="text-gray-500 text-lg leading-relaxed">
+                    探索 {currentData.title}{" "}
+                    的内部构造。点击查看高清分解图，帮助您轻松定位和识别每一个原厂细节。
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
+                {currentData.images.map((img, idx) => (
+                  <motion.div
+                    key={idx}
+                    whileHover={{ y: -6, scale: 1.01 }}
+                    onClick={() =>
+                      openLightbox(img, `${currentData.title} Detail ${idx + 1}`)
+                    }
+                    className="relative aspect-square rounded-[32px] overflow-hidden bg-white border border-gray-100 flex items-center justify-center p-8 cursor-zoom-in shadow-sm hover:shadow-xl transition-all duration-500 group"
+                  >
+                    <Image
+                      src={img}
+                      alt={`Gallery ${idx}`}
+                      fill
+                      sizes="(max-width: 640px) 50vw, 25vw"
+                      className="object-contain p-8 transition-transform duration-1000 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform bg-gradient-to-t from-gray-900/40 to-transparent">
+                      <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center ml-auto">
+                        <MotorcycleImageIcon size={20} className="text-white" />
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </ScrollReveal>
+        )}
+      </div>
+
+      <ImageLightbox
+        isOpen={lightbox.isOpen}
+        onClose={() => setLightbox({ ...lightbox, isOpen: false })}
+        src={lightbox.src}
+        alt={lightbox.alt}
+      />
+    </main>
+  );
+};
