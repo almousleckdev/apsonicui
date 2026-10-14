@@ -5,9 +5,10 @@ const ok = (data: unknown) => new Response(JSON.stringify({ success: true, data 
 const status = (code: number) => new Response(JSON.stringify({ message: 'nope' }), { status: code });
 
 type Handler = (url: string, init: RequestInit) => Response | Promise<Response>;
+type Call = { url: string; init: RequestInit; headers: Headers };
 
 function stubFetch(handler: Handler) {
-  const calls: { url: string; init: RequestInit; headers: Headers }[] = [];
+  const calls: Call[] = [];
   const fetchMock = vi.fn(async (url: string, init: RequestInit = {}) => {
     calls.push({ url, init, headers: new Headers(init.headers) });
     return handler(url, init);
@@ -23,7 +24,7 @@ async function loadClient() {
   return { ...client, tokenStorage };
 }
 
-const refreshCalls = (calls: { url: string }[]) => calls.filter((c) => c.url.endsWith('/auth/refresh'));
+const refreshCalls = (calls: Call[]) => calls.filter((c) => c.url.endsWith('/auth/refresh'));
 
 describe('apiClient', () => {
   beforeEach(() => {
@@ -57,7 +58,7 @@ describe('apiClient', () => {
 
   it('on 401 refreshes the session once and retries with the new token', async () => {
     let first = true;
-    const calls = stubFetch((url, init) => {
+    const calls = stubFetch((url) => {
       if (url.endsWith('/auth/refresh')) return ok({ accessToken: 'fresh' });
       if (first) {
         first = false;
