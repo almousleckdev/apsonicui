@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Link } from "@/lib/i18n/navigation";
 import { useLocale } from "next-intl";
 import { motion } from "framer-motion";
 import { ENTERPRISE_EASE } from "@/lib/constants/animations";
+import { categoryService, CategoryItem } from "@/services/category";
 import { cn } from "@/lib/utils";
 
 interface ProductsDropdownProps {
@@ -15,6 +16,80 @@ interface ProductsDropdownProps {
   onClose?: () => void;
 }
 
+const SIDEBAR_TITLES: Record<string, string> = {
+  zh: "车型类别",
+  en: "VEHICLE CATEGORIES",
+  fr: "CATÉGORIES DE VÉHICULES",
+};
+
+const CATEGORIES_NAV_GROUPS = [
+  {
+    id: "two-wheeler",
+    label: { zh: "两轮车", en: "Two-wheeler", fr: "Deux-roues" },
+  },
+  {
+    id: "three-wheeler",
+    label: { zh: "三轮车", en: "Three-wheeler", fr: "Trois-roues" },
+  },
+  {
+    id: "atv",
+    label: { zh: "全地形", en: "All-Terrain (ATV)", fr: "Tout-terrain (ATV)" },
+  },
+];
+
+const DEFAULT_SUBCATEGORIES_MAP: Record<
+  string,
+  Array<{
+    id: string;
+    label: Record<string, string>;
+    image: string;
+    href: string;
+  }>
+> = {
+  "two-wheeler": [
+    {
+      id: "standard",
+      label: { zh: "骑士车", en: "Knight", fr: "Knight" },
+      image: "/categories/骑士车/AP125-K(1.2).png",
+      href: "/products?category=standard",
+    },
+    {
+      id: "street",
+      label: { zh: "街车", en: "Street", fr: "Street" },
+      image: "/categories/街车/AP125-27 (2.2).png",
+      href: "/products?category=street",
+    },
+    {
+      id: "underbone",
+      label: { zh: "弯梁车", en: "Underbone", fr: "Underbone" },
+      image: "/categories/弯梁车/AP110 (2).png",
+      href: "/products?category=underbone",
+    },
+    {
+      id: "scooter",
+      label: { zh: "踏板车", en: "Scooter", fr: "Scooter" },
+      image: "/categories/踏板车/AP125T-4 (2).png",
+      href: "/products?category=scooter",
+    },
+  ],
+  "three-wheeler": [
+    {
+      id: "tricycle",
+      label: { zh: "货运三轮车", en: "Cargo Tricycle", fr: "Tricycle Cargo" },
+      image: "/categories/三轮车/AP200ZH-B (2.2).png",
+      href: "/products?category=tricycle",
+    },
+  ],
+  atv: [
+    {
+      id: "atv",
+      label: { zh: "全地形车", en: "All-Terrain (ATV)", fr: "Tout-terrain (ATV)" },
+      image: "/categories/骑士车/AP125-K(1.2).png",
+      href: "/products?category=atv",
+    },
+  ],
+};
+
 export const ProductsDropdown: React.FC<ProductsDropdownProps> = ({
   onMouseEnter,
   onMouseLeave,
@@ -23,93 +98,56 @@ export const ProductsDropdown: React.FC<ProductsDropdownProps> = ({
 }) => {
   const locale = useLocale();
   const [activeCategory, setActiveCategory] = useState<string>("two-wheeler");
+  const [dbCategories, setDbCategories] = useState<CategoryItem[]>([]);
 
-  // Multilingual sidebar titles
-  const sidebarTitles: Record<string, string> = {
-    zh: "车型类别",
-    en: "VEHICLE CATEGORIES",
-    fr: "CATÉGORIES DE VÉHICULES",
-  };
+  useEffect(() => {
+    categoryService.getPublicCategories().then((data: CategoryItem[]) => {
+      if (data && data.length > 0) {
+        setDbCategories(data);
+      }
+    }).catch(() => {});
+  }, []);
 
-  const categoriesList = [
-    {
-      id: "two-wheeler",
-      label: { zh: "两轮车", en: "Two-wheeler", fr: "Deux-roues" },
-    },
-    {
-      id: "three-wheeler",
-      label: { zh: "三轮车", en: "Three-wheeler", fr: "Trois-roues" },
-    },
-    {
-      id: "atv",
-      label: { zh: "全地形", en: "All-Terrain (ATV)", fr: "Tout-terrain (ATV)" },
-    },
-  ];
+  const subcategoriesMap = React.useMemo(() => {
+    if (!dbCategories || dbCategories.length === 0) {
+      return DEFAULT_SUBCATEGORIES_MAP;
+    }
 
-  const subcategoriesMap: Record<
-    string,
-    Array<{
-      id: string;
-      label: Record<string, string>;
-      image: string;
-      href: string;
-    }>
-  > = {
-    "two-wheeler": [
-      {
-        id: "standard",
-        label: { zh: "骑士车", en: "Knight", fr: "Knight" },
-        image: "/categories/骑士车/AP125-K(1.2).png",
-        href: "/products?category=standard",
-      },
-      {
-        id: "street",
-        label: { zh: "街车", en: "Street", fr: "Street" },
-        image: "/categories/街车/AP125-27 (2.2).png",
-        href: "/products?category=street",
-      },
-      {
-        id: "offroad",
-        label: { zh: "越野车", en: "Off-Road", fr: "Tout-Terrain" },
-        image: "/products/AP250GY (1).png",
-        href: "/products?category=offroad",
-      },
-      {
-        id: "underbone",
-        label: { zh: "弯梁车", en: "Underbone", fr: "Underbone" },
-        image: "/categories/弯梁车/AP110 (2).png",
-        href: "/products?category=underbone",
-      },
-      {
-        id: "scooter",
-        label: { zh: "踏板车", en: "Scooter", fr: "Scooter" },
-        image: "/categories/踏板车/AP125T/AP125T 右侧 精修 白（2）.png",
-        href: "/products?category=scooter",
-      },
-    ],
-    "three-wheeler": [
-      {
-        id: "passenger",
-        label: { zh: "载人三轮车", en: "Passenger Tricycle", fr: "Tricycle Passager" },
-        image: "/categories/三轮车/特殊/AP150ZK (1).png",
-        href: "/products?category=tricycle&search=ZK",
-      },
-      {
-        id: "cargo",
-        label: { zh: "载货三轮车", en: "Cargo Tricycle", fr: "Tricycle Cargo" },
-        image: "/categories/三轮车/AP150ZH-175 更新/AP150ZH-175 MAX (1).png",
-        href: "/products?category=tricycle&search=ZH",
-      },
-    ],
-    atv: [
-      {
-        id: "atv-sub",
-        label: { zh: "全地形", en: "ATV", fr: "ATV" },
-        image: "/categories/ATV/AP150ST-250 正右侧 投影.png",
-        href: "/products?category=atv",
-      },
-    ],
-  };
+    const map: Record<string, Array<{ id: string; label: Record<string, string>; image: string; href: string }>> = {
+      "two-wheeler": [],
+      "three-wheeler": [],
+      atv: [],
+    };
+
+    dbCategories.forEach((cat) => {
+      const slug = (cat.slug || "").toLowerCase();
+      const parent = (cat.parentType || "").toLowerCase();
+      const item = {
+        id: String(cat.id || slug),
+        label: {
+          zh: cat.nameZh || cat.name || cat.nameEn || slug,
+          en: cat.nameEn || cat.name || slug,
+          fr: cat.nameFr || cat.nameEn || cat.name || slug,
+        },
+        image: cat.imageUrl || "/categories/弯梁车/AP110 (2).png",
+        href: `/products?category=${slug}`,
+      };
+
+      if (parent === "three-wheeler" || slug.includes("tri") || slug.includes("cargo") || slug.includes("passenger") || slug.includes("三轮")) {
+        map["three-wheeler"].push(item);
+      } else if (parent === "atv" || slug.includes("atv") || slug.includes("terrain") || slug.includes("全地形")) {
+        map["atv"].push(item);
+      } else {
+        map["two-wheeler"].push(item);
+      }
+    });
+
+    if (map["two-wheeler"].length === 0) map["two-wheeler"] = DEFAULT_SUBCATEGORIES_MAP["two-wheeler"];
+    if (map["three-wheeler"].length === 0) map["three-wheeler"] = DEFAULT_SUBCATEGORIES_MAP["three-wheeler"];
+    if (map["atv"].length === 0) map["atv"] = DEFAULT_SUBCATEGORIES_MAP["atv"];
+
+    return map;
+  }, [dbCategories]);
 
   const currentSubcategories = subcategoriesMap[activeCategory] || [];
 
@@ -130,14 +168,13 @@ export const ProductsDropdown: React.FC<ProductsDropdownProps> = ({
     >
       <div className="max-w-[1360px] mx-auto px-4 sm:px-8">
         <div className="flex">
-          
-          {/* Left Category Sidebar (Super Compact Height) */}
+          {/* Left Category Sidebar */}
           <div className="w-[200px] py-3 pr-4 border-r border-zinc-100 shrink-0">
             <span className="text-[9px] font-black tracking-widest text-zinc-400 uppercase mb-1.5 block">
-              {sidebarTitles[locale] || sidebarTitles.en}
+              {SIDEBAR_TITLES[locale] || SIDEBAR_TITLES.en}
             </span>
             <div className="space-y-0.5">
-              {categoriesList.map((category) => {
+              {CATEGORIES_NAV_GROUPS.map((category) => {
                 const isActive = activeCategory === category.id;
                 const displayLabel = category.label[locale as keyof typeof category.label] || category.label.en;
                 return (
@@ -162,7 +199,7 @@ export const ProductsDropdown: React.FC<ProductsDropdownProps> = ({
             </div>
           </div>
 
-          {/* Right Subcategories Grid (Super Flat Layout) */}
+          {/* Right Subcategories Grid */}
           <div className="flex-1 py-3 pl-6 grid grid-cols-5 gap-4 items-center">
             {currentSubcategories.map((sub) => {
               const displaySubLabel = sub.label[locale as keyof typeof sub.label] || sub.label.en;
@@ -176,13 +213,13 @@ export const ProductsDropdown: React.FC<ProductsDropdownProps> = ({
                   <span className="text-[11px] font-bold text-zinc-500 tracking-wide group-hover:text-brand-green transition-colors block mb-2">
                     {displaySubLabel}
                   </span>
-                  
-                  {/* Uniform Aspect-ratio Container for Equal Sized Images */}
+
                   <div className="relative w-full h-[76px] flex items-center justify-center">
                     <Image
                       src={sub.image}
                       alt={displaySubLabel}
                       fill
+                      unoptimized={sub.image.startsWith("/uploads") || sub.image.startsWith("http")}
                       sizes="120px"
                       className="object-contain transition-transform duration-500 group-hover:scale-105 drop-shadow-[0_4px_6px_rgba(0,0,0,0.02)]"
                     />
@@ -191,7 +228,6 @@ export const ProductsDropdown: React.FC<ProductsDropdownProps> = ({
               );
             })}
           </div>
-
         </div>
       </div>
     </motion.div>

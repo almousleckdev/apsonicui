@@ -15,7 +15,7 @@ interface ProductHeroProps {
   productId: string;
 }
 
-export const ProductHero: React.FC<ProductHeroProps> = () => {
+export const ProductHero: React.FC<ProductHeroProps> = ({ content }) => {
   const reduceMotion = useReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
 
@@ -26,6 +26,8 @@ export const ProductHero: React.FC<ProductHeroProps> = () => {
   });
   const imageY = useTransform(scrollYProgress, [0, 1], ["0%", "12%"]);
   const contentOpacity = useTransform(scrollYProgress, [0, 0.8, 1], [1, 1, 0]);
+
+  const heroSrc = (content as any)?.heroImageUrl || content?.middle || "/products/details/producdetailhero.jpg";
 
   return (
     <section
@@ -41,11 +43,12 @@ export const ProductHero: React.FC<ProductHeroProps> = () => {
         className="relative w-full h-auto block z-0"
       >
         <Image
-          src="/products/details/producdetailhero.jpg"
+          src={heroSrc}
           alt="APSONIC Product Hero"
           width={2000}
           height={1023}
           priority
+          loading="eager"
           className="w-full h-auto block object-contain"
           sizes="100vw"
         />

@@ -1,0 +1,118 @@
+'use client';
+import { ActionModal } from "@/components/admin/ActionModal";
+
+import React, { useState, useEffect } from 'react';
+import { AdminLayout } from '@/components/admin/AdminLayout';
+import { HeroSectionEditor } from '@/components/admin/homepage/HeroSectionEditor';
+import { FeaturedModelsEditor } from '@/components/admin/homepage/FeaturedModelsEditor';
+import { LineupCategoriesEditor } from '@/components/admin/homepage/LineupCategoriesEditor';
+import { homepageService } from '@/services/homepage-service';
+import { HomePageConfig, DEFAULT_HOMEPAGE_CONFIG } from '@/lib/types/homepage';
+import { Save, RefreshCw, CheckCircle2 } from 'lucide-react';
+
+export default function AdminHomePage() {
+  const [config, setConfig] = useState<HomePageConfig>(DEFAULT_HOMEPAGE_CONFIG);
+  const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const cfg = await homepageService.getHomepageConfig();
+        setConfig(cfg);
+      } catch (error) {
+        console.error("Failed to load config", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchConfig();
+  }, []);
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await homepageService.saveHomepageConfig(config);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (error) {
+      alert("Failed to save configuration");
+    }
+  };
+
+  const [showResetModal, setShowResetModal] = useState(false);
+
+  const handleReset = () => {
+    setShowResetModal(true);
+  };
+
+  const confirmReset = async () => {
+    try {
+      const def = await homepageService.resetToDefault();
+      setConfig(def);
+      setShowResetModal(false);
+    } catch (error) {
+      alert("Failed to reset configuration");
+    }
+  };
+
+  if (loading) {
+    return <AdminLayout><div className="p-8 text-center text-zinc-500 font-medium">Loading config...</div></AdminLayout>;
+  }
+
+  return (
+    <AdminLayout>
+      <form onSubmit={handleSave} className="space-y-6 font-sans max-w-7xl mx-auto pb-12">
+        {/* Top Control Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-zinc-100 shadow-sm">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-extrabold text-zinc-900 tracking-tight">Home Page Content Management</h1>
+            <p className="text-xs text-zinc-500 font-medium mt-0.5">Manage hero videos, titles, slogans, featured model slides, and category lineups.</p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            {saved && (
+              <span className="flex items-center gap-1.5 text-emerald-600 text-xs font-bold bg-emerald-50 px-3.5 py-2.5 rounded-xl border border-emerald-200/60 animate-in fade-in">
+                <CheckCircle2 className="w-4 h-4 text-brand-green" /> Saved Successfully!
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={handleReset}
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer"
+            >
+              <RefreshCw className="w-3.5 h-3.5" /> Reset
+            </button>
+            <button
+              type="submit"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-green text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-brand-green/20 hover:bg-green-700 transition-all cursor-pointer"
+            >
+              <Save className="w-4 h-4" /> Save Content Changes
+            </button>
+          </div>
+        </div>
+
+        {/* 1. Hero Section Management */}
+        <HeroSectionEditor hero={config.hero} onChange={(hero) => setConfig({ ...config, hero })} />
+
+        {/* 2. Featured Models Section Management */}
+        <FeaturedModelsEditor models={config.recommendedModels} onChange={(recommendedModels) => setConfig({ ...config, recommendedModels })} />
+
+        {/* 3. Category Lineup Section Management */}
+        <LineupCategoriesEditor categories={config.categories} onChange={(categories) => setConfig({ ...config, categories })} />
+
+        <ActionModal
+          isOpen={showResetModal}
+          onClose={() => setShowResetModal(false)}
+          onConfirm={confirmReset}
+          variant="danger"
+          title="Reset Homepage Config"
+          description="Are you sure you want to reset the homepage content to system defaults? All custom videos, slogans, and lineup data will be lost."
+          confirmLabel="Reset Defaults"
+          cancelLabel="Cancel"
+          expectedConfirmationName="RESET"
+        />
+      </form>
+    </AdminLayout>
+  );
+}

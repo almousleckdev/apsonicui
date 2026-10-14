@@ -26,9 +26,6 @@ export const getCountryISOCode = (countryName: string): string | null => {
   return countryCode || null;
 };
 
-/**
- * Get country name from ISO code, derived from lib/data/countries.ts
- */
 export const getCountryNameFromISOCode = (code: string): string => {
   return getCountryByIso3(code)?.name || '';
 };

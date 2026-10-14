@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
@@ -20,6 +20,18 @@ export const ImageLightbox: React.FC<ImageLightboxProps> = ({
   currentIndex,
   onChangeIndex,
 }) => {
+  const handleNext = useCallback(() => {
+    if (images.length === 0) return;
+    const nextIdx = (currentIndex + 1) % images.length;
+    onChangeIndex(nextIdx);
+  }, [currentIndex, images.length, onChangeIndex]);
+
+  const handlePrev = useCallback(() => {
+    if (images.length === 0) return;
+    const prevIdx = (currentIndex - 1 + images.length) % images.length;
+    onChangeIndex(prevIdx);
+  }, [currentIndex, images.length, onChangeIndex]);
+
   // Prevent body scrolling
   useEffect(() => {
     if (isOpen) {
@@ -47,19 +59,7 @@ export const ImageLightbox: React.FC<ImageLightboxProps> = ({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, currentIndex, images]);
-
-  const handleNext = () => {
-    if (images.length === 0) return;
-    const nextIdx = (currentIndex + 1) % images.length;
-    onChangeIndex(nextIdx);
-  };
-
-  const handlePrev = () => {
-    if (images.length === 0) return;
-    const prevIdx = (currentIndex - 1 + images.length) % images.length;
-    onChangeIndex(prevIdx);
-  };
+  }, [isOpen, handleNext, handlePrev, onClose]);
 
   const activeSrc = images[currentIndex] || "";
 

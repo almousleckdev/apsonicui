@@ -1,3 +1,5 @@
+import { cmsPagesService } from "@/services/cms-pages";
+import { DynamicCmsPageViewer } from "@/components/features/DynamicCmsPageViewer";
 import React from "react";
 import type { Metadata } from "next";
 import Image from "next/image";
@@ -31,6 +33,21 @@ interface ServicesPageProps {
 
 export default async function ServicesPage({ params }: ServicesPageProps) {
   const { locale } = await params;
+  
+  // Safe Migration Hook: Check if CMS version exists and is published
+  try {
+    const cmsPage = await cmsPagesService.getPublicPageBySlug('services');
+    if (cmsPage && cmsPage.status === 'PUBLISHED' && cmsPage.publishedSnapshot) {
+      return (
+        <main className="min-h-screen bg-white">
+          <DynamicCmsPageViewer page={cmsPage.publishedSnapshot} />
+        </main>
+      );
+    }
+  } catch (e) {
+    // CMS page doesn't exist or not published, silently fallback to static version
+  }
+
   const t = await getTranslations("services");
   const cards = getFeatureCards(t);
   const faqs = getLocalizedFaqs(locale);

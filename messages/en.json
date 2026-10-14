@@ -110,6 +110,7 @@
       "emailRequired": "Email is required",
       "emailInvalid": "Email format is invalid",
       "phoneInvalid": "Phone number format is invalid",
+      "countryRequired": "Country is required",
       "departmentRequired": "Department is required",
       "subjectRequired": "Subject is required",
       "messageMinLength": "Message must be at least 20 characters"

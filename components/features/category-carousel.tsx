@@ -8,15 +8,18 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "@/lib/i18n/navigation";
 import { DEFAULT_CATEGORIES } from "@/lib/data/featured-models";
 import { PREMIUM_SPRING } from "@/lib/constants/animations";
+import { homepageService } from "@/services/homepage-service";
 import { cn } from "@/lib/utils";
+import { HomeCategoryItem } from "@/lib/types/homepage";
 
 interface CategoryCarouselProps {
   className?: string;
+  initialConfig?: HomeCategoryItem[];
 }
 
-export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({ className }) => {
+export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({ className, initialConfig }) => {
   const locale = useLocale();
-  const categories = DEFAULT_CATEGORIES;
+  const categories = initialConfig && initialConfig.length > 0 ? initialConfig : DEFAULT_CATEGORIES;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [itemsPerView, setItemsPerView] = useState(3);
 
@@ -50,8 +53,9 @@ export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({ className })
   const canScrollLeft = clampedIndex > 0;
   const canScrollRight = clampedIndex < maxIndex;
 
-  const getLocalizedName = (id: string, name: string) => {
+  const getLocalizedName = (cat: any) => {
     if (locale === "zh") {
+      if (cat.nameZh) return cat.nameZh;
       const mapping: Record<string, string> = {
         standard: "骑士车",
         street: "街车",
@@ -61,9 +65,10 @@ export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({ className })
         atv: "ATV",
         tricycle: "三轮车",
       };
-      return mapping[id] || name;
+      return mapping[cat.id] || cat.name;
     }
-    return name;
+    if (locale === "fr" && cat.nameFr) return cat.nameFr;
+    return cat.name;
   };
 
   return (
@@ -105,46 +110,47 @@ export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({ className })
               animate={{ x: `-${clampedIndex * (100 / itemsPerView)}%` }}
               transition={{ type: "spring", stiffness: 220, damping: 26, mass: 1 }}
             >
-              {categories.map((category) => (
-                <div
-                  key={category.id}
-                  style={{ width: `${100 / itemsPerView}%` }}
-                  className="flex-shrink-0 px-4"
-                >
-                  <Link
-                    href={category.href}
-                    className="group block relative w-full overflow-hidden cursor-pointer outline-none rounded-xl"
+              {categories.map((category, index) => {
+                return (
+                  <div
+                    key={category.id}
+                    style={{ width: `${100 / itemsPerView}%` }}
+                    className="flex-shrink-0 px-4"
                   >
-                    <motion.div
-                      whileHover={{ y: -6 }}
-                      whileTap={{ scale: 0.98 }}
-                      transition={PREMIUM_SPRING}
-                      className="flex flex-col items-center"
+                    <Link
+                      href={category.href}
+                      className="group block relative w-full overflow-hidden cursor-pointer outline-none rounded-xl"
                     >
-                      {/* Image container with no white card background */}
-                      <div className="relative w-full aspect-[4/3] flex items-center justify-center">
-                        <Image
-                          src={category.image}
-                          alt={category.name}
-                          fill
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 30vw"
-                          className={cn(
-                            "object-contain p-2 transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-105",
-                            category.imageClassName
-                          )}
-                        />
-                      </div>
+                      <motion.div
+                        whileHover={{ y: -6 }}
+                        whileTap={{ scale: 0.98 }}
+                        transition={PREMIUM_SPRING}
+                        className="flex flex-col items-center"
+                      >
+                        {/* Image container on clean normal white background */}
+                        <div className="relative w-full aspect-[4/3] flex items-center justify-center">
+                          <Image
+                            src={category.image}
+                            alt={category.name}
+                            fill
+                            priority={index < 3}
+                            loading={index < 3 ? "eager" : "lazy"}
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 30vw"
+                            className="object-contain p-2 transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-105"
+                          />
+                        </div>
 
-                      {/* Text */}
-                      <div className="mt-4 flex flex-col items-center">
-                        <h3 className="text-xl sm:text-2xl font-bold text-zinc-900 group-hover:text-brand-green transition-colors duration-300">
-                          {getLocalizedName(category.id, category.name)}
-                        </h3>
-                      </div>
-                    </motion.div>
-                  </Link>
-                </div>
-              ))}
+                        {/* Category Name below the image */}
+                        <div className="mt-4 flex flex-col items-center">
+                          <h3 className="text-xl sm:text-2xl font-bold text-zinc-900 group-hover:text-brand-green transition-colors duration-300">
+                            {getLocalizedName(category)}
+                          </h3>
+                        </div>
+                      </motion.div>
+                    </Link>
+                  </div>
+                );
+              })}
             </motion.div>
           </div>
 

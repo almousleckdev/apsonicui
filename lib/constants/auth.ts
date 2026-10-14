@@ -5,3 +5,4 @@ export const ADMIN_AUTH_CONSTANTS = {
 } as const;
 
 export const BRAND_TAGLINE_EN = 'Good Quality, Good Life';
+export const BRAND_TAGLINE_ZH = '好质量 好生活';

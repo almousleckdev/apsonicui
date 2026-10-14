@@ -1,57 +1,82 @@
 // Africa map configuration for Service Support
-import { COUNTRIES } from '@/lib/data/countries';
+import { COUNTRIES, CountryInfo, AfricaRegion } from '@/lib/data/countries';
 
-function isoCodesForRegion(region: 'west' | 'east' | 'central' | 'southern'): string[] {
+function isoCodesForRegion(region: AfricaRegion): string[] {
   return COUNTRIES.filter((c) => c.region === region).map((c) => c.iso3);
 }
 
+const westCodes = isoCodesForRegion('west');
+const centralCodes = isoCodesForRegion('central');
+const eastCodes = isoCodesForRegion('east');
+const southernCodes = isoCodesForRegion('southern');
+
 export const AFRICA_MAP_CONFIG = {
-  // Map bounds for Africa continent
   bounds: {
-    // Tighter Africa continent bounds [west, south, east, north]
     africa: [-25, -36, 55, 38] as [number, number, number, number],
   },
-
-  // Strict bounds to keep view on Africa
   maxBounds: [-30, -40, 65, 45] as [number, number, number, number],
-
-  // Refined default view
   defaultCenter: [15, 0] as [number, number],
   defaultZoom: 2.8,
-  minZoom: 2.0,
+  minZoom: 2.5,
+  maxZoom: 6,
 
-  // Region colors for APSONIC presence highlighting
-  regionColors: {
-    west: '#10B981', // Green - Strong presence
-    east: '#EAB308', // Yellow
-    central: '#F97316', // Orange
-    southern: '#8B5CF6', // Purple - matches the original "Southern Africa - Purple" intent that was never wired into the color map (see lib/utils/map-layers.ts)
-    other: '#3B82F6', // Blue - Coverage/Parts
-    default: '#CFD8DC', // Gray - No presence
-  },
-
-  // Countries by region (ISO 3166-1 alpha-3 codes), derived from lib/data/countries.ts
   countriesByRegion: {
-    westAfrica: isoCodesForRegion('west'),
-    eastAfrica: isoCodesForRegion('east'),
-    centralAfrica: isoCodesForRegion('central'),
-    southernAfrica: isoCodesForRegion('southern'),
+    west: westCodes,
+    central: centralCodes,
+    east: eastCodes,
+    southern: southernCodes,
+    westAfrica: westCodes,
+    centralAfrica: centralCodes,
+    eastAfrica: eastCodes,
+    southernAfrica: southernCodes,
   },
 
-  // Search highlight color (when searching for a country)
-  searchHighlightColor: '#EF4444', // Red
+  regionColors: {
+    west: '#059669',
+    central: '#3B82F6',
+    east: '#F59E0B',
+    southern: '#8B5CF6',
+    other: '#71717A',
+    default: '#E4E4E7',
+  },
 
-  // Animation settings
+  searchHighlightColor: '#EF4444',
+
+  regions: {
+    west: {
+      color: '#059669',
+      hoverColor: '#10B981',
+      countries: westCodes,
+    },
+    central: {
+      color: '#3B82F6',
+      hoverColor: '#60A5FA',
+      countries: centralCodes,
+    },
+    east: {
+      color: '#F59E0B',
+      hoverColor: '#FBBF24',
+      countries: eastCodes,
+    },
+    southern: {
+      color: '#8B5CF6',
+      hoverColor: '#A78BFA',
+      countries: southernCodes,
+    },
+  },
+
+  nonOperationalColor: '#E4E4E7',
+  strokeColor: '#FFFFFF',
+  strokeWidth: 1.2,
+
   animation: {
-    duration: 1500, // milliseconds
-    easing: 0.5, // easing factor
+    duration: 1200,
+    flyToZoom: 4.5,
   },
-} as const;
+};
 
-// Country name mappings for search (supports English and French), derived
-// from lib/data/countries.ts (name + aliases -> ISO3).
 export const COUNTRY_NAME_MAP: Record<string, string> = COUNTRIES.reduce(
-  (map, country) => {
+  (map: Record<string, string>, country: CountryInfo) => {
     map[country.name.toLowerCase()] = country.iso3;
     for (const alias of country.aliases ?? []) {
       map[alias.toLowerCase()] = country.iso3;

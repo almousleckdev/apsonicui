@@ -13,7 +13,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
       className,
-      variant = "primary",
+      variant = "brand",
       size = "md",
       loading = false,
       icon,
@@ -24,21 +24,21 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref,
   ) => {
-    const baseStyles = "inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 rounded-lg cursor-pointer";
+    const baseStyles = "inline-flex items-center justify-center font-bold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 rounded-xl cursor-pointer";
 
     const variants = {
-      primary: "bg-zinc-900 text-white hover:bg-black hover:scale-[1.02] active:scale-[0.98] dark:bg-zinc-50 dark:text-black dark:hover:bg-white",
-      secondary: "bg-zinc-100 text-zinc-900 border border-zinc-200 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-white dark:border-zinc-700 dark:hover:bg-zinc-700",
-      outline: "bg-transparent text-zinc-900 border border-zinc-900 hover:bg-zinc-900/5 dark:text-white dark:border-white dark:hover:bg-white/5",
-      ghost: "bg-transparent text-zinc-900 hover:bg-zinc-100 dark:text-white dark:hover:bg-zinc-800",
-      brand: "bg-brand-green hover:bg-brand-green/90 active:scale-[0.98] text-white font-bold rounded-full shadow-lg shadow-brand-green/25 hover:shadow-brand-green/40",
+      primary: "bg-brand-green text-white hover:bg-green-700 active:scale-[0.98] shadow-md shadow-brand-green/20",
+      secondary: "bg-zinc-100 text-zinc-700 hover:bg-zinc-200 border border-zinc-200/80 active:scale-[0.98]",
+      outline: "bg-transparent text-zinc-700 border border-zinc-300 hover:bg-zinc-100 active:scale-[0.98]",
+      ghost: "bg-transparent text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900",
+      brand: "bg-brand-green text-white hover:bg-green-700 active:scale-[0.98] shadow-lg shadow-brand-green/20",
     };
 
     const sizes = {
       sm: "h-8 px-3 text-xs",
-      md: "h-10 px-5 text-sm",
-      lg: "h-12 px-6 text-base",
-      xl: "h-14 px-8 text-base",
+      md: "h-10 px-5 text-xs tracking-wider uppercase",
+      lg: "h-12 px-6 text-sm tracking-wider uppercase",
+      xl: "h-14 px-8 text-sm tracking-wider uppercase",
     };
 
     return (
@@ -49,13 +49,13 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         {loading ? (
-          <span className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+          <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
         ) : icon && iconPosition === "left" ? (
-          <span className="mr-2">{icon}</span>
+          <span className="mr-1.5">{icon}</span>
         ) : null}
         {children}
         {!loading && icon && iconPosition === "right" ? (
-          <span className="ml-2">{icon}</span>
+          <span className="ml-1.5">{icon}</span>
         ) : null}
       </button>
     );

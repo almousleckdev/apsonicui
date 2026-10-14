@@ -5,11 +5,12 @@ import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 
 interface ProductKeyFeaturesProps {
-  content: any;
+  content?: any;
 }
 
-export const ProductKeyFeatures: React.FC<ProductKeyFeaturesProps> = () => {
+export const ProductKeyFeatures: React.FC<ProductKeyFeaturesProps> = ({ content }) => {
   const reduceMotion = useReducedMotion();
+  const perfSrc = (content as any)?.performanceImageUrl || "/products/details/performance.jpg";
 
   return (
     <section className="isolate relative z-0 overflow-hidden bg-zinc-950 select-none border-t border-zinc-900 w-full">
@@ -22,7 +23,7 @@ export const ProductKeyFeatures: React.FC<ProductKeyFeaturesProps> = () => {
         className="relative w-full h-auto block"
       >
         <Image
-          src="/products/details/performance.jpg"
+          src={perfSrc}
           alt="APSONIC Performance Features"
           width={2000}
           height={1146}

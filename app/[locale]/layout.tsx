@@ -3,9 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { locales } from "@/lib/i18n/locales";
-import { Header } from "@/components/shared/header";
-import { Footer } from "@/components/shared/footer";
-import { ScrollToTop } from "@/components/ui/scroll-to-top";
+import { ConditionalLayout } from "@/components/layout/ConditionalLayout";
 import { SiteLoader } from "@/components/shared/site-loader";
 import Providers from "../providers";
 import "../globals.css";
@@ -45,10 +43,7 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages} locale={locale}>
           <Providers>
             <SiteLoader />
-            <Header />
-            <div className="flex-grow">{children}</div>
-            <Footer />
-            <ScrollToTop />
+            <ConditionalLayout>{children}</ConditionalLayout>
           </Providers>
         </NextIntlClientProvider>
       </body>

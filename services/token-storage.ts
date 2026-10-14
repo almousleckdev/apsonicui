@@ -1,31 +1,71 @@
-import { AuthUser } from '@/lib/types/auth';
+import { UserProfileResponse } from '@/lib/types/auth';
 
-// Access token and user profile live in memory only - never localStorage/sessionStorage.
-// The refresh token never reaches this module at all: it travels exclusively as an
-// httpOnly cookie set by the backend, invisible to and unmanaged by JS. On a fresh
-// page load these are empty until AuthContext performs a silent refresh.
-let accessToken: string | null = null;
-let currentUser: AuthUser | null = null;
+const TOKEN_KEY = 'apsonic_access_token';
+const USER_KEY = 'apsonic_user_profile';
+
+let memoryAccessToken: string | null = null;
+let memoryCurrentUser: UserProfileResponse | null = null;
 
 export const tokenStorage = {
   getAccessToken(): string | null {
-    return accessToken;
+    if (memoryAccessToken) return memoryAccessToken;
+    if (typeof window !== 'undefined') {
+      try {
+        memoryAccessToken = localStorage.getItem(TOKEN_KEY);
+      } catch {
+        // Fallback
+      }
+    }
+    return memoryAccessToken;
   },
 
   setAccessToken(token: string): void {
-    accessToken = token;
+    memoryAccessToken = token;
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(TOKEN_KEY, token);
+      } catch {
+        // Fallback
+      }
+    }
   },
 
-  getUser(): AuthUser | null {
-    return currentUser;
+  getUser(): UserProfileResponse | null {
+    if (memoryCurrentUser) return memoryCurrentUser;
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem(USER_KEY);
+        if (stored) {
+          memoryCurrentUser = JSON.parse(stored);
+        }
+      } catch {
+        // Fallback
+      }
+    }
+    return memoryCurrentUser;
   },
 
-  setUser(user: AuthUser): void {
-    currentUser = user;
+  setUser(user: UserProfileResponse): void {
+    memoryCurrentUser = user;
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(USER_KEY, JSON.stringify(user));
+      } catch {
+        // Fallback
+      }
+    }
   },
 
   clearAll(): void {
-    accessToken = null;
-    currentUser = null;
+    memoryAccessToken = null;
+    memoryCurrentUser = null;
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(USER_KEY);
+      } catch {
+        // Fallback
+      }
+    }
   },
 };

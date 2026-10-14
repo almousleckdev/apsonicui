@@ -52,14 +52,15 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
                 {/* Thumbnail */}
                 <div className="relative aspect-[16/9] w-full overflow-hidden bg-zinc-100">
                   <Image
-                    src={item.thumbnail}
-                    alt={item.title}
+                    src={item.thumbnail || "/images/logo/apsoniclogo.png"}
+                    alt={item.title || "Story Thumbnail"}
                     fill
+                    unoptimized
                     sizes="(max-width: 768px) 100vw, 380px"
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                   <div className="absolute top-4 left-4 bg-zinc-950/80 backdrop-blur-sm text-white text-[9px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-md">
-                    {item.category}
+                    {item.category || "Corporate"}
                   </div>
                 </div>
 
@@ -67,11 +68,12 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
                 <div className="p-6 flex flex-col flex-grow">
                   {/* Author & Date metadata */}
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="relative h-8 w-8 rounded-full overflow-hidden border border-zinc-100 shrink-0">
+                    <div className="relative h-8 w-8 rounded-full overflow-hidden border border-zinc-100 shrink-0 bg-zinc-100">
                       <Image
-                        src={item.authorImage || "/images/about-hero.png"}
+                        src={item.authorImage || "/images/logo/apsoniclogo.png"}
                         alt={item.authorName || "Author"}
                         fill
+                        unoptimized
                         sizes="48px"
                         className="object-cover"
                       />

@@ -18,12 +18,6 @@ export const BRANDS: Brand[] = [
     slug: "apsonic-pro",
     description: "Premium performance motorcycles",
   },
-  {
-    id: "apsonic-emoto",
-    name: "APSONIC E-MOTO",
-    slug: "apsonic-emoto",
-    description: "Electric mobility solutions",
-  },
 ];
 
 // Categories organized by brand
@@ -90,22 +84,6 @@ export const BRAND_CATEGORIES: Record<string, ProductCategory[]> = {
       slug: "touring",
       image: "/products/AP125-12(1).png",
       brandId: "apsonic-pro",
-    },
-  ],
-  "apsonic-emoto": [
-    {
-      id: "emoto-scooter",
-      name: "电动踏板车",
-      slug: "e-scooter",
-      image: "/products/AP110-A-PLUS(白).png",
-      brandId: "apsonic-emoto",
-    },
-    {
-      id: "emoto-bike",
-      name: "电动自行车",
-      slug: "e-bike",
-      image: "/products/AP125-K(1).png",
-      brandId: "apsonic-emoto",
     },
   ],
 };

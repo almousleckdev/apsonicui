@@ -37,7 +37,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
       return (
         <>
           {parts[0]}
-          <span className="text-[#1FA84F]">{highlightWord}</span>
+          <span className="text-brand-green">{highlightWord}</span>
           {parts[1]}
         </>
       );

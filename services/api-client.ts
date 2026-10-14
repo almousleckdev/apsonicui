@@ -2,21 +2,17 @@ import { ApiResponse, ApiErrorResponse } from '@/lib/types/api';
 import { tokenStorage } from './token-storage';
 import { reportError } from '@/lib/error-reporting';
 
-// In the browser, a same-origin relative path is correct: the browser never
-// learns the backend's real address, and next.config.ts rewrites /api/* to it
-// server-to-server. But that rewrite only applies to requests that arrive at
-// the Next.js HTTP server - it can't help a fetch() issued from inside a
-// Server Component/route handler, and Node's fetch (unlike the browser's)
-// throws "Invalid URL" on a relative path since there is no document to
-// resolve it against. So on the server we call INTERNAL_API_URL directly.
-const BASE_URL =
-  typeof window === 'undefined'
-    ? `${process.env.INTERNAL_API_URL}/api/v1`
-    : '/api/v1';
-const DEFAULT_TIMEOUT_MS = 8000;
+const getBaseUrl = () => {
+  if (typeof window === 'undefined') {
+    const serverUrl = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
+    return serverUrl.endsWith('/api/v1') ? serverUrl : `${serverUrl}/api/v1`;
+  }
+  return '/api/v1';
+};
 
-// Dispatched instead of a hard `window.location` redirect so this HTTP client
-// stays free of routing concerns; context/AuthContext.tsx owns the navigation.
+const BASE_URL = getBaseUrl();
+const DEFAULT_TIMEOUT_MS = 30000;
+
 export const SESSION_EXPIRED_EVENT = 'apsonic:session-expired';
 
 export class ApiError extends Error {
@@ -60,9 +56,7 @@ interface RefreshWaiter {
 let isRefreshing = false;
 let refreshQueue: RefreshWaiter[] = [];
 
-// Settles every request that queued up behind an in-flight refresh. Failing to
-// call this on the error path (as the previous implementation did) leaves every
-// queued request hanging forever - this is the fix for that bug.
+// Settles every request that queued up behind an in-flight refresh.
 function settleRefreshQueue(outcome: { token: string } | { error: unknown }) {
   const waiters = refreshQueue;
   refreshQueue = [];
@@ -96,8 +90,11 @@ async function performRefresh(): Promise<string> {
     throw new ApiError('Session expired', 401);
   }
 
-  const refreshData = await refreshRes.json();
-  const newToken: string = refreshData.data.accessToken;
+  const refreshData = await refreshRes.json().catch(() => ({}));
+  const newToken: string | undefined = refreshData?.data?.accessToken;
+  if (!newToken) {
+    throw new ApiError('Invalid refresh response payload', 401);
+  }
   tokenStorage.setAccessToken(newToken);
   return newToken;
 }
@@ -216,10 +213,7 @@ export async function apiClient<T>(
     if (error instanceof Error && error.name === 'AbortError') {
       throw new ApiError('Request cancelled', 499);
     }
-    // Genuinely unexpected (network failure, malformed response) rather than
-    // a routine HTTP error status, which callers already handle explicitly.
-    // `silent` opts out for calls the caller already knows will fail today
-    // (see NO_BACKEND_YET in news-service.ts) and handles via fallback data.
+
     if (!silent) {
       reportError(error, { endpoint });
     }

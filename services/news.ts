@@ -1,79 +1,162 @@
-import type { NewsItem } from "@/lib/types/news";
-import fs from "fs";
-import path from "path";
-
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1";
+import { apiClient } from './api-client';
+import type { NewsItem, CreateNewsPayload } from '@/lib/types/news';
 
 export const newsService = {
   /**
-   * Fetches news articles from the CMS API.
-   * If the CMS API fails (because the backend news module is not yet integrated),
-   * it falls back to loading local static JSON dictionaries from the public folder.
+   * Fetch public news articles from live backend DB.
    */
-  async getNews(locale: string = "en"): Promise<NewsItem[]> {
+  async getNewsList(locale: string = 'en', category?: string): Promise<NewsItem[]> {
     try {
-      const response = await fetch(`${BASE_URL}/news?lang=${locale}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        next: { revalidate: 3600 }, // Cache for 1 hour
+      const queryParams = new URLSearchParams({ locale, size: '50' });
+      if (category && category !== 'ALL') {
+        queryParams.set('category', category);
+      }
+
+      const res = await apiClient<any>(`/news?${queryParams.toString()}`, {
+        method: 'GET',
+        requiresAuth: false,
+        silent: true,
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch news from API");
+      if (res.data) {
+        const items = res.data.content || res.data || [];
+        return items.map(mapBackendNewsItem);
       }
-
-      const resJson = await response.json();
-      return resJson.data || resJson;
     } catch (error) {
-      console.warn(`CMS API /news failed. Loading local static news fallback for ${locale}.`);
-      
-      try {
-        const filePath = path.join(process.cwd(), "public", "data", `news_${locale}.json`);
-        if (fs.existsSync(filePath)) {
-          const fileContent = fs.readFileSync(filePath, "utf-8");
-          return JSON.parse(fileContent);
-        }
-      } catch (fsError) {
-        console.error("Failed to read local news JSON file:", fsError);
-      }
-      
-      return [];
+      console.warn('Backend API /news call exception:', error);
     }
+
+    return [];
   },
 
-  async getNewsById(id: string, locale: string = "en"): Promise<NewsItem | null> {
+  async getNews(locale: string = 'en', category?: string): Promise<NewsItem[]> {
+    return newsService.getNewsList(locale, category);
+  },
+
+  /**
+   * Fetch admin news articles list for dashboard management.
+   */
+  async getAdminNewsList(token?: string): Promise<NewsItem[]> {
     try {
-      const response = await fetch(`${BASE_URL}/news/${id}?lang=${locale}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        next: { revalidate: 3600 },
+      const res = await apiClient<any>('/admin/news?size=100', {
+        method: 'GET',
+        requiresAuth: true,
+        silent: true,
       });
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch article ${id} from API`);
+      if (res.data) {
+        const items = res.data.content || res.data || [];
+        return items.map(mapBackendNewsItem);
       }
-
-      const resJson = await response.json();
-      return resJson.data || resJson;
     } catch (error) {
-      console.warn(`CMS API /news/${id} failed. Loading local static news details for ${locale}.`);
-      
-      try {
-        const filePath = path.join(process.cwd(), "public", "data", `news_${locale}.json`);
-        if (fs.existsSync(filePath)) {
-          const fileContent = fs.readFileSync(filePath, "utf-8");
-          const newsList: NewsItem[] = JSON.parse(fileContent);
-          return newsList.find((item) => item.id === id) || null;
-        }
-      } catch (fsError) {
-        console.error("Failed to read local news JSON file:", fsError);
-      }
-      
-      return null;
+      console.warn('Backend API /admin/news call exception:', error);
     }
+
+    return [];
+  },
+
+  /**
+   * Fetch single news story details by ID or Slug.
+   */
+  async getNewsById(idOrSlug: string, locale: string = 'en'): Promise<NewsItem | null> {
+    try {
+      const res = await apiClient<any>(`/news/${idOrSlug}?locale=${locale}`, {
+        method: 'GET',
+        requiresAuth: false,
+        silent: true,
+      });
+
+      if (res.data) {
+        return mapBackendNewsItem(res.data);
+      }
+    } catch (error) {
+      console.warn(`Backend API /news/${idOrSlug} call exception:`, error);
+    }
+
+    return null;
+  },
+
+  /**
+   * Create a new article in the live backend DB.
+   */
+  async createNews(payload: CreateNewsPayload, token?: string): Promise<NewsItem> {
+    const res = await apiClient<any>('/admin/news', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      requiresAuth: true,
+    });
+
+    return mapBackendNewsItem(res.data);
+  },
+
+  /**
+   * Update an existing article in the live backend DB.
+   */
+  async updateNews(id: string | number, payload: Partial<CreateNewsPayload>, token?: string): Promise<NewsItem> {
+    const res = await apiClient<any>(`/admin/news/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+      requiresAuth: true,
+    });
+
+    return mapBackendNewsItem(res.data);
+  },
+
+  /**
+   * Toggle published / draft status.
+   */
+  async togglePublish(id: string | number, published: boolean, token?: string): Promise<NewsItem> {
+    const res = await apiClient<any>(`/admin/news/${id}/publish?published=${published}`, {
+      method: 'PATCH',
+      requiresAuth: true,
+    });
+
+    return mapBackendNewsItem(res.data);
+  },
+
+  /**
+   * Delete an article safely from backend DB.
+   */
+  async deleteNews(id: string | number, token?: string): Promise<void> {
+    await apiClient(`/admin/news/${id}`, {
+      method: 'DELETE',
+      requiresAuth: true,
+    });
   },
 };
+
+// Backend DTO to Frontend NewsItem Mapper with Robust Language Fallbacks
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mapBackendNewsItem(item: any): NewsItem {
+  const title = item.title || item.titleEn || item.titleFr || item.titleZh || 'Untitled Article';
+  const summary = item.summary || item.summaryEn || item.summaryFr || item.summaryZh || '';
+  const contentHtml = item.contentHtml || item.contentHtmlEn || item.contentHtmlFr || item.contentHtmlZh || '';
+
+  return {
+    id: String(item.id),
+    slug: item.slug,
+    title,
+    titleEn: item.titleEn || title,
+    titleFr: item.titleFr || title,
+    titleZh: item.titleZh || title,
+    excerpt: summary,
+    summaryEn: item.summaryEn || summary,
+    summaryFr: item.summaryFr || summary,
+    summaryZh: item.summaryZh || summary,
+    contentHtml,
+    contentHtmlEn: item.contentHtmlEn || contentHtml,
+    contentHtmlFr: item.contentHtmlFr || contentHtml,
+    contentHtmlZh: item.contentHtmlZh || contentHtml,
+    date: item.publishedAt || item.createdAt || new Date().toISOString(),
+    category: item.category || 'Corporate',
+    thumbnail: item.coverImageUrl || '/images/logo/apsoniclogo.png',
+    authorName: item.authorName || 'APSONIC Team',
+    authorRole: item.authorRole || 'Official Contributor',
+    authorImage: item.authorAvatarUrl || '/images/logo/apsoniclogo.png',
+    viewsCount: item.viewsCount || 0,
+    readTimeMinutes: item.readTimeMinutes || 5,
+    published: item.published !== undefined ? item.published : true,
+    sections: item.sections || [],
+    content: item.content || [],
+  };
+}

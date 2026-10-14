@@ -110,6 +110,7 @@
       "emailRequired": "请输入电子邮箱",
       "emailInvalid": "电子邮箱格式不正确",
       "phoneInvalid": "电话号码格式不正确",
+      "countryRequired": "请选择国家",
       "departmentRequired": "请选择部门",
       "subjectRequired": "请输入主题",
       "messageMinLength": "留言内容至少需要20个字符"

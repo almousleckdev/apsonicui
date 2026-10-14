@@ -141,7 +141,7 @@ export const ProductAestheticDesign: React.FC<ProductAestheticDesignProps> = ({
   // Localized title & subtitle variables using shared, robust non-nested keys
   const localTitle = t("aesthetic.title", { defaultMessage: title });
   const localSubtitle = t("aesthetic.subtitle", { defaultMessage: subtitle });
-  const localHighlight = t("aesthetic.subtitleHighlight", { defaultMessage: subtitleHighlight });
+  const localHighlight = t("aesthetic.subtitleHighlight", { defaultMessage: subtitleHighlight || "" });
 
   // Split subtitle into highlight segments
   const hasHighlight = localSubtitle.includes(localHighlight);

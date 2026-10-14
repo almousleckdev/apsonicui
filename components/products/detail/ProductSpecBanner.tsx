@@ -27,25 +27,26 @@ export const ProductSpecBanner: React.FC<ProductSpecBannerProps> = ({
   const isRight = align === "right";
   const slideFrom = isRight ? 48 : -48;
 
-  // Section 3 (index 0), Section 4 (index 1), and Section 5 (index 2) use full-bleed mockup images exclusively
-  if (index === 0 || index === 1 || index === 2) {
-    let imgSrc = "";
-    let imgWidth = 2000;
+  if (index === 0 || index === 1 || index === 2 || (content as any)?.imageUrl) {
+    let imgSrc = (content as any)?.imageUrl || content?.background || "";
+    const imgWidth = 2000;
     let imgHeight = 1028;
-    let imgAlt = "";
+    let imgAlt = content?.titleLines?.join(" ") || "APSONIC Specification";
 
-    if (index === 0) {
-      imgSrc = "/products/details/thirdsection.jpg";
-      imgHeight = 1028;
-      imgAlt = "APSONIC Frame Specification";
-    } else if (index === 1) {
-      imgSrc = "/products/details/fourthsection.jpg";
-      imgHeight = 1033;
-      imgAlt = "APSONIC Rear Carrier Specification";
-    } else {
-      imgSrc = "/products/details/fivessection.jpg";
-      imgHeight = 1032;
-      imgAlt = "APSONIC Engine Specification";
+    if (!imgSrc) {
+      if (index === 0) {
+        imgSrc = "/products/details/thirdsection.jpg";
+        imgHeight = 1028;
+        imgAlt = "APSONIC Frame Specification";
+      } else if (index === 1) {
+        imgSrc = "/products/details/fourthsection.jpg";
+        imgHeight = 1033;
+        imgAlt = "APSONIC Rear Carrier Specification";
+      } else {
+        imgSrc = "/products/details/fivessection.jpg";
+        imgHeight = 1032;
+        imgAlt = "APSONIC Engine Specification";
+      }
     }
 
     return (

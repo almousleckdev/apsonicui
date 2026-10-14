@@ -1,0 +1,85 @@
+import React from 'react';
+import { Plus, Trash2 } from 'lucide-react';
+import { ProductSpecBannerPayload } from '@/services/product';
+import { SectionImageUpload } from './SectionImageUpload';
+
+interface SpecBannerEditorProps {
+  banners: ProductSpecBannerPayload[];
+  onChange: (banners: ProductSpecBannerPayload[]) => void;
+}
+
+export const SpecBannerEditor: React.FC<SpecBannerEditorProps> = ({
+  banners,
+  onChange,
+}) => {
+  const addBanner = () => {
+    onChange([
+      ...banners,
+      {
+        title: `Section ${banners.length + 3} Specification`,
+        description: '',
+        imageUrl: '',
+        metricLabel: '',
+        metricValue: '',
+        metricUnit: '',
+        displayOrder: banners.length + 1,
+      },
+    ]);
+  };
+
+  const removeBanner = (idx: number) => {
+    onChange(banners.filter((_, i) => i !== idx));
+  };
+
+  const updateBanner = (idx: number, field: keyof ProductSpecBannerPayload, val: any) => {
+    const updated = [...banners];
+    updated[idx] = { ...updated[idx], [field]: val };
+    onChange(updated);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <label className="block text-zinc-900 font-bold text-xs">
+            Specification Section Banners (Section 3, 4, 5...)
+          </label>
+          <p className="text-[11px] text-zinc-500">
+            Upload full-bleed pictures for Frame, Carrier, Engine, and other technical highlight sections.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={addBanner}
+          className="px-3.5 py-1.5 bg-emerald-50 text-brand-green border border-brand-green/30 hover:bg-emerald-100 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1"
+        >
+          <Plus className="w-3.5 h-3.5" /> + Add Section
+        </button>
+      </div>
+
+      {banners.map((b, i) => (
+        <div key={i} className="border border-zinc-200/80 rounded-2xl p-4 bg-zinc-50/50 space-y-3">
+          <div className="flex items-center justify-between">
+            <input
+              type="text"
+              value={b.title}
+              onChange={(e) => updateBanner(i, 'title', e.target.value)}
+              placeholder="Section Title"
+              className="px-3 py-1.5 border border-zinc-200 rounded-xl bg-white text-xs font-bold w-1/2"
+            />
+            <button type="button" onClick={() => removeBanner(i)} className="text-red-500 hover:text-red-700 p-1.5 cursor-pointer">
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+
+          <SectionImageUpload
+            label="Section Full-Bleed Picture"
+            description="Banner photo for this feature"
+            value={b.imageUrl}
+            onChange={(url) => updateBanner(i, 'imageUrl', url)}
+          />
+        </div>
+      ))}
+    </div>
+  );
+};
