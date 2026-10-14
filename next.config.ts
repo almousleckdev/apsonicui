@@ -14,6 +14,23 @@ const nextConfig: NextConfig = {
   experimental: {
     proxyClientMaxBodySize: "100mb",
   },
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          // The services page uses the visitor's location for the nearest-office map; nothing else is needed.
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(self), payment=()" },
+          ...(isDev
+            ? []
+            : [{ key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" }]),
+        ],
+      },
+    ];
+  },
   async rewrites() {
     return [
       {
