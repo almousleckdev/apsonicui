@@ -8,6 +8,7 @@ import { productService, CreateProductPayload } from '@/services/product';
 import { categoryService, CategoryItem } from '@/services/category';
 import { useToast } from '@/components/ui/Toast';
 import { Save } from 'lucide-react';
+import { getErrorMessage } from '@/lib/utils/errors';
 
 const INITIAL_FORM: CreateProductPayload = {
   modelName: '',
@@ -50,8 +51,8 @@ export default function AdminNewProductPage() {
       await productService.createProduct(formData);
       toast.success('Product created successfully!');
       router.push('/admin/products');
-    } catch (err: any) {
-      toast.error(err?.message || 'Error creating product');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err, 'Error creating product'));
     } finally {
       setLoading(false);
     }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Upload, X, Film, ImageIcon, Loader2 } from 'lucide-react';
+import { Upload, X, Loader2 } from 'lucide-react';
 import { mediaService } from '@/services/media';
 import { useToast } from '@/components/ui/Toast';
 

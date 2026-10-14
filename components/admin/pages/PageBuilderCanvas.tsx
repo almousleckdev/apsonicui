@@ -5,9 +5,10 @@ import { ActionModal } from "@/components/admin/ActionModal";
 import React, { useState } from 'react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { CmsPageSectionDto, Locale, SectionType } from '@/lib/types/cms-page';
+import { BaseSectionConfig, CmsPageSectionDto, Locale, SectionType } from '@/lib/types/cms-page';
 import { SortableSectionCard } from './SortableSectionCard';
 import { Plus } from 'lucide-react';
+import type { DragEndEvent } from '@dnd-kit/core';
 
 interface PageBuilderCanvasProps {
   sections: CmsPageSectionDto[];
@@ -25,9 +26,10 @@ export const PageBuilderCanvas: React.FC<PageBuilderCanvasProps> = ({ sections, 
 
   const [sectionToDelete, setSectionToDelete] = useState<number | null>(null);
 
-  const handleDragEnd = (event: any) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    if (active.id !== over.id) {
+    // `over` is null when the item is dropped outside any target.
+    if (over && active.id !== over.id) {
       setSections((items) => {
         const oldIndex = items.findIndex((item) => item.id === active.id || item.sectionOrder === active.id);
         const newIndex = items.findIndex((item) => item.id === over.id || item.sectionOrder === over.id);
@@ -61,7 +63,7 @@ export const PageBuilderCanvas: React.FC<PageBuilderCanvasProps> = ({ sections, 
     setSectionToDelete(null);
   };
 
-  const updateSection = (index: number, newConfig: any) => {
+  const updateSection = (index: number, newConfig: BaseSectionConfig) => {
     const newSections = [...sections];
     newSections[index].configuration = newConfig;
     setSections(newSections);

@@ -31,10 +31,9 @@ export const filterProducts = (
 
   if (!filters) return products;
 
-  const f = filters as any;
-  const category = f.selectedCategory || f.category;
-  const displacement = f.displacement;
-  const search = f.searchQuery || f.search;
+  const category = filters.selectedCategory || filters.category;
+  const displacement = filters.displacement;
+  const search = filters.searchQuery || filters.search;
 
   return products.filter((p) => {
     if (category && category !== 'all' && p.category !== category) return false;

@@ -31,7 +31,7 @@ export const SpecBannerEditor: React.FC<SpecBannerEditorProps> = ({
     onChange(banners.filter((_, i) => i !== idx));
   };
 
-  const updateBanner = (idx: number, field: keyof ProductSpecBannerPayload, val: any) => {
+  const updateBanner = <K extends keyof ProductSpecBannerPayload>(idx: number, field: K, val: ProductSpecBannerPayload[K]) => {
     const updated = [...banners];
     updated[idx] = { ...updated[idx], [field]: val };
     onChange(updated);

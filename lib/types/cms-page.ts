@@ -9,8 +9,25 @@ export interface CmsPageTranslationDto {
   seoDescription?: string;
 }
 
+/** Per-locale copy of a section. Which keys are used depends on the section type. */
+export interface SectionTranslation {
+  title?: string;
+  subtitle?: string;
+  ctaText?: string;
+  content?: string;
+  description?: string;
+  [key: string]: string | undefined;
+}
+
+/** Section configuration as authored in the page builder (stored as JSON on the backend). */
 export interface BaseSectionConfig {
-  [key: string]: any;
+  backgroundImage?: string;
+  image?: string;
+  videoUrl?: string;
+  thumbnail?: string;
+  ctaLink?: string;
+  layout?: string;
+  translations?: Record<string, SectionTranslation>;
 }
 
 export interface CmsPageSectionDto {
@@ -29,7 +46,8 @@ export interface CmsPageDto {
   navOrder: number;
   translations: Record<string, CmsPageTranslationDto>;
   sections: CmsPageSectionDto[];
-  publishedSnapshot?: any;
+  /** The page as it was when last published; what the public site renders. */
+  publishedSnapshot?: CmsPageDto;
   publishedAt?: string;
   createdAt: string;
   updatedAt: string;

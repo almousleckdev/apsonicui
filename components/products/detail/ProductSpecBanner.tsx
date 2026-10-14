@@ -27,8 +27,8 @@ export const ProductSpecBanner: React.FC<ProductSpecBannerProps> = ({
   const isRight = align === "right";
   const slideFrom = isRight ? 48 : -48;
 
-  if (index === 0 || index === 1 || index === 2 || (content as any)?.imageUrl) {
-    let imgSrc = (content as any)?.imageUrl || content?.background || "";
+  if (index === 0 || index === 1 || index === 2 || content?.imageUrl) {
+    let imgSrc = content?.imageUrl || content?.background || "";
     const imgWidth = 2000;
     let imgHeight = 1028;
     let imgAlt = content?.titleLines?.join(" ") || "APSONIC Specification";

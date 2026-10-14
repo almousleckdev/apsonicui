@@ -29,7 +29,7 @@ export const LineupCategoriesEditor: React.FC<LineupCategoriesEditorProps> = ({ 
     onChange(categories.filter((_, i) => i !== idx));
   };
 
-  const updateCategory = (idx: number, field: keyof HomeCategoryItem, val: any) => {
+  const updateCategory = <K extends keyof HomeCategoryItem>(idx: number, field: K, val: HomeCategoryItem[K]) => {
     const updated = [...categories];
     updated[idx] = { ...updated[idx], [field]: val };
     onChange(updated);

@@ -6,6 +6,7 @@ import { AdminPageForm } from '@/components/admin/pages/AdminPageForm';
 import { cmsPagesService } from '@/services/cms-pages';
 import { useToast } from '@/components/ui/Toast';
 import type { CmsPageRequest, CmsPageDto } from '@/lib/types/cms-page';
+import { getErrorMessage } from '@/lib/utils/errors';
 
 export default function EditCmsPage() {
   const router = useRouter();
@@ -33,8 +34,8 @@ export default function EditCmsPage() {
       toast.success('Page updated successfully');
       setInitialData(page);
       return page;
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to update page');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err, 'Failed to update page'));
       throw err;
     }
   };

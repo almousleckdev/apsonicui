@@ -8,6 +8,7 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Save, LayoutList } from 'lucide-react';
+import type { DragEndEvent } from '@dnd-kit/core';
 
 const SortableNavItem = ({ item, id }: { item: NavigationItem, id: string }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
@@ -52,9 +53,10 @@ export default function NavigationManager() {
     fetchNav();
   }, [toast]);
 
-  const handleDragEnd = (event: any) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    if (active.id !== over.id) {
+    // `over` is null when the item is dropped outside any target.
+    if (over && active.id !== over.id) {
       setItems((items) => {
         const oldIndex = items.findIndex((item) => item.slug === active.id);
         const newIndex = items.findIndex((item) => item.slug === over.id);

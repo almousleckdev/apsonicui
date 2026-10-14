@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useLocale } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
@@ -89,7 +89,7 @@ export const RecommendedModels: React.FC<RecommendedModelsProps> = ({ className,
         </div>
 
         <ModelSlideContainer
-          currentModel={currentModel as any}
+          currentModel={currentModel}
           activeImage={activeImage}
           direction={direction}
           onPrev={handlePrev}

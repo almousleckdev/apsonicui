@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { CmsPageSectionDto, Locale } from '@/lib/types/cms-page';
+import { BaseSectionConfig, CmsPageSectionDto, Locale } from '@/lib/types/cms-page';
 import { GripVertical, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import { SectionImageUpload } from '../products/SectionImageUpload';
 
@@ -12,7 +12,7 @@ interface SortableSectionCardProps {
   section: CmsPageSectionDto;
   activeLocale: Locale;
   onRemove: () => void;
-  onUpdate: (config: any) => void;
+  onUpdate: (config: BaseSectionConfig) => void;
 }
 
 export const SortableSectionCard: React.FC<SortableSectionCardProps> = ({ id, section, activeLocale, onRemove, onUpdate }) => {
@@ -41,7 +41,7 @@ export const SortableSectionCard: React.FC<SortableSectionCardProps> = ({ id, se
     });
   };
 
-  const updateGlobal = (key: string, value: any) => {
+  const updateGlobal = <K extends keyof BaseSectionConfig>(key: K, value: BaseSectionConfig[K]) => {
     onUpdate({
       ...config,
       [key]: value

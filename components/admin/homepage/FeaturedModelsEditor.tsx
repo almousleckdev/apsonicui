@@ -32,7 +32,7 @@ export const FeaturedModelsEditor: React.FC<FeaturedModelsEditorProps> = ({ mode
     onChange(models.filter((_, i) => i !== idx));
   };
 
-  const updateModel = (idx: number, field: keyof HomeFeaturedModelItem, val: any) => {
+  const updateModel = <K extends keyof HomeFeaturedModelItem>(idx: number, field: K, val: HomeFeaturedModelItem[K]) => {
     const updated = [...models];
     updated[idx] = { ...updated[idx], [field]: val };
     onChange(updated);

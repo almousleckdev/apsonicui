@@ -147,7 +147,7 @@ export const Footer: React.FC = () => {
                   {section.title}
                 </span>
                 <ul className="flex flex-col gap-2.5">
-                  {section.items.map((item: any, itemIdx: number) => (
+                  {section.items.map((item, itemIdx) => (
                     <li key={itemIdx} className="flex flex-col gap-2">
                       {item.href ? (
                         <Link
@@ -163,7 +163,7 @@ export const Footer: React.FC = () => {
                       )}
                       {item.subItems && item.subItems.length > 0 && (
                         <ul className="pl-3 border-l border-zinc-800/80 flex flex-col gap-2">
-                          {item.subItems.map((sub: any, subIdx: number) => (
+                          {item.subItems.map((sub, subIdx) => (
                             <li key={subIdx}>
                               <Link
                                 href={sub.href || "/products"}

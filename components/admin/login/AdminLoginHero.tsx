@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { ArrowLeft } from 'lucide-react';
-import { ADMIN_AUTH_CONSTANTS, BRAND_TAGLINE_ZH } from '@/lib/constants/auth';
+import { ADMIN_AUTH_CONSTANTS } from '@/lib/constants/auth';
 
 export const AdminLoginHero: React.FC = () => {
   const t = useTranslations('auth');

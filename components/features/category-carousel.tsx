@@ -53,7 +53,7 @@ export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({ className, i
   const canScrollLeft = clampedIndex > 0;
   const canScrollRight = clampedIndex < maxIndex;
 
-  const getLocalizedName = (cat: any) => {
+  const getLocalizedName = (cat: HomeCategoryItem) => {
     if (locale === "zh") {
       if (cat.nameZh) return cat.nameZh;
       const mapping: Record<string, string> = {

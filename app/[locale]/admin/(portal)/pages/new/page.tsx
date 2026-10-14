@@ -6,6 +6,7 @@ import { AdminPageForm } from '@/components/admin/pages/AdminPageForm';
 import { cmsPagesService } from '@/services/cms-pages';
 import { useToast } from '@/components/ui/Toast';
 import type { CmsPageRequest } from '@/lib/types/cms-page';
+import { getErrorMessage } from '@/lib/utils/errors';
 
 export default function CreateCmsPage() {
   const router = useRouter();
@@ -17,8 +18,8 @@ export default function CreateCmsPage() {
       toast.success('Page created successfully');
       router.push(`/en/admin/pages/${page.id}`);
       return page;
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to create page');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err, 'Failed to create page'));
       throw err;
     }
   };

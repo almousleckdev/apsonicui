@@ -1,6 +1,7 @@
 import { Node, mergeAttributes } from '@tiptap/core';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 import { ImageBlockNodeView } from './ImageBlockNodeView';
+import type { DOMOutputSpec } from '@tiptap/pm/model';
 
 export const ImageBlock = Node.create({
   name: 'imageBlock',
@@ -61,7 +62,7 @@ export const ImageBlock = Node.create({
 
   renderHTML({ HTMLAttributes }) {
     const captionText = (HTMLAttributes.caption || '').trim();
-    const children: any[] = [
+    const children: DOMOutputSpec[] = [
       [
         'img',
         {

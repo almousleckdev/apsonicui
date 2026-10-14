@@ -1,17 +1,11 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { NodeViewWrapper } from '@tiptap/react';
+import { NodeViewWrapper, type NodeViewProps } from '@tiptap/react';
 import { Upload, Trash2, RefreshCw } from 'lucide-react';
 import { uploadMediaFile } from '@/services/media';
 
-interface ImageBlockNodeViewProps {
-  editor: any;
-  node: any;
-  updateAttributes: (attrs: Record<string, any>) => void;
-  selected: boolean;
-  getPos: () => number | undefined;
-}
+type ImageBlockNodeViewProps = Pick<NodeViewProps, 'editor' | 'node' | 'updateAttributes' | 'selected' | 'getPos'>;
 
 export const ImageBlockNodeView: React.FC<ImageBlockNodeViewProps> = ({
   editor,

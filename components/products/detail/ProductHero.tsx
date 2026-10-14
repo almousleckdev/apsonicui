@@ -27,7 +27,8 @@ export const ProductHero: React.FC<ProductHeroProps> = ({ content }) => {
   const imageY = useTransform(scrollYProgress, [0, 1], ["0%", "12%"]);
   const contentOpacity = useTransform(scrollYProgress, [0, 0.8, 1], [1, 1, 0]);
 
-  const heroSrc = (content as any)?.heroImageUrl || content?.middle || "/products/details/producdetailhero.jpg";
+  // `rider` carries the admin-uploaded hero image (falling back to the cover image upstream).
+  const heroSrc = content?.rider || content?.middle || "/products/details/producdetailhero.jpg";
 
   return (
     <section

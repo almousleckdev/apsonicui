@@ -13,7 +13,18 @@ export const SOCIAL_LINKS = {
 };
 
 // Footer navigation structure, translated. `t` is the "footer" namespace
-export function getFooterSections(t: (key: string) => string) {
+export interface FooterLink {
+  label: string;
+  href?: string;
+  subItems?: FooterLink[];
+}
+
+export interface FooterSection {
+  title: string;
+  items: FooterLink[];
+}
+
+export function getFooterSections(t: (key: string) => string): FooterSection[] {
   const products = {
     title: t('products.title'),
     items: [

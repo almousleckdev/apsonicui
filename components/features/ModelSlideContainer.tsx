@@ -5,10 +5,10 @@ import Image from "next/image";
 import { Link } from "@/lib/i18n/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import type { FeaturedModel } from "@/lib/types/products";
+import type { HomeFeaturedModelItem } from "@/lib/types/homepage";
 
 interface ModelSlideContainerProps {
-  currentModel: FeaturedModel;
+  currentModel: Pick<HomeFeaturedModelItem, 'id' | 'name' | 'image' | 'watermark' | 'href'>;
   activeImage: string;
   direction: number;
   onPrev: () => void;

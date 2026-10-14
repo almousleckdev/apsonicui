@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Quote, AlertCircle, ExternalLink, Play } from 'lucide-react';
+import { Quote, AlertCircle, ExternalLink } from 'lucide-react';
 import type { NewsSectionItem } from '@/lib/types/news';
 
 interface NewsSectionRendererProps {

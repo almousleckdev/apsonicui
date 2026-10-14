@@ -4,7 +4,7 @@ import { DynamicCmsPageViewer } from '@/components/features/DynamicCmsPageViewer
 import { Header } from '@/components/shared/header';
 import { Footer } from '@/components/shared/footer';
 import { Metadata } from 'next';
-import { CmsPageDto, Locale } from '@/lib/types/cms-page';
+import { CmsPageDto } from '@/lib/types/cms-page';
 
 interface CmsPageProps {
   params: Promise<{

@@ -27,7 +27,7 @@ export default function ErrorPage({
             Something went wrong
           </h1>
           <p className="text-xs text-zinc-500 leading-relaxed">
-            We encountered an unexpected error, but don't worry. Your data is safe.
+            We encountered an unexpected error, but don&apos;t worry. Your data is safe.
           </p>
         </div>
 

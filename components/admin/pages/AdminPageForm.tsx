@@ -6,6 +6,7 @@ import { Save, Eye, Globe } from 'lucide-react';
 import type { CmsPageRequest, CmsPageDto, CmsPageSectionDto, PageStatus, Locale, CmsPageTranslationDto } from '@/lib/types/cms-page';
 import { useToast } from '@/components/ui/Toast';
 import { PageBuilderCanvas } from './PageBuilderCanvas';
+import { getErrorMessage } from '@/lib/utils/errors';
 
 interface AdminPageFormProps {
   initialData?: CmsPageDto;
@@ -68,9 +69,9 @@ export const AdminPageForm: React.FC<AdminPageFormProps> = ({
       };
       
       await onSubmit(payload);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      toast.error(err.message || 'Failed to save page');
+      toast.error(getErrorMessage(err, 'Failed to save page'));
     } finally {
       setSaving(false);
     }

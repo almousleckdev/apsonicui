@@ -8,6 +8,7 @@ import { productService, CreateProductPayload } from '@/services/product';
 import { categoryService, CategoryItem } from '@/services/category';
 import { useToast } from '@/components/ui/Toast';
 import { Loader2, Save } from 'lucide-react';
+import { getErrorMessage } from '@/lib/utils/errors';
 
 export default function AdminEditProductPage() {
   const router = useRouter();
@@ -19,6 +20,14 @@ export default function AdminEditProductPage() {
   const [formData, setFormData] = useState<CreateProductPayload | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+
+  // The form edits a non-null payload; this page holds null until the product has loaded. Ignore updates until then.
+  const updateFormData: React.Dispatch<React.SetStateAction<CreateProductPayload>> = (action) => {
+    setFormData((previous) => {
+      if (!previous) return previous;
+      return typeof action === 'function' ? action(previous) : action;
+    });
+  };
 
   useEffect(() => {
     Promise.all([
@@ -48,8 +57,8 @@ export default function AdminEditProductPage() {
       await productService.updateProduct(id, formData);
       toast.success('Product updated successfully!');
       router.push('/admin/products');
-    } catch (err: any) {
-      toast.error(err?.message || 'Error updating product');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err, 'Error updating product'));
     } finally {
       setSaving(false);
     }
@@ -92,7 +101,7 @@ export default function AdminEditProductPage() {
           ) : (
             <ProductFormContent
               formData={formData}
-              setFormData={setFormData as any}
+              setFormData={updateFormData}
               categories={categories}
               isEditing={true}
               onSubmit={handleSubmit}

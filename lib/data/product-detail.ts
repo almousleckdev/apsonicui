@@ -54,6 +54,8 @@ export interface SpecBannerFeatureCard {
 export interface SpecBannerContent {
   id: string;
   background: string;
+  /** Optional explicit image; when set it takes precedence over `background`. */
+  imageUrl?: string;
   align: 'left' | 'right';
   titleLines: string[];
   description: string;

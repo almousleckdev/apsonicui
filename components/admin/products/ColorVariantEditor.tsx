@@ -23,7 +23,7 @@ export const ColorVariantEditor: React.FC<ColorVariantEditorProps> = ({
     onChange(colors.filter((_, i) => i !== idx));
   };
 
-  const updateColor = (idx: number, field: keyof ProductColorPayload, val: any) => {
+  const updateColor = <K extends keyof ProductColorPayload>(idx: number, field: K, val: ProductColorPayload[K]) => {
     const updated = [...colors];
     updated[idx] = { ...updated[idx], [field]: val };
     onChange(updated);

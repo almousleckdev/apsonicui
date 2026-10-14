@@ -3,14 +3,16 @@
 import React from "react";
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
+import type { KeyFeatureItem } from "@/lib/data/product-detail";
 
 interface ProductKeyFeaturesProps {
-  content?: any;
+  content?: KeyFeatureItem[];
 }
 
 export const ProductKeyFeatures: React.FC<ProductKeyFeaturesProps> = ({ content }) => {
   const reduceMotion = useReducedMotion();
-  const perfSrc = (content as any)?.performanceImageUrl || "/products/details/performance.jpg";
+  // The page puts the admin-uploaded performance image in the first key-feature item.
+  const perfSrc = content?.[0]?.image || "/products/details/performance.jpg";
 
   return (
     <section className="isolate relative z-0 overflow-hidden bg-zinc-950 select-none border-t border-zinc-900 w-full">

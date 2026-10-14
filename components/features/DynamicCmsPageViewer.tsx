@@ -5,7 +5,7 @@ import { useLocale } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
 import { CmsPageDto, CmsPageSectionDto, Locale } from '@/lib/types/cms-page';
-import { ArrowRight, PlayCircle } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 interface DynamicCmsPageViewerProps {
   page: CmsPageDto;

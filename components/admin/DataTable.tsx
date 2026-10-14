@@ -11,7 +11,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { Loader2, LucideIcon, Inbox } from 'lucide-react';
 
 interface DataTableProps<TData> {
-  columns: ColumnDef<TData, any>[];
+  columns: ColumnDef<TData, unknown>[];
   data: TData[];
   loading?: boolean;
   emptyTitle?: string;

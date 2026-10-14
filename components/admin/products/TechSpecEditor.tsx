@@ -62,7 +62,7 @@ export const TechSpecEditor: React.FC<TechSpecEditorProps> = ({
     onChange(specs.filter((_, i) => i !== idx));
   };
 
-  const updateSpec = (idx: number, field: keyof ProductSpecPayload, val: any) => {
+  const updateSpec = <K extends keyof ProductSpecPayload>(idx: number, field: K, val: ProductSpecPayload[K]) => {
     const updated = [...specs];
     updated[idx] = { ...updated[idx], [field]: val };
     onChange(updated);
