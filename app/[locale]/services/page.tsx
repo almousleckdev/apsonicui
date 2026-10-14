@@ -31,21 +31,27 @@ interface ServicesPageProps {
   params: Promise<{ locale: string }>;
 }
 
+async function loadPublishedServicesSnapshot() {
+  try {
+    const cmsPage = await cmsPagesService.getPublicPageBySlug('services');
+    return cmsPage && cmsPage.status === 'PUBLISHED' && cmsPage.publishedSnapshot ? cmsPage.publishedSnapshot : null;
+  } catch {
+    // No CMS version (or backend unreachable): the static page is the intended fallback.
+    return null;
+  }
+}
+
 export default async function ServicesPage({ params }: ServicesPageProps) {
   const { locale } = await params;
   
-  // Safe Migration Hook: Check if CMS version exists and is published
-  try {
-    const cmsPage = await cmsPagesService.getPublicPageBySlug('services');
-    if (cmsPage && cmsPage.status === 'PUBLISHED' && cmsPage.publishedSnapshot) {
-      return (
-        <main className="min-h-screen bg-white">
-          <DynamicCmsPageViewer page={cmsPage.publishedSnapshot} />
-        </main>
-      );
-    }
-  } catch (e) {
-    // CMS page doesn't exist or not published, silently fallback to static version
+  // A published CMS version of this page takes precedence; otherwise fall back to the built-in static page.
+  const cmsSnapshot = await loadPublishedServicesSnapshot();
+  if (cmsSnapshot) {
+    return (
+      <main className="min-h-screen bg-white">
+        <DynamicCmsPageViewer page={cmsSnapshot} />
+      </main>
+    );
   }
 
   const t = await getTranslations("services");

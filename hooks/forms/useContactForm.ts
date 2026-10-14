@@ -8,6 +8,19 @@ import { ApiError } from '@/services/api-client';
 import { reportError } from '@/lib/error-reporting';
 import { COUNTRY_LIST, CountryInfo } from '@/lib/data/countries';
 
+const MIN_SUBMIT_FEEDBACK_MS = 1000;
+
+/** Resolves with the task's result, but never sooner than `minMs` - so the sending animation is visible. */
+async function withMinimumDuration<T>(task: Promise<T>, minMs: number): Promise<T> {
+  const startedAt = Date.now();
+  const result = await task;
+  const remaining = minMs - (Date.now() - startedAt);
+  if (remaining > 0) {
+    await new Promise((resolve) => setTimeout(resolve, remaining));
+  }
+  return result;
+}
+
 export const useContactForm = () => {
   const t = useTranslations('contact');
   const [selectedCountry, setSelectedCountry] = useState<CountryInfo>(COUNTRY_LIST[0]); // Default to Mali 🇲🇱 ML
@@ -46,18 +59,14 @@ export const useContactForm = () => {
     setErrorMessage('');
     setIsLoadingAnimation(true);
 
-    const startTime = Date.now();
-
     try {
-      await submitContactForm({
-        ...data,
-        country: `${selectedCountry.flag} ${selectedCountry.code} - ${selectedCountry.name}`,
-      });
-      
-      const elapsed = Date.now() - startTime;
-      if (elapsed < 1000) {
-        await new Promise((resolve) => setTimeout(resolve, 1000 - elapsed));
-      }
+      await withMinimumDuration(
+        submitContactForm({
+          ...data,
+          country: `${selectedCountry.flag} ${selectedCountry.code} - ${selectedCountry.name}`,
+        }),
+        MIN_SUBMIT_FEEDBACK_MS
+      );
 
       setSubmitStatus('success');
       reset();

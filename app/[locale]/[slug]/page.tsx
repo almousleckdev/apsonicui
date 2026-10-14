@@ -31,29 +31,36 @@ export async function generateMetadata({ params }: CmsPageProps): Promise<Metada
   }
 }
 
-export default async function CmsDynamicPage({ params }: CmsPageProps) {
+async function loadPublishedSnapshot(slug: string): Promise<CmsPageDto | null> {
   try {
-    const { locale: localeStr, slug } = await params;
     const pageData = await cmsPagesService.getPublicPageBySlug(slug);
-    
     if (!pageData || pageData.status !== 'PUBLISHED' || !pageData.publishedSnapshot) {
-      return notFound();
+      return null;
     }
-
-    const snapshot = pageData.publishedSnapshot as CmsPageDto;
-
-    return (
-      <main className="flex min-h-screen flex-col font-sans">
-        <Header />
-        
-        {/* We pass the serialized snapshot directly to the pure React viewer */}
-        <DynamicCmsPageViewer page={snapshot} />
-
-        <Footer />
-      </main>
-    );
+    return pageData.publishedSnapshot as CmsPageDto;
   } catch (error) {
     console.error('Error fetching CMS page:', error);
-    return notFound();
+    return null;
   }
+}
+
+export default async function CmsDynamicPage({ params }: CmsPageProps) {
+  const { slug } = await params;
+  const snapshot = await loadPublishedSnapshot(slug);
+
+  // Outside any try/catch: notFound() works by throwing, and must not be swallowed.
+  if (!snapshot) {
+    notFound();
+  }
+
+  return (
+    <main className="flex min-h-screen flex-col font-sans">
+      <Header />
+
+      {/* We pass the serialized snapshot directly to the pure React viewer */}
+      <DynamicCmsPageViewer page={snapshot} />
+
+      <Footer />
+    </main>
+  );
 }
