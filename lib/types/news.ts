@@ -80,3 +80,33 @@ export interface CreateNewsPayload {
   readTimeMinutes?: number;
   sections?: NewsSectionItem[];
 }
+
+/** Article as returned by the backend (NewsResponse / NewsDetailResponse). Every localized field may be absent. */
+export interface BackendNewsItem {
+  id: number | string;
+  slug: string;
+  title?: string;
+  titleEn?: string;
+  titleFr?: string;
+  titleZh?: string;
+  summary?: string;
+  summaryEn?: string;
+  summaryFr?: string;
+  summaryZh?: string;
+  contentHtml?: string;
+  contentHtmlEn?: string;
+  contentHtmlFr?: string;
+  contentHtmlZh?: string;
+  coverImageUrl?: string;
+  category?: string;
+  authorName?: string;
+  authorRole?: string;
+  authorAvatarUrl?: string;
+  publishedAt?: string;
+  createdAt?: string;
+  published?: boolean;
+  viewsCount?: number;
+  readTimeMinutes?: number;
+  sections?: NewsSectionItem[];
+  content?: NewsContentBlock[];
+}

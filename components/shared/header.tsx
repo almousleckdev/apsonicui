@@ -33,9 +33,8 @@ export const Header: React.FC = () => {
     import('@/services/cms-pages').then(({ cmsPagesService }) => {
       cmsPagesService.getNavigationTree().then(tree => {
         const mapped = tree.map(item => ({
-          label: locale === 'fr' ? (item.navLabelFr || item.navLabelEn) : 
-                 locale === 'zh' ? (item.navLabelZh || item.navLabelEn) : 
-                 item.navLabelEn,
+          // Backend sends labels keyed by locale; fall back to English, then the slug, so a link is never blank.
+          label: item.labels?.[locale] || item.labels?.en || item.slug,
           href: `/${item.slug}`
         }));
         setDynamicNav(mapped);

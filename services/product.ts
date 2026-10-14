@@ -1,3 +1,5 @@
+import { unwrapList } from '@/lib/api/unwrap-list';
+import type { PageResponse } from '@/lib/types/api';
 import { apiClient } from './api-client';
 
 export interface ProductListItem {
@@ -124,12 +126,12 @@ export const productService = {
       if (params?.search) q.set('search', params.search);
       if (params?.size) q.set('size', String(params.size));
 
-      const res = await apiClient<any>(`/products?${q.toString()}`, {
+      const res = await apiClient<PageResponse<ProductListItem> | ProductListItem[]>(`/products?${q.toString()}`, {
         method: 'GET',
         requiresAuth: false,
         silent: true,
       });
-      return res.data?.content || res.data || [];
+      return unwrapList(res.data);
     } catch {
       return [];
     }
@@ -180,11 +182,11 @@ export const productService = {
     if (params?.brand) q.set('brand', params.brand);
     if (params?.search) q.set('search', params.search);
 
-    const res = await apiClient<any>(`/admin/products?${q.toString()}`, {
+    const res = await apiClient<PageResponse<ProductListItem> | ProductListItem[]>(`/admin/products?${q.toString()}`, {
       method: 'GET',
       requiresAuth: true,
     });
-    return res.data?.content || res.data || [];
+    return unwrapList(res.data);
   },
 
   async createProduct(payload: CreateProductPayload): Promise<ProductDetailItem> {

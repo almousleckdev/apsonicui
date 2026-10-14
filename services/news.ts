@@ -1,5 +1,9 @@
 import { apiClient } from './api-client';
-import type { NewsItem, CreateNewsPayload } from '@/lib/types/news';
+import { unwrapList } from '@/lib/api/unwrap-list';
+import type { PageResponse } from '@/lib/types/api';
+import type { BackendNewsItem, NewsItem, CreateNewsPayload } from '@/lib/types/news';
+
+type NewsListData = PageResponse<BackendNewsItem> | BackendNewsItem[];
 
 export const newsService = {
   /**
@@ -12,15 +16,14 @@ export const newsService = {
         queryParams.set('category', category);
       }
 
-      const res = await apiClient<any>(`/news?${queryParams.toString()}`, {
+      const res = await apiClient<NewsListData>(`/news?${queryParams.toString()}`, {
         method: 'GET',
         requiresAuth: false,
         silent: true,
       });
 
       if (res.data) {
-        const items = res.data.content || res.data || [];
-        return items.map(mapBackendNewsItem);
+        return unwrapList(res.data).map(mapBackendNewsItem);
       }
     } catch (error) {
       console.warn('Backend API /news call exception:', error);
@@ -38,15 +41,14 @@ export const newsService = {
    */
   async getAdminNewsList(): Promise<NewsItem[]> {
     try {
-      const res = await apiClient<any>('/admin/news?size=100', {
+      const res = await apiClient<NewsListData>('/admin/news?size=100', {
         method: 'GET',
         requiresAuth: true,
         silent: true,
       });
 
       if (res.data) {
-        const items = res.data.content || res.data || [];
-        return items.map(mapBackendNewsItem);
+        return unwrapList(res.data).map(mapBackendNewsItem);
       }
     } catch (error) {
       console.warn('Backend API /admin/news call exception:', error);
@@ -60,7 +62,7 @@ export const newsService = {
    */
   async getNewsById(idOrSlug: string, locale: string = 'en'): Promise<NewsItem | null> {
     try {
-      const res = await apiClient<any>(`/news/${idOrSlug}?locale=${locale}`, {
+      const res = await apiClient<BackendNewsItem>(`/news/${idOrSlug}?locale=${locale}`, {
         method: 'GET',
         requiresAuth: false,
         silent: true,
@@ -80,7 +82,7 @@ export const newsService = {
    * Create a new article in the live backend DB.
    */
   async createNews(payload: CreateNewsPayload): Promise<NewsItem> {
-    const res = await apiClient<any>('/admin/news', {
+    const res = await apiClient<BackendNewsItem>('/admin/news', {
       method: 'POST',
       body: JSON.stringify(payload),
       requiresAuth: true,
@@ -93,7 +95,7 @@ export const newsService = {
    * Update an existing article in the live backend DB.
    */
   async updateNews(id: string | number, payload: Partial<CreateNewsPayload>): Promise<NewsItem> {
-    const res = await apiClient<any>(`/admin/news/${id}`, {
+    const res = await apiClient<BackendNewsItem>(`/admin/news/${id}`, {
       method: 'PUT',
       body: JSON.stringify(payload),
       requiresAuth: true,
@@ -106,7 +108,7 @@ export const newsService = {
    * Toggle published / draft status.
    */
   async togglePublish(id: string | number, published: boolean): Promise<NewsItem> {
-    const res = await apiClient<any>(`/admin/news/${id}/publish?published=${published}`, {
+    const res = await apiClient<BackendNewsItem>(`/admin/news/${id}/publish?published=${published}`, {
       method: 'PATCH',
       requiresAuth: true,
     });
@@ -126,8 +128,7 @@ export const newsService = {
 };
 
 // Backend DTO to Frontend NewsItem Mapper with Robust Language Fallbacks
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function mapBackendNewsItem(item: any): NewsItem {
+function mapBackendNewsItem(item: BackendNewsItem): NewsItem {
   const title = item.title || item.titleEn || item.titleFr || item.titleZh || 'Untitled Article';
   const summary = item.summary || item.summaryEn || item.summaryFr || item.summaryZh || '';
   const contentHtml = item.contentHtml || item.contentHtmlEn || item.contentHtmlFr || item.contentHtmlZh || '';

@@ -1,3 +1,5 @@
+import { unwrapList } from '@/lib/api/unwrap-list';
+import type { PageResponse } from '@/lib/types/api';
 import { apiClient } from './api-client';
 import { tokenStorage } from './token-storage';
 import type {
@@ -118,12 +120,12 @@ export const userService = {
     queryParams.set('size', '50');
 
     const endpoint = `/admin/users?${queryParams.toString()}`;
-    const res: ApiResponse<any> = await apiClient(endpoint, {
+    const res: ApiResponse<PageResponse<UserManagementItem> | UserManagementItem[]> = await apiClient(endpoint, {
       method: 'GET',
       requiresAuth: true,
     });
 
-    return res.data?.content || res.data || [];
+    return unwrapList(res.data);
   },
 
   async createUser(payload: CreateUserPayload): Promise<UserManagementItem> {

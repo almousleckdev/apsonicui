@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import type { NavigationItem } from '@/lib/types/cms-page';
 import { cmsPagesService } from '@/services/cms-pages';
 import { useToast } from '@/components/ui/Toast';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
@@ -8,14 +9,7 @@ import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSo
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Save, LayoutList } from 'lucide-react';
 
-interface NavItem {
-  slug: string;
-  labels: Record<string, string>;
-  navPosition: string;
-  navOrder: number;
-}
-
-const SortableNavItem = ({ item, id }: { item: NavItem, id: string }) => {
+const SortableNavItem = ({ item, id }: { item: NavigationItem, id: string }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
   const style = { transform: CSS.Transform.toString(transform), transition };
 
@@ -34,7 +28,7 @@ const SortableNavItem = ({ item, id }: { item: NavItem, id: string }) => {
 
 export default function NavigationManager() {
   const { toast } = useToast();
-  const [items, setItems] = useState<NavItem[]>([]);
+  const [items, setItems] = useState<NavigationItem[]>([]);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -48,7 +42,7 @@ export default function NavigationManager() {
       try {
         const data = await cmsPagesService.getNavigationTree();
         // Assume backend returns Array of NavigationItemDto ordered by navOrder
-        setItems(data.sort((a, b) => a.navOrder - b.navOrder));
+        setItems(data.sort((a, b) => (a.navOrder ?? 0) - (b.navOrder ?? 0)));
       } catch (err) {
         toast.error('Failed to load navigation tree');
       } finally {

@@ -3,10 +3,15 @@ import { apiClient } from './api-client';
 
 const CONFIG_KEY = 'homepage_config';
 
+/** Backend SystemConfig payload: the homepage config is stored as a JSON string. */
+interface StoredConfig {
+  configValue?: string;
+}
+
 export const homepageService = {
   async getHomepageConfig(): Promise<HomePageConfig> {
     try {
-      const response = await apiClient<any>(`/cms/config/${CONFIG_KEY}`, {
+      const response = await apiClient<StoredConfig>(`/cms/config/${CONFIG_KEY}`, {
         method: 'GET',
         requiresAuth: false,
         silent: true, // Don't toast if it doesn't exist yet
@@ -29,7 +34,7 @@ export const homepageService = {
 
   async saveHomepageConfig(config: HomePageConfig): Promise<HomePageConfig> {
     try {
-      await apiClient<any>(`/admin/cms/config/${CONFIG_KEY}`, {
+      await apiClient<StoredConfig>(`/admin/cms/config/${CONFIG_KEY}`, {
         method: 'PUT',
         requiresAuth: true,
         body: JSON.stringify({ configValue: JSON.stringify(config) }),

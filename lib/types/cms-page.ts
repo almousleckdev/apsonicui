@@ -35,6 +35,14 @@ export interface CmsPageDto {
   updatedAt: string;
 }
 
+/** Public navigation entry (backend NavigationItemDto). `labels` is keyed by locale. */
+export interface NavigationItem {
+  slug: string;
+  labels: Record<string, string>;
+  navPosition?: string;
+  navOrder?: number;
+}
+
 export interface CmsPageRequest {
   slug: string;
   status: PageStatus;
