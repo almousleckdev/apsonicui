@@ -48,27 +48,6 @@ export const cancelRequest = (cancelId: string) => {
   }
 };
 
-interface RefreshWaiter {
-  resolve: (token: string) => void;
-  reject: (error: unknown) => void;
-}
-
-let isRefreshing = false;
-let refreshQueue: RefreshWaiter[] = [];
-
-// Settles every request that queued up behind an in-flight refresh.
-function settleRefreshQueue(outcome: { token: string } | { error: unknown }) {
-  const waiters = refreshQueue;
-  refreshQueue = [];
-  for (const waiter of waiters) {
-    if ('token' in outcome) {
-      waiter.resolve(outcome.token);
-    } else {
-      waiter.reject(outcome.error);
-    }
-  }
-}
-
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function notifySessionExpired() {
@@ -77,14 +56,29 @@ function notifySessionExpired() {
   }
 }
 
+// Required by the backend on cookie-authenticated endpoints (/auth/refresh, /auth/logout): a custom header
+// cannot be sent by a cross-site page without a CORS preflight, which the API only grants to our own origins.
+export const CSRF_HEADER = { 'X-Requested-With': 'apsonic-web' } as const;
+
 // The refresh token itself is an httpOnly cookie the browser attaches
 // automatically - nothing to read or send from JS here.
-async function performRefresh(): Promise<string> {
-  const refreshRes = await fetch(`${BASE_URL}/auth/refresh`, {
+async function requestRefresh(): Promise<Response> {
+  return fetch(`${BASE_URL}/auth/refresh`, {
     method: 'POST',
     credentials: 'include',
+    headers: CSRF_HEADER,
     signal: AbortSignal.timeout(DEFAULT_TIMEOUT_MS),
   });
+}
+
+async function performRefresh(): Promise<string> {
+  let refreshRes = await requestRefresh();
+
+  // Another tab may have rotated the cookie a moment ago; the browser now holds the new one, so retry once.
+  if (refreshRes.status === 401) {
+    await sleep(300);
+    refreshRes = await requestRefresh();
+  }
 
   if (!refreshRes.ok) {
     throw new ApiError('Session expired', 401);
@@ -97,6 +91,21 @@ async function performRefresh(): Promise<string> {
   }
   tokenStorage.setAccessToken(newToken);
   return newToken;
+}
+
+let inFlightRefresh: Promise<string> | null = null;
+
+/**
+ * Single-flight session refresh: concurrent callers (parallel 401s, StrictMode double effects) share one
+ * request, so the rotating refresh token is never presented twice.
+ */
+export function refreshSession(): Promise<string> {
+  if (!inFlightRefresh) {
+    inFlightRefresh = performRefresh().finally(() => {
+      inFlightRefresh = null;
+    });
+  }
+  return inFlightRefresh;
 }
 
 export async function apiClient<T>(
@@ -129,6 +138,7 @@ export async function apiClient<T>(
   const signal = AbortSignal.any(signals);
 
   const headers = new Headers(customHeaders);
+  headers.set('X-Requested-With', CSRF_HEADER['X-Requested-With']);
   if (!headers.has('Content-Type') && !(restOptions.body instanceof FormData)) {
     headers.set('Content-Type', 'application/json');
   }
@@ -162,29 +172,16 @@ export async function apiClient<T>(
     let response = await fetchWithRetry(1);
 
     if (response.status === 401 && requiresAuth) {
-      if (!isRefreshing) {
-        isRefreshing = true;
-        try {
-          const newToken = await performRefresh();
-          isRefreshing = false;
-          settleRefreshQueue({ token: newToken });
-          headers.set('Authorization', `Bearer ${newToken}`);
-          response = await doFetch();
-        } catch (refreshError) {
-          isRefreshing = false;
-          settleRefreshQueue({ error: refreshError });
-          tokenStorage.clearAll();
-          notifySessionExpired();
-          throw refreshError instanceof ApiError
-            ? refreshError
-            : new ApiError('Session expired', 401);
-        }
-      } else {
-        const newToken = await new Promise<string>((resolve, reject) => {
-          refreshQueue.push({ resolve, reject });
-        });
+      try {
+        const newToken = await refreshSession();
         headers.set('Authorization', `Bearer ${newToken}`);
         response = await doFetch();
+      } catch (refreshError) {
+        tokenStorage.clearAll();
+        notifySessionExpired();
+        throw refreshError instanceof ApiError
+          ? refreshError
+          : new ApiError('Session expired', 401);
       }
     }
 

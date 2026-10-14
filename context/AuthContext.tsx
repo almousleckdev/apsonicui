@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { authService } from "@/services/auth-service";
 import { tokenStorage } from "@/services/token-storage";
-import { SESSION_EXPIRED_EVENT } from "@/services/api-client";
+import { SESSION_EXPIRED_EVENT, refreshSession } from "@/services/api-client";
 import type { LoginRequest, UserProfileResponse } from "@/lib/types/auth";
 
 interface AuthContextType {
@@ -59,12 +59,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (!token) {
         try {
-          const refreshRes = await authService.refreshToken();
-          if (refreshRes?.accessToken) {
-            token = refreshRes.accessToken;
-          }
+          token = await refreshSession();
         } catch {
-          // Refresh cookie absent or expired
+          // Refresh cookie absent or expired: the visitor is simply signed out.
         }
       }
 
@@ -78,8 +75,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } catch (err) {
           console.warn("Failed to validate token profile on init:", err);
           try {
-            const refreshRes = await authService.refreshToken();
-            if (refreshRes?.accessToken) {
+            if (await refreshSession()) {
               const profile = await authService.getCurrentUser();
               if (isMounted) {
                 setUserState(profile);
