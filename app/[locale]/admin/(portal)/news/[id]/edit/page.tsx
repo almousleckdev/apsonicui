@@ -62,6 +62,7 @@ export default function EditNewsPage({ params }: EditNewsPageProps) {
           </div>
         ) : (
           <NewsStoryForm
+            key={initialData?.id ?? 'new'}
             initialData={initialData}
             currentUser={currentUser}
             onSubmit={handleSubmit}

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { NewsRichTextEditor } from '@/components/admin/news/NewsRichTextEditor';
 import { AdminBackNav } from '@/components/admin/AdminBackNav';
 import type { CreateNewsPayload, NewsItem } from '@/lib/types/news';
@@ -26,23 +26,12 @@ export const NewsStoryForm: React.FC<NewsStoryFormProps> = ({
   const [uploadingCover, setUploadingCover] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const [title, setTitle] = useState('');
-  const [summary, setSummary] = useState('');
-  const [contentHtml, setContentHtml] = useState('');
-  const [category, setCategory] = useState('Corporate');
-  const [coverImageUrl, setCoverImageUrl] = useState('');
-  const [published, setPublished] = useState(true);
-
-  useEffect(() => {
-    if (initialData) {
-      setTitle(initialData.titleEn || initialData.title || '');
-      setSummary(initialData.summaryEn || initialData.excerpt || '');
-      setContentHtml(initialData.contentHtmlEn || initialData.contentHtml || '');
-      setCategory(initialData.category || 'Corporate');
-      setCoverImageUrl(initialData.thumbnail || '');
-      setPublished(initialData.published !== undefined ? initialData.published : true);
-    }
-  }, [initialData]);
+  const [title, setTitle] = useState(initialData?.titleEn || initialData?.title || '');
+  const [summary, setSummary] = useState(initialData?.summaryEn || initialData?.excerpt || '');
+  const [contentHtml, setContentHtml] = useState(initialData?.contentHtmlEn || initialData?.contentHtml || '');
+  const [category, setCategory] = useState(initialData?.category || 'Corporate');
+  const [coverImageUrl, setCoverImageUrl] = useState(initialData?.thumbnail || '');
+  const [published, setPublished] = useState(initialData?.published !== undefined ? initialData.published : true);
 
   const generateSlug = (text: string) => {
     return text

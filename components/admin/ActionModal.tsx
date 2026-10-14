@@ -36,11 +36,13 @@ export const ActionModal: React.FC<ActionModalProps> = ({
 }) => {
   const [typedName, setTypedName] = useState('');
 
-  useEffect(() => {
-    if (isOpen) {
-      setTypedName('');
-    }
-  }, [isOpen]);
+  // Clear the typed confirmation each time the dialog opens. Adjusting state while rendering (instead of in an
+  // effect) avoids a render with stale text; see "Adjusting state when a prop changes" in the React docs.
+  const [wasOpen, setWasOpen] = useState(isOpen);
+  if (isOpen !== wasOpen) {
+    setWasOpen(isOpen);
+    if (isOpen) setTypedName('');
+  }
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

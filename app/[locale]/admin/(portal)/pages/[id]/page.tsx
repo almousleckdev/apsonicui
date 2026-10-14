@@ -45,7 +45,7 @@ export default function EditCmsPage() {
       <>
         <div className="max-w-7xl mx-auto font-sans">
           {initialData ? (
-            <AdminPageForm initialData={initialData} onSubmit={handleSubmit} isEditing={true} />
+            <AdminPageForm key={initialData.id} initialData={initialData} onSubmit={handleSubmit} isEditing={true} />
           ) : (
             <div className="py-20 text-center text-gray-500">Loading page data...</div>
           )}

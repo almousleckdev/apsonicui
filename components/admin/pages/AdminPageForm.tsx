@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { AdminBackNav } from '@/components/admin/AdminBackNav';
 import { Save, Eye, Globe } from 'lucide-react';
 import type { CmsPageRequest, CmsPageDto, CmsPageSectionDto, PageStatus, Locale, CmsPageTranslationDto } from '@/lib/types/cms-page';
@@ -25,38 +25,19 @@ export const AdminPageForm: React.FC<AdminPageFormProps> = ({
   
   // Master State
   const [activeLocale, setActiveLocale] = useState<Locale>('en');
-  const [slug, setSlug] = useState('');
-  const [status, setStatus] = useState<PageStatus>('DRAFT');
-  const [navVisibility, setNavVisibility] = useState(false);
-  const [navPosition, setNavPosition] = useState('HEADER_MAIN');
-  const [navOrder, setNavOrder] = useState(0);
-  
-  const [translations, setTranslations] = useState<Record<string, CmsPageTranslationDto>>({
-    en: { ...DEFAULT_TRANSLATION },
-    fr: { ...DEFAULT_TRANSLATION },
-    zh: { ...DEFAULT_TRANSLATION }
-  });
-  
-  const [sections, setSections] = useState<CmsPageSectionDto[]>([]);
+  const [slug, setSlug] = useState(initialData?.slug ?? '');
+  const [status, setStatus] = useState<PageStatus>(initialData?.status ?? 'DRAFT');
+  const [navVisibility, setNavVisibility] = useState(initialData?.navVisibility ?? false);
+  const [navPosition, setNavPosition] = useState(initialData?.navPosition || 'HEADER_MAIN');
+  const [navOrder, setNavOrder] = useState(initialData?.navOrder || 0);
 
-  useEffect(() => {
-    if (initialData) {
-      setSlug(initialData.slug);
-      setStatus(initialData.status);
-      setNavVisibility(initialData.navVisibility);
-      setNavPosition(initialData.navPosition || 'HEADER_MAIN');
-      setNavOrder(initialData.navOrder || 0);
-      setSections(initialData.sections || []);
-      
-      if (initialData.translations) {
-        setTranslations({
-          en: initialData.translations.en || { ...DEFAULT_TRANSLATION },
-          fr: initialData.translations.fr || { ...DEFAULT_TRANSLATION },
-          zh: initialData.translations.zh || { ...DEFAULT_TRANSLATION }
-        });
-      }
-    }
-  }, [initialData]);
+  const [translations, setTranslations] = useState<Record<string, CmsPageTranslationDto>>({
+    en: initialData?.translations?.en || { ...DEFAULT_TRANSLATION },
+    fr: initialData?.translations?.fr || { ...DEFAULT_TRANSLATION },
+    zh: initialData?.translations?.zh || { ...DEFAULT_TRANSLATION },
+  });
+
+  const [sections, setSections] = useState<CmsPageSectionDto[]>(initialData?.sections || []);
 
   const handleTranslationChange = (key: keyof CmsPageTranslationDto, value: string) => {
     setTranslations(prev => ({

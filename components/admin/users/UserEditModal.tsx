@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import type { CreateUserPayload, UserManagementItem } from '@/lib/types/auth';
 import { UserRolePicker } from './UserRolePicker';
 import { User, KeyRound, Mail } from 'lucide-react';
@@ -13,8 +13,7 @@ interface UserEditModalProps {
   onSubmit: (payload: CreateUserPayload) => Promise<void>;
 }
 
-export const UserEditModal: React.FC<UserEditModalProps> = ({
-  isOpen,
+const UserEditForm: React.FC<Omit<UserEditModalProps, 'isOpen'>> = ({
   editingUser,
   onClose,
   onSubmit,
@@ -22,34 +21,13 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({
   const [saving, setSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState(editingUser?.username || '');
+  const [email, setEmail] = useState(editingUser?.email || '');
   const [password, setPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [role, setRole] = useState('ROLE_ADMIN');
-  const [avatarUrl, setAvatarUrl] = useState('');
-
-  useEffect(() => {
-    if (editingUser) {
-      setUsername(editingUser.username || '');
-      setEmail(editingUser.email || '');
-      setFirstName(editingUser.firstName || '');
-      setLastName(editingUser.lastName || '');
-      setRole(editingUser.roles?.[0] || 'ROLE_ADMIN');
-      setAvatarUrl(editingUser.avatarUrl || '');
-      setPassword('');
-    } else {
-      setUsername('');
-      setEmail('');
-      setPassword('');
-      setFirstName('');
-      setLastName('');
-      setRole('ROLE_ADMIN');
-      setAvatarUrl('');
-    }
-    setErrorMsg(null);
-  }, [editingUser, isOpen]);
+  const [firstName, setFirstName] = useState(editingUser?.firstName || '');
+  const [lastName, setLastName] = useState(editingUser?.lastName || '');
+  const [role, setRole] = useState(editingUser?.roles?.[0] || 'ROLE_ADMIN');
+  const [avatarUrl, setAvatarUrl] = useState(editingUser?.avatarUrl || '');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,11 +62,7 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={editingUser ? `Edit User: @${editingUser.username}` : 'Create New System Account'}
-    >
+    <>
       <form onSubmit={handleSubmit} className="space-y-6 font-sans">
         {errorMsg && (
           <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold">
@@ -176,6 +150,17 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({
           </button>
         </div>
       </form>
-    </Modal>
+    </>
   );
 };
+
+export const UserEditModal: React.FC<UserEditModalProps> = ({ isOpen, editingUser, onClose, onSubmit }) => (
+  <Modal
+    isOpen={isOpen}
+    onClose={onClose}
+    title={editingUser ? `Edit User: @${editingUser.username}` : 'Create New System Account'}
+  >
+    {/* Modal unmounts its children when closed, so the form (and its fields) starts fresh on every open. */}
+    <UserEditForm key={editingUser?.id ?? 'new'} editingUser={editingUser} onClose={onClose} onSubmit={onSubmit} />
+  </Modal>
+);

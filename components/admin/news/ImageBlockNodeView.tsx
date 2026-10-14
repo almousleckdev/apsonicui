@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { NodeViewWrapper } from '@tiptap/react';
 import { Upload, Trash2, RefreshCw } from 'lucide-react';
 import { uploadMediaFile } from '@/services/media';
@@ -26,9 +26,12 @@ export const ImageBlockNodeView: React.FC<ImageBlockNodeViewProps> = ({
   const [replacing, setReplacing] = useState(false);
   const replaceFileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
+  // Follow the node attribute when it changes from outside (undo/redo, collaboration) - adjusted during render.
+  const [syncedCaption, setSyncedCaption] = useState(caption);
+  if (caption !== syncedCaption) {
+    setSyncedCaption(caption);
     setCaptionValue(caption);
-  }, [caption]);
+  }
 
   const handleCaptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVal = e.target.value;

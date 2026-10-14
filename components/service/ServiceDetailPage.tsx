@@ -32,7 +32,7 @@ export const ServiceDetailPage: React.FC<ServiceDetailPageProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<string>(categories[0]);
   const [lightboxIndex, setLightboxIndex] = useState<number>(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState<boolean>(false);
-  const [hasScrolledForTab, setHasScrolledForTab] = useState<boolean>(false);
+  const hasScrolledForTab = useRef(false); // skip the scroll on first render, scroll on later tab changes
 
   const currentData = data[selectedCategory];
   const { isVisible: isHeaderVisible } = useScrollDirection();
@@ -47,7 +47,7 @@ export const ServiceDetailPage: React.FC<ServiceDetailPageProps> = ({
   };
 
   useEffect(() => {
-    if (hasScrolledForTab && sectionAnchorRef.current) {
+    if (hasScrolledForTab.current && sectionAnchorRef.current) {
       const headerOffset = isHeaderVisible ? 160 : 80;
       const elementPosition = sectionAnchorRef.current.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
@@ -57,7 +57,7 @@ export const ServiceDetailPage: React.FC<ServiceDetailPageProps> = ({
         behavior: 'smooth',
       });
     }
-    setHasScrolledForTab(true);
+    hasScrolledForTab.current = true;
   }, [selectedCategory]);
 
   return (
