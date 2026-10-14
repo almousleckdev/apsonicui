@@ -4,7 +4,6 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { AdminPageForm } from '@/components/admin/pages/AdminPageForm';
 import { cmsPagesService } from '@/services/cms-pages';
-import { tokenStorage } from '@/services/token-storage';
 import { useToast } from '@/components/ui/Toast';
 import type { CmsPageRequest } from '@/lib/types/cms-page';
 
@@ -13,10 +12,8 @@ export default function CreateCmsPage() {
   const { toast } = useToast();
 
   const handleSubmit = async (payload: CmsPageRequest) => {
-    const token = tokenStorage.getAccessToken();
-    if (!token) return;
     try {
-      const page = await cmsPagesService.createPage(payload, token);
+      const page = await cmsPagesService.createPage(payload);
       toast.success('Page created successfully');
       router.push(`/en/admin/pages/${page.id}`);
       return page;

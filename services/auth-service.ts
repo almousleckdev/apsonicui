@@ -126,7 +126,7 @@ export const userService = {
     return res.data?.content || res.data || [];
   },
 
-  async createUser(payload: CreateUserPayload, token?: string): Promise<UserManagementItem> {
+  async createUser(payload: CreateUserPayload): Promise<UserManagementItem> {
     const res: ApiResponse<UserManagementItem> = await apiClient('/admin/users', {
       method: 'POST',
       body: JSON.stringify(payload),
@@ -136,7 +136,7 @@ export const userService = {
     return res.data;
   },
 
-  async updateUser(id: number, payload: UpdateUserPayload, token?: string): Promise<UserManagementItem> {
+  async updateUser(id: number, payload: UpdateUserPayload): Promise<UserManagementItem> {
     const res: ApiResponse<UserManagementItem> = await apiClient(`/admin/users/${id}`, {
       method: 'PUT',
       body: JSON.stringify(payload),
@@ -146,7 +146,7 @@ export const userService = {
     return res.data;
   },
 
-  async toggleUserStatus(id: number, enabled: boolean, token?: string): Promise<UserManagementItem> {
+  async toggleUserStatus(id: number, enabled: boolean): Promise<UserManagementItem> {
     const res: ApiResponse<UserManagementItem> = await apiClient(
       `/admin/users/${id}/status?enabled=${enabled}`,
       {
@@ -158,14 +158,14 @@ export const userService = {
     return res.data;
   },
 
-  async deleteUser(id: number, token?: string): Promise<void> {
+  async deleteUser(id: number): Promise<void> {
     await apiClient(`/admin/users/${id}`, {
       method: 'DELETE',
       requiresAuth: true,
     });
   },
 
-  async getAllRoles(token?: string): Promise<RoleItem[]> {
+  async getAllRoles(): Promise<RoleItem[]> {
     try {
       const res: ApiResponse<RoleItem[]> = await apiClient('/admin/users/roles', {
         method: 'GET',

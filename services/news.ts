@@ -36,7 +36,7 @@ export const newsService = {
   /**
    * Fetch admin news articles list for dashboard management.
    */
-  async getAdminNewsList(token?: string): Promise<NewsItem[]> {
+  async getAdminNewsList(): Promise<NewsItem[]> {
     try {
       const res = await apiClient<any>('/admin/news?size=100', {
         method: 'GET',
@@ -79,7 +79,7 @@ export const newsService = {
   /**
    * Create a new article in the live backend DB.
    */
-  async createNews(payload: CreateNewsPayload, token?: string): Promise<NewsItem> {
+  async createNews(payload: CreateNewsPayload): Promise<NewsItem> {
     const res = await apiClient<any>('/admin/news', {
       method: 'POST',
       body: JSON.stringify(payload),
@@ -92,7 +92,7 @@ export const newsService = {
   /**
    * Update an existing article in the live backend DB.
    */
-  async updateNews(id: string | number, payload: Partial<CreateNewsPayload>, token?: string): Promise<NewsItem> {
+  async updateNews(id: string | number, payload: Partial<CreateNewsPayload>): Promise<NewsItem> {
     const res = await apiClient<any>(`/admin/news/${id}`, {
       method: 'PUT',
       body: JSON.stringify(payload),
@@ -105,7 +105,7 @@ export const newsService = {
   /**
    * Toggle published / draft status.
    */
-  async togglePublish(id: string | number, published: boolean, token?: string): Promise<NewsItem> {
+  async togglePublish(id: string | number, published: boolean): Promise<NewsItem> {
     const res = await apiClient<any>(`/admin/news/${id}/publish?published=${published}`, {
       method: 'PATCH',
       requiresAuth: true,
@@ -117,7 +117,7 @@ export const newsService = {
   /**
    * Delete an article safely from backend DB.
    */
-  async deleteNews(id: string | number, token?: string): Promise<void> {
+  async deleteNews(id: string | number): Promise<void> {
     await apiClient(`/admin/news/${id}`, {
       method: 'DELETE',
       requiresAuth: true,

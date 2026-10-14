@@ -4,7 +4,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { ActionModal } from '@/components/admin/ActionModal';
 import { cmsPagesService } from '@/services/cms-pages';
-import { tokenStorage } from '@/services/token-storage';
 import { getPageTitle, type CmsPageDto } from '@/lib/types/cms-page';
 import { AdminPagesTable } from '@/components/admin/pages/AdminPagesTable';
 import { useToast } from '@/components/ui/Toast';
@@ -20,8 +19,7 @@ export default function AdminCmsPages() {
   const fetchPages = useCallback(async () => {
     setLoading(true);
     try {
-      const token = tokenStorage.getAccessToken() || undefined;
-      const data = await cmsPagesService.getAdminPages(token);
+      const data = await cmsPagesService.getAdminPages();
       setPages(data);
     } catch (err) {
       console.error('Failed to load pages:', err);
@@ -36,11 +34,9 @@ export default function AdminCmsPages() {
   }, [fetchPages]);
 
   const handleToggleStatus = async (item: CmsPageDto) => {
-    const token = tokenStorage.getAccessToken();
-    if (!token) return;
     try {
       const nextStatus = item.status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED';
-      await cmsPagesService.updateStatus(item.id, nextStatus, token);
+      await cmsPagesService.updateStatus(item.id, nextStatus);
       setPages((prev) =>
         prev.map((p) => (p.id === item.id ? { ...p, status: nextStatus } : p))
       );
@@ -52,11 +48,10 @@ export default function AdminCmsPages() {
   };
 
   const handleDeleteConfirm = async () => {
-    const token = tokenStorage.getAccessToken();
-    if (!deleteTarget || !token) return;
+    if (!deleteTarget) return;
     setIsDeleting(true);
     try {
-      await cmsPagesService.deletePage(deleteTarget.id, token);
+      await cmsPagesService.deletePage(deleteTarget.id);
       toast.success(`Page "${getPageTitle(deleteTarget)}" deleted successfully.`);
       setPages((prev) => prev.filter((p) => p.id !== deleteTarget.id));
       setDeleteTarget(null);

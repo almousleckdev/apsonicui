@@ -4,7 +4,6 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { ActionModal } from '@/components/admin/ActionModal';
 import { newsService } from '@/services/news';
-import { tokenStorage } from '@/services/token-storage';
 import type { NewsItem } from '@/lib/types/news';
 import { AdminNewsFilterBar } from '@/components/admin/news/AdminNewsFilterBar';
 import { AdminNewsTable } from '@/components/admin/news/AdminNewsTable';
@@ -24,8 +23,7 @@ export default function AdminNewsPage() {
   const fetchNews = useCallback(async () => {
     setLoading(true);
     try {
-      const token = tokenStorage.getAccessToken() || undefined;
-      const data = await newsService.getAdminNewsList(token);
+      const data = await newsService.getAdminNewsList();
       setNewsList(data);
     } catch (err) {
       console.error('Failed to load news list:', err);
@@ -40,11 +38,9 @@ export default function AdminNewsPage() {
   }, [fetchNews]);
 
   const handleTogglePublish = async (item: NewsItem) => {
-    const token = tokenStorage.getAccessToken();
-    if (!token) return;
     try {
       const nextStatus = !item.published;
-      await newsService.togglePublish(item.id, nextStatus, token);
+      await newsService.togglePublish(item.id, nextStatus);
       setNewsList((prev) =>
         prev.map((n) => (n.id === item.id ? { ...n, published: nextStatus } : n))
       );
@@ -56,11 +52,10 @@ export default function AdminNewsPage() {
   };
 
   const handleDeleteConfirm = async () => {
-    const token = tokenStorage.getAccessToken();
-    if (!deleteTarget || !token) return;
+    if (!deleteTarget) return;
     setIsDeleting(true);
     try {
-      await newsService.deleteNews(deleteTarget.id, token);
+      await newsService.deleteNews(deleteTarget.id);
       toast.success(`Article "${deleteTarget.title}" deleted successfully.`);
       setNewsList((prev) => prev.filter((n) => n.id !== deleteTarget.id));
       setDeleteTarget(null);

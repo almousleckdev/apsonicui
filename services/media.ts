@@ -1,39 +1,34 @@
-import { tokenStorage } from './token-storage';
+import { apiClient } from './api-client';
 
+interface UploadedMedia {
+  url: string;
+  filename: string;
+}
+
+const UPLOAD_TIMEOUT_MS = 120_000; // videos can be up to 50 MB
+
+/**
+ * Uploads a file through apiClient so it gets the same treatment as every other admin call:
+ * bearer token, automatic session refresh on 401 (access tokens are short-lived), and consistent errors.
+ * The backend validates the real content type; the server's message is surfaced in the thrown error.
+ */
 export async function uploadMediaFile(file: File): Promise<string> {
-  const token = tokenStorage.getAccessToken();
   const formData = new FormData();
   formData.append('file', file);
 
-  const headers: Record<string, string> = {};
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+  const res = await apiClient<UploadedMedia>('/admin/media/upload', {
+    method: 'POST',
+    body: formData,
+    requiresAuth: true,
+    retryCount: 1,
+    timeoutMs: UPLOAD_TIMEOUT_MS,
+  });
+
+  const url = res.data?.url;
+  if (!url) {
+    throw new Error('Upload succeeded but the server returned no file URL');
   }
-
-  // Use relative '/api/v1/admin/media/upload' so Next.js rewrites to backend proxy seamlessly
-  const uploadUrl = typeof window !== 'undefined'
-    ? '/api/v1/admin/media/upload'
-    : `${process.env.INTERNAL_API_URL || 'http://localhost:8080'}/api/v1/admin/media/upload`;
-
-  try {
-    const res = await fetch(uploadUrl, {
-      method: 'POST',
-      headers,
-      body: formData,
-    });
-
-    if (res.ok) {
-      const json = await res.json();
-      const relativeUrl = json.data?.url;
-      if (relativeUrl) return relativeUrl;
-    }
-    const errorJson = await res.json().catch(() => null);
-    const errMsg = errorJson?.message || `Server returned ${res.status}: ${res.statusText}`;
-    throw new Error(errMsg);
-  } catch (error) {
-    console.error('Backend media upload error:', error);
-    throw error;
-  }
+  return url;
 }
 
 export const mediaService = {

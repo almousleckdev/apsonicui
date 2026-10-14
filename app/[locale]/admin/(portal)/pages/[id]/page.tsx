@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { AdminPageForm } from '@/components/admin/pages/AdminPageForm';
 import { cmsPagesService } from '@/services/cms-pages';
-import { tokenStorage } from '@/services/token-storage';
 import { useToast } from '@/components/ui/Toast';
 import type { CmsPageRequest, CmsPageDto } from '@/lib/types/cms-page';
 
@@ -18,10 +17,8 @@ export default function EditCmsPage() {
   useEffect(() => {
     if (isNaN(id)) return;
     const fetchPage = async () => {
-      const token = tokenStorage.getAccessToken();
-      if (!token) return;
       try {
-        const data = await cmsPagesService.getAdminPageById(id, token);
+        const data = await cmsPagesService.getAdminPageById(id);
         setInitialData(data);
       } catch (err) {
         toast.error('Failed to load page data');
@@ -31,10 +28,8 @@ export default function EditCmsPage() {
   }, [id, toast]);
 
   const handleSubmit = async (payload: CmsPageRequest) => {
-    const token = tokenStorage.getAccessToken();
-    if (!token) return;
     try {
-      const page = await cmsPagesService.updatePage(id, payload, token);
+      const page = await cmsPagesService.updatePage(id, payload);
       toast.success('Page updated successfully');
       setInitialData(page);
       return page;

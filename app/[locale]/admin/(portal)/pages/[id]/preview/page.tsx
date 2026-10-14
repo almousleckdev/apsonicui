@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { cmsPagesService } from '@/services/cms-pages';
-import { tokenStorage } from '@/services/token-storage';
 import { useToast } from '@/components/ui/Toast';
 import type { CmsPageDto } from '@/lib/types/cms-page';
 import { DynamicCmsPageViewer } from '@/components/features/DynamicCmsPageViewer';
@@ -20,10 +19,8 @@ export default function AdminPagePreview() {
   useEffect(() => {
     if (isNaN(id)) return;
     const fetchPage = async () => {
-      const token = tokenStorage.getAccessToken();
-      if (!token) return;
       try {
-        const data = await cmsPagesService.getAdminPageById(id, token);
+        const data = await cmsPagesService.getAdminPageById(id);
         setPage(data);
       } catch (err) {
         toast.error('Failed to load page for preview');

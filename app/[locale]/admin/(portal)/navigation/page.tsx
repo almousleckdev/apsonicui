@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { cmsPagesService } from '@/services/cms-pages';
-import { tokenStorage } from '@/services/token-storage';
 import { useToast } from '@/components/ui/Toast';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
@@ -71,8 +70,6 @@ export default function NavigationManager() {
   };
 
   const handleSave = async () => {
-    const token = tokenStorage.getAccessToken();
-    if (!token) return;
     setSaving(true);
     try {
       // Create a batch update or call an endpoint to update orders

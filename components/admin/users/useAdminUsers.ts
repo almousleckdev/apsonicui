@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { userService } from '@/services/auth-service';
-import { tokenStorage } from '@/services/token-storage';
 import type { UserManagementItem, CreateUserPayload, UpdateUserPayload } from '@/lib/types/auth';
 
 import { useToast } from '@/components/ui/Toast';
@@ -50,27 +49,23 @@ export function useAdminUsers() {
   };
 
   const handleSaveUser = async (payload: CreateUserPayload) => {
-    const token = tokenStorage.getAccessToken();
-    if (!token) throw new Error('Authentication session expired');
     if (editingUser) {
       const updatePayload: UpdateUserPayload = {
         ...payload,
         enabled: editingUser.enabled,
       };
-      await userService.updateUser(editingUser.id, updatePayload, token);
+      await userService.updateUser(editingUser.id, updatePayload);
       toast.success('User updated successfully!');
     } else {
-      await userService.createUser(payload, token);
+      await userService.createUser(payload);
       toast.success('User created successfully!');
     }
     await fetchUserList();
   };
 
   const handleToggleStatus = async (user: UserManagementItem) => {
-    const token = tokenStorage.getAccessToken();
-    if (!token) return;
     try {
-      await userService.toggleUserStatus(user.id, !user.enabled, token);
+      await userService.toggleUserStatus(user.id, !user.enabled);
       toast.success(`User account ${!user.enabled ? 'activated' : 'suspended'} successfully.`);
       await fetchUserList();
     } catch (err: unknown) {
@@ -80,11 +75,9 @@ export function useAdminUsers() {
   };
 
   const handleDeleteUser = async (id: number) => {
-    const token = tokenStorage.getAccessToken();
-    if (!token) return;
     setDeleting(true);
     try {
-      await userService.deleteUser(id, token);
+      await userService.deleteUser(id);
       toast.success('User account deleted successfully.');
       setDeletingUser(null);
       await fetchUserList();

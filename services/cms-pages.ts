@@ -2,7 +2,7 @@ import { apiClient } from './api-client';
 import type { CmsPageDto, CmsPageRequest, PageStatus } from '@/lib/types/cms-page';
 
 export const cmsPagesService = {
-  async getAdminPages(token?: string): Promise<CmsPageDto[]> {
+  async getAdminPages(): Promise<CmsPageDto[]> {
     const res = await apiClient<any>('/admin/pages', {
       method: 'GET',
       requiresAuth: true,
@@ -11,7 +11,7 @@ export const cmsPagesService = {
     return res.data?.content || [];
   },
 
-  async getAdminPageById(id: number, token?: string): Promise<CmsPageDto> {
+  async getAdminPageById(id: number): Promise<CmsPageDto> {
     const res = await apiClient<any>(`/admin/pages/${id}`, {
       method: 'GET',
       requiresAuth: true,
@@ -19,7 +19,7 @@ export const cmsPagesService = {
     return res.data;
   },
 
-  async createPage(payload: CmsPageRequest, token?: string): Promise<CmsPageDto> {
+  async createPage(payload: CmsPageRequest): Promise<CmsPageDto> {
     const res = await apiClient<any>('/admin/pages', {
       method: 'POST',
       body: JSON.stringify(payload),
@@ -28,7 +28,7 @@ export const cmsPagesService = {
     return res.data;
   },
 
-  async updatePage(id: number, payload: CmsPageRequest, token?: string): Promise<CmsPageDto> {
+  async updatePage(id: number, payload: CmsPageRequest): Promise<CmsPageDto> {
     const res = await apiClient<any>(`/admin/pages/${id}`, {
       method: 'PUT',
       body: JSON.stringify(payload),
@@ -37,14 +37,14 @@ export const cmsPagesService = {
     return res.data;
   },
 
-  async deletePage(id: number, token?: string): Promise<void> {
+  async deletePage(id: number): Promise<void> {
     await apiClient<any>(`/admin/pages/${id}`, {
       method: 'DELETE',
       requiresAuth: true,
     });
   },
 
-  async updateStatus(id: number, status: PageStatus, token?: string): Promise<CmsPageDto> {
+  async updateStatus(id: number, status: PageStatus): Promise<CmsPageDto> {
     const res = await apiClient<any>(`/admin/pages/${id}/status?status=${status}`, {
       method: 'PATCH',
       requiresAuth: true,
