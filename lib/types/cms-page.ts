@@ -1,5 +1,5 @@
 export type PageStatus = 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
-export type SectionType = 'HERO' | 'RICH_TEXT' | 'IMAGE_TEXT' | 'VIDEO' | 'GALLERY' | 'CTA' | 'CARDS';
+export type SectionType = 'HERO' | 'RICH_TEXT' | 'IMAGE_TEXT' | 'TEXT_IMAGE' | 'VIDEO' | 'GALLERY' | 'CTA' | 'CARDS';
 export type Locale = 'en' | 'fr' | 'zh';
 
 export interface CmsPageTranslationDto {
@@ -43,4 +43,10 @@ export interface CmsPageRequest {
   navOrder: number;
   translations: Record<string, CmsPageTranslationDto>;
   sections: CmsPageSectionDto[];
+}
+
+/** Display title for admin screens: English translation, then any translation, then the slug. */
+export function getPageTitle(page: Pick<CmsPageDto, 'slug' | 'translations'>): string {
+  const translations = page.translations ?? {};
+  return translations.en?.title || Object.values(translations).find((t) => t?.title)?.title || page.slug;
 }

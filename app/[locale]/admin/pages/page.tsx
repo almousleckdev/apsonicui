@@ -8,7 +8,7 @@ import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { ActionModal } from '@/components/admin/ActionModal';
 import { cmsPagesService } from '@/services/cms-pages';
 import { tokenStorage } from '@/services/token-storage';
-import type { CmsPageDto } from '@/lib/types/cms-page';
+import { getPageTitle, type CmsPageDto } from '@/lib/types/cms-page';
 import { AdminPagesTable } from '@/components/admin/pages/AdminPagesTable';
 import { useToast } from '@/components/ui/Toast';
 
@@ -47,7 +47,7 @@ export default function AdminCmsPages() {
       setPages((prev) =>
         prev.map((p) => (p.id === item.id ? { ...p, status: nextStatus } : p))
       );
-      toast.success(`Page "${item.titleEn}" status updated to ${nextStatus}.`);
+      toast.success(`Page "${getPageTitle(item)}" status updated to ${nextStatus}.`);
     } catch (err) {
       console.error(err);
       toast.error('Failed to update page status');
@@ -60,7 +60,7 @@ export default function AdminCmsPages() {
     setIsDeleting(true);
     try {
       await cmsPagesService.deletePage(deleteTarget.id, token);
-      toast.success(`Page "${deleteTarget.titleEn}" deleted successfully.`);
+      toast.success(`Page "${getPageTitle(deleteTarget)}" deleted successfully.`);
       setPages((prev) => prev.filter((p) => p.id !== deleteTarget.id));
       setDeleteTarget(null);
     } catch (err: any) {
@@ -97,10 +97,10 @@ export default function AdminCmsPages() {
             onConfirm={handleDeleteConfirm}
             variant="danger"
             title="Confirm Delete Page"
-            description={`Are you sure you want to delete "${deleteTarget?.titleEn}"? This action cannot be undone.`}
+            description={`Are you sure you want to delete "${(deleteTarget ? getPageTitle(deleteTarget) : '')}"? This action cannot be undone.`}
             confirmLabel="Delete Page"
             cancelLabel="Cancel"
-            expectedConfirmationName={deleteTarget?.titleEn}
+            expectedConfirmationName={deleteTarget ? getPageTitle(deleteTarget) : undefined}
             isLoading={isDeleting}
           />
         </div>
