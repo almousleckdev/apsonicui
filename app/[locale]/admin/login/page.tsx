@@ -1,8 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { NextIntlClientProvider } from 'next-intl';
-import zhMessages from '@/messages/zh.json';
 import { AdminLoginHero } from '@/components/admin/login/AdminLoginHero';
 import { AdminLoginForm } from '@/components/admin/login/AdminLoginForm';
 import { ADMIN_AUTH_CONSTANTS } from '@/lib/constants/auth';
@@ -59,12 +57,10 @@ export default async function AdminLoginPage({ params }: AdminLoginPageProps) {
         </header>
 
         {/* Hero & Login Card Grid forced to Chinese locale */}
-        <NextIntlClientProvider locale="zh" messages={zhMessages}>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center my-auto py-8">
             <AdminLoginHero />
             <AdminLoginForm />
           </div>
-        </NextIntlClientProvider>
       </div>
     </main>
   );
