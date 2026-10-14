@@ -1,6 +1,15 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
+const isDev = process.env.NODE_ENV !== "production";
+
+const devImageHosts = isDev
+  ? [
+      { protocol: "http" as const, hostname: "localhost", port: "8080", pathname: "/**" },
+      { protocol: "http" as const, hostname: "127.0.0.1", port: "8080", pathname: "/**" },
+    ]
+  : [];
+
 const nextConfig: NextConfig = {
   experimental: {
     proxyClientMaxBodySize: "100mb",
@@ -22,19 +31,11 @@ const nextConfig: NextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     dangerouslyAllowSVG: true,
+    // Optimised SVGs are served sandboxed so embedded script can never run on our origin.
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    contentDispositionType: "attachment",
     remotePatterns: [
-      {
-        protocol: "http",
-        hostname: "localhost",
-        port: "8080",
-        pathname: "/**",
-      },
-      {
-        protocol: "http",
-        hostname: "127.0.0.1",
-        port: "8080",
-        pathname: "/**",
-      },
+      ...devImageHosts,
       {
         protocol: "https",
         hostname: "images.unsplash.com",
