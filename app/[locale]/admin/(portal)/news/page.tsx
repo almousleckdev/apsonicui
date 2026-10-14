@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
+import { useRemoteList } from '@/hooks/queries/useRemoteList';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { ActionModal } from '@/components/admin/ActionModal';
 import { newsService } from '@/services/news';
@@ -11,8 +12,11 @@ import { useToast } from '@/components/ui/Toast';
 
 export default function AdminNewsPage() {
   const { toast } = useToast();
-  const [newsList, setNewsList] = useState<NewsItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: newsList, setData: setNewsList, loading, refetch: fetchNews } = useRemoteList<NewsItem>(
+    ['admin', 'news'],
+    () => newsService.getAdminNewsList(),
+    () => toast.error('Failed to load news articles')
+  );
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
 
@@ -20,22 +24,6 @@ export default function AdminNewsPage() {
   const [deleteTarget, setDeleteTarget] = useState<NewsItem | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const fetchNews = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await newsService.getAdminNewsList();
-      setNewsList(data);
-    } catch (err) {
-      console.error('Failed to load news list:', err);
-      toast.error('Failed to load news articles');
-    } finally {
-      setLoading(false);
-    }
-  }, [toast]);
-
-  useEffect(() => {
-    fetchNews();
-  }, [fetchNews]);
 
   const handleTogglePublish = async (item: NewsItem) => {
     try {

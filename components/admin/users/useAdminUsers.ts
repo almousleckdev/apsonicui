@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
+import { useRemoteList } from '@/hooks/queries/useRemoteList';
 import { userService } from '@/services/auth-service';
 import type { UserManagementItem, CreateUserPayload, UpdateUserPayload } from '@/lib/types/auth';
 
@@ -8,9 +9,6 @@ import { useToast } from '@/components/ui/Toast';
 
 export function useAdminUsers() {
   const { toast } = useToast();
-  const [users, setUsers] = useState<UserManagementItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState('ALL');
 
@@ -19,24 +17,21 @@ export function useAdminUsers() {
   const [deletingUser, setDeletingUser] = useState<UserManagementItem | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  const fetchUserList = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await userService.getUsersList(searchQuery, selectedRole);
-      setUsers(res || []);
-    } catch (err: unknown) {
+  const {
+    data: users,
+    loading,
+    refetch: fetchUserList,
+    error: loadError,
+  } = useRemoteList<UserManagementItem>(
+    ['admin', 'users', searchQuery, selectedRole],
+    () => userService.getUsersList(searchQuery, selectedRole),
+    (err) => {
       console.error(err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch user list');
       toast.error('Failed to fetch user list');
-    } finally {
-      setLoading(false);
-    }
-  }, [searchQuery, selectedRole, toast]);
-
-  useEffect(() => {
-    fetchUserList();
-  }, [fetchUserList]);
+    },
+    { keepPrevious: true }
+  );
+  const error = loadError ? loadError.message || 'Failed to fetch user list' : null;
 
   const handleOpenCreateModal = () => {
     setEditingUser(null);

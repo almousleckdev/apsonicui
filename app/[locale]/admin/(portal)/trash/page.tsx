@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
+import { useRemoteList } from '@/hooks/queries/useRemoteList';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { DataTable } from '@/components/admin/DataTable';
 import { ActionModal } from '@/components/admin/ActionModal';
@@ -25,8 +26,6 @@ const TABS: { id: TrashResourceType; label: string }[] = [
 
 export default function TrashPage() {
   const [activeTab, setActiveTab] = useState<TrashResourceType>('products');
-  const [items, setItems] = useState<TrashItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
   // Modal states
   const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
@@ -37,21 +36,11 @@ export default function TrashPage() {
 
   const [isClearModalOpen, setIsClearModalOpen] = useState(false);
 
-  const loadData = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const res = await fetchTrashItems(activeTab);
-      setItems(res.data || []);
-    } catch (e) {
-      console.error('Failed to load trash items', e);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [activeTab]);
-
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
+  const { data: items, setData: setItems, loading: isLoading, refetch: loadData } = useRemoteList<TrashItem>(
+    ['admin', 'trash', activeTab],
+    async () => (await fetchTrashItems(activeTab)).data ?? [],
+    (e) => console.error('Failed to load trash items', e)
+  );
 
   const confirmRestore = (item: TrashItem) => {
     setItemToRestore(item);
@@ -95,7 +84,7 @@ export default function TrashPage() {
   const handleClearTrash = async () => {
     try {
       await clearTrash(activeTab);
-      setItems([]);
+      setItems(() => []);
       setIsClearModalOpen(false);
     } catch (e) {
       console.error('Failed to clear trash', e);

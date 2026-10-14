@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
+import { useRemoteList } from '@/hooks/queries/useRemoteList';
+import { useUnreadContactCount } from '@/hooks/queries/useUnreadContactCount';
 import { RefreshCw } from 'lucide-react';
 import type { ContactMessageItem } from '@/services/contact';
 import {
   fetchAdminContactMessages,
-  fetchAdminContactUnreadCount,
   markAdminContactRead,
 } from '@/services/contact';
 import { AdminBackNav } from '@/components/admin/AdminBackNav';
@@ -15,30 +16,15 @@ import { ContactMessageModal } from '@/components/admin/ContactMessageModal';
 
 export default function AdminNotificationsPage() {
   const [currentTab, setCurrentTab] = useState<NotificationStatusTab>('all');
-  const [messages, setMessages] = useState<ContactMessageItem[]>([]);
-  const [unreadCount, setUnreadCount] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [selectedMessage, setSelectedMessage] = useState<ContactMessageItem | null>(null);
 
-  const loadData = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const [msgRes, countRes] = await Promise.all([
-        fetchAdminContactMessages(currentTab, 0, 50),
-        fetchAdminContactUnreadCount(),
-      ]);
-      setMessages(msgRes.data?.content || []);
-      setUnreadCount(countRes.data?.unreadCount || 0);
-    } catch (err) {
-      console.error('Failed to load notifications', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [currentTab]);
-
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
+  const { data: messages, loading: isLoading, refetch: refetchMessages } = useRemoteList<ContactMessageItem>(
+    ['admin', 'contact', 'messages', currentTab],
+    async () => (await fetchAdminContactMessages(currentTab, 0, 50)).data?.content ?? [],
+    (err) => console.error('Failed to load notifications', err)
+  );
+  const { data: unreadCount = 0, refetch: refetchUnread } = useUnreadContactCount();
+  const loadData = () => Promise.all([refetchMessages(), refetchUnread()]);
 
   const handleSelectMessage = async (msg: ContactMessageItem) => {
     setSelectedMessage(msg);

@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { Layers, Newspaper, FolderTree, Users, ArrowUpRight, Plus, RefreshCw } from 'lucide-react';
 import { productService } from '@/services/product';
@@ -8,41 +9,32 @@ import { categoryService } from '@/services/category';
 import { newsService } from '@/services/news';
 import { userService } from '@/services/auth-service';
 
-export default function AdminDashboardPage() {
-  const [stats, setStats] = useState({
-    products: 0,
-    categories: 0,
-    news: 0,
-    users: 0,
-  });
-  const [loading, setLoading] = useState(true);
+interface DashboardStats {
+  products: number;
+  categories: number;
+  news: number;
+  users: number;
+}
 
-  const fetchLiveStats = async () => {
-    setLoading(true);
-    try {
+const EMPTY_STATS: DashboardStats = { products: 0, categories: 0, news: 0, users: 0 };
+
+export default function AdminDashboardPage() {
+  // Each count degrades to 0 on its own failure, so one broken endpoint never blanks the whole dashboard.
+  const { data: stats = EMPTY_STATS, isFetching: loading, refetch } = useQuery({
+    queryKey: ['admin', 'dashboard', 'stats'],
+    staleTime: 0,
+    queryFn: async (): Promise<DashboardStats> => {
       const [prods, cats, news, users] = await Promise.allSettled([
         productService.getAdminProducts(),
         categoryService.getAdminCategories(),
         newsService.getAdminNewsList(),
         userService.getUsersList(),
       ]);
-
-      setStats({
-        products: prods.status === 'fulfilled' ? prods.value.length : 0,
-        categories: cats.status === 'fulfilled' ? cats.value.length : 0,
-        news: news.status === 'fulfilled' ? news.value.length : 0,
-        users: users.status === 'fulfilled' ? users.value.length : 0,
-      });
-    } catch (e) {
-      console.error('Failed to load dashboard stats:', e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchLiveStats();
-  }, []);
+      const count = <T,>(result: PromiseSettledResult<T[]>) => (result.status === 'fulfilled' ? result.value.length : 0);
+      return { products: count(prods), categories: count(cats), news: count(news), users: count(users) };
+    },
+  });
+  const fetchLiveStats = () => refetch();
 
   const statCards = [
     {

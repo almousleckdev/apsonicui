@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Menu, Search, Bell } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { fetchAdminContactUnreadCount } from '@/services/contact';
+import { useUnreadContactCount } from '@/hooks/queries/useUnreadContactCount';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -15,26 +15,11 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onMenuClick, title, titleEn }) => {
   const { user } = useAuth();
-  const [unreadCount, setUnreadCount] = useState<number>(0);
+  const { data: unreadCount = 0 } = useUnreadContactCount();
 
   const username = user?.username || 'Super Admin';
   const roleName = user?.roles?.[0] ? user.roles[0].replace('ROLE_', '') : 'Super Admin';
   const avatarUrl = user?.avatarUrl || '/images/logo/apsoniclogo.png';
-
-  const refreshUnreadCount = useCallback(async () => {
-    try {
-      const res = await fetchAdminContactUnreadCount();
-      setUnreadCount(res.data?.unreadCount || 0);
-    } catch {
-      // Fallback silently if non-authenticated or server restarting
-    }
-  }, []);
-
-  useEffect(() => {
-    refreshUnreadCount();
-    const interval = setInterval(refreshUnreadCount, 30000);
-    return () => clearInterval(interval);
-  }, [refreshUnreadCount]);
 
   return (
     <header className="sticky top-0 z-30 flex h-20 w-full items-center justify-between border-b border-zinc-100 bg-white/80 backdrop-blur-xl px-4 md:px-8 font-sans">

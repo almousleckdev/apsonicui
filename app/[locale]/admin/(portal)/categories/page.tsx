@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
+import { useRemoteList } from '@/hooks/queries/useRemoteList';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { Modal } from '@/components/ui/modal';
 import { ActionModal } from '@/components/admin/ActionModal';
@@ -12,8 +13,15 @@ import { Search } from 'lucide-react';
 
 export default function AdminCategoriesPage() {
   const { toast } = useToast();
-  const [categories, setCategories] = useState<CategoryItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const {
+    data: categories,
+    loading,
+    refetch: fetchCategories,
+  } = useRemoteList<CategoryItem>(
+    ['admin', 'categories'],
+    () => categoryService.getAdminCategories(),
+    (e) => toast.error(e.message || 'Failed to load categories')
+  );
   const [search, setSearch] = useState('');
   const [selectedBrand, setSelectedBrand] = useState<string>('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,22 +41,6 @@ export default function AdminCategoriesPage() {
     active: true,
   });
 
-  const fetchCategories = async () => {
-    setLoading(true);
-    try {
-      const data = await categoryService.getAdminCategories();
-      setCategories(data);
-    } catch (e) {
-      console.error(e);
-      toast.error(e instanceof Error ? e.message : 'Failed to load categories');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchCategories();
-  }, []);
 
   const openCreateModal = () => {
     setEditingCategory(null);

@@ -1,44 +1,25 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
+import { useRemoteList } from '@/hooks/queries/useRemoteList';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { ActionModal } from '@/components/admin/ActionModal';
 import { productService, ProductListItem } from '@/services/product';
-import { categoryService, CategoryItem } from '@/services/category';
 import { ProductTable } from '@/components/admin/products/ProductTable';
 import { useToast } from '@/components/ui/Toast';
 import { Search } from 'lucide-react';
 
 export default function AdminProductsPage() {
   const { toast } = useToast();
-  const [products, setProducts] = useState<ProductListItem[]>([]);
-  const [categories, setCategories] = useState<CategoryItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: products, loading, refetch: fetchData } = useRemoteList<ProductListItem>(
+    ['admin', 'products'],
+    () => productService.getAdminProducts(),
+    (e) => toast.error(e.message || 'Failed to load products')
+  );
   const [search, setSearch] = useState('');
   const [selectedBrand, setSelectedBrand] = useState<string>('all');
   const [deletingProduct, setDeletingProduct] = useState<ProductListItem | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const [prodData, catData] = await Promise.all([
-        productService.getAdminProducts(),
-        categoryService.getAdminCategories(),
-      ]);
-      setProducts(prodData);
-      setCategories(catData);
-    } catch (e) {
-      console.error(e);
-      toast.error(e instanceof Error ? e.message : 'Failed to load products');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   const confirmDelete = async () => {
     if (!deletingProduct) return;

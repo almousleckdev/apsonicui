@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
+import { useRemoteList } from '@/hooks/queries/useRemoteList';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { ActionModal } from '@/components/admin/ActionModal';
 import { cmsPagesService } from '@/services/cms-pages';
@@ -10,28 +11,15 @@ import { useToast } from '@/components/ui/Toast';
 
 export default function AdminCmsPages() {
   const { toast } = useToast();
-  const [pages, setPages] = useState<CmsPageDto[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: pages, setData: setPages, loading, refetch: fetchPages } = useRemoteList<CmsPageDto>(
+    ['admin', 'pages'],
+    () => cmsPagesService.getAdminPages(),
+    () => toast.error('Failed to load pages')
+  );
 
   const [deleteTarget, setDeleteTarget] = useState<CmsPageDto | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const fetchPages = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await cmsPagesService.getAdminPages();
-      setPages(data);
-    } catch (err) {
-      console.error('Failed to load pages:', err);
-      toast.error('Failed to load CMS pages');
-    } finally {
-      setLoading(false);
-    }
-  }, [toast]);
-
-  useEffect(() => {
-    fetchPages();
-  }, [fetchPages]);
 
   const handleToggleStatus = async (item: CmsPageDto) => {
     try {
@@ -55,9 +43,9 @@ export default function AdminCmsPages() {
       toast.success(`Page "${getPageTitle(deleteTarget)}" deleted successfully.`);
       setPages((prev) => prev.filter((p) => p.id !== deleteTarget.id));
       setDeleteTarget(null);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      toast.error(err.message || 'Failed to delete page');
+      toast.error(err instanceof Error ? err.message : 'Failed to delete page');
     } finally {
       setIsDeleting(false);
     }
