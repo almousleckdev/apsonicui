@@ -16,7 +16,9 @@ interface NewsContentProps {
 export const NewsContent: React.FC<NewsContentProps> = ({ contentHtml, sections, blocks, className }) => {
   const locale = useLocale();
 
-  const sanitizedHtml = React.useMemo(() => {
+  // Presentation tweak only (strips legacy utility classes). This is NOT a security control: the API returns
+  // HTML already sanitized by the backend allow-list (see HtmlSanitizer), and the CSP is the second layer.
+  const displayHtml = React.useMemo(() => {
     if (!contentHtml) return '';
     return contentHtml
       .replace(/border border-zinc-100 shadow-xl bg-zinc-50/g, '')
@@ -25,7 +27,7 @@ export const NewsContent: React.FC<NewsContentProps> = ({ contentHtml, sections,
       .replace(/bg-zinc-50/g, '');
   }, [contentHtml]);
 
-  if (sanitizedHtml && sanitizedHtml.trim().length > 0) {
+  if (displayHtml && displayHtml.trim().length > 0) {
     return (
       <div
         className={cn(
@@ -41,7 +43,7 @@ export const NewsContent: React.FC<NewsContentProps> = ({ contentHtml, sections,
           '[&_figcaption]:text-center [&_figcaption]:text-xs [&_figcaption]:sm:text-sm [&_figcaption]:text-zinc-500 [&_figcaption]:italic [&_figcaption]:mt-2.5 [&_figcaption]:font-sans',
           className
         )}
-        dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
+        dangerouslySetInnerHTML={{ __html: displayHtml }}
       />
     );
   }
