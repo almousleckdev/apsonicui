@@ -11,6 +11,8 @@ const devImageHosts = isDev
   : [];
 
 const nextConfig: NextConfig = {
+  // Self-contained server bundle (server.js + only the node_modules it needs) for a small container image.
+  output: "standalone",
   experimental: {
     proxyClientMaxBodySize: "100mb",
   },
