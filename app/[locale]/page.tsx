@@ -45,10 +45,12 @@ export default async function Home({ params }: PageProps) {
         <ServiceSupport />
       </ScrollReveal>
 
-      {/* 5. Client Testimonials */}
-      <ScrollReveal variant="fadeUp" delay={0.1}>
-        <VoicesSection />
-      </ScrollReveal>
+      {/* 5. Client Testimonials (managed in the admin: Home Page > Testimonials) */}
+      {config.visibility.showVoices && (
+        <ScrollReveal variant="fadeUp" delay={0.1}>
+          <VoicesSection initialConfig={config.testimonials} />
+        </ScrollReveal>
+      )}
 
       {/* 6. Blog & News Center */}
       <ScrollReveal variant="fadeUp" delay={0.1}>

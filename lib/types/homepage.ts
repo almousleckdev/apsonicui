@@ -35,6 +35,24 @@ export interface HomeCategoryItem {
   href: string;
 }
 
+/**
+ * One testimonial in the homepage section "Community - Voices of the Continent".
+ * Name and photo are the same in every language; role and quote have an English text (the fallback) and optional
+ * French and Chinese versions.
+ */
+export interface HomeTestimonialItem {
+  id: string;
+  name: string;
+  /** Uploaded photo, as a site-relative path such as /uploads/xyz.jpg. */
+  image: string;
+  roleEn?: string;
+  roleFr?: string;
+  roleZh?: string;
+  quoteEn?: string;
+  quoteFr?: string;
+  quoteZh?: string;
+}
+
 export interface HomePageSectionVisibility {
   showHero: boolean;
   showRecommendedModels: boolean;
@@ -48,6 +66,7 @@ export interface HomePageConfig {
   hero: HomeHeroConfig;
   recommendedModels: HomeFeaturedModelItem[];
   categories: HomeCategoryItem[];
+  testimonials: HomeTestimonialItem[];
   visibility: HomePageSectionVisibility;
 }
 
@@ -97,6 +116,30 @@ export const DEFAULT_HOMEPAGE_CONFIG: HomePageConfig = {
     { id: "scooter", name: "Scooter", nameZh: "踏板车", nameFr: "Scooter", image: "/categories/踏板车/AP150T/AP150T-珍珠白（2）.png", href: "/products?category=scooter" },
     { id: "atv", name: "ATV", nameZh: "ATV", nameFr: "Quad / ATV", image: "/categories/ATV/AP150ST-250 正右侧 投影.png", href: "/products?category=atv" },
     { id: "tricycle", name: "Tricycle", nameZh: "三轮车", nameFr: "Tricycle", image: "/categories/三轮车/AP150ZH-20更新/AP150ZH-20 MAX (1).png", href: "/products?category=tricycle" },
+  ],
+  testimonials: [
+    {
+      id: "kwame-mensah",
+      name: "Kwame Mensah",
+      image: "/images/about/envato-labs-image-edit (1)E.png",
+      roleEn: "Logistics Entrepreneur, Ghana",
+      roleFr: "Entrepreneur en Logistique, Ghana",
+      roleZh: "物流企业家，加纳",
+      quoteEn: "Standard motorcycles couldn't cope with the gravel roads. Apsonic's suspension changed my business.",
+      quoteFr: "Les motos standard ne pouvaient pas faire face aux routes gravillonnées menant aux fermes du nord. La suspension d'Apsonic a changé mon entreprise.",
+      quoteZh: "标准摩托车无法应对通往北部农场的碎石路。Apsonic的悬挂系统改变了我的业务。我从一辆摩托车发展到了十辆的车队。",
+    },
+    {
+      id: "amara-diop",
+      name: "Amara Diop",
+      image: "/images/about/WechatIMG5212.jpg",
+      roleEn: "Healthcare Worker, Senegal",
+      roleFr: "Agent de Santé, Sénégal",
+      roleZh: "医护人员，塞内加尔",
+      quoteEn: "Reliability is not a luxury for me; it's a matter of life and death.",
+      quoteFr: "La fiabilité n'est pas un luxe pour moi; c'est une question de vie ou de mort.",
+      quoteZh: "可靠性对我来说不是奢侈品；它关乎生死。当我需要到达偏远村庄时，我只信任一台引擎启动。",
+    },
   ],
   visibility: {
     showHero: true,

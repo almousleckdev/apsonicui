@@ -5,6 +5,9 @@ import React, { useState, useEffect } from 'react';
 import { HeroSectionEditor } from '@/components/admin/homepage/HeroSectionEditor';
 import { FeaturedModelsEditor } from '@/components/admin/homepage/FeaturedModelsEditor';
 import { LineupCategoriesEditor } from '@/components/admin/homepage/LineupCategoriesEditor';
+import { TestimonialsEditor } from '@/components/admin/homepage/TestimonialsEditor';
+import { useToast } from '@/components/ui/Toast';
+import { validateTestimonials } from '@/lib/homepage/testimonials';
 import { homepageService } from '@/services/homepage-service';
 import { HomePageConfig, DEFAULT_HOMEPAGE_CONFIG } from '@/lib/types/homepage';
 import { Save, RefreshCw, CheckCircle2 } from 'lucide-react';
@@ -13,6 +16,10 @@ export default function AdminHomePage() {
   const [config, setConfig] = useState<HomePageConfig>(DEFAULT_HOMEPAGE_CONFIG);
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+  // Problems are only shown after a first attempt to save, so a fresh "Add Testimonial" row is not red straight away.
+  const [showTestimonialErrors, setShowTestimonialErrors] = useState(false);
+  const testimonialErrors = validateTestimonials(config.testimonials);
 
   useEffect(() => {
     const fetchConfig = async () => {
@@ -30,8 +37,15 @@ export default function AdminHomePage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (Object.keys(testimonialErrors).length > 0) {
+      setShowTestimonialErrors(true);
+      toast.error('Some testimonials are incomplete. Please fix the highlighted fields before saving.');
+      document.getElementById('testimonials-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
     try {
       await homepageService.saveHomepageConfig(config);
+      setShowTestimonialErrors(false);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (error) {
@@ -66,7 +80,7 @@ export default function AdminHomePage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-zinc-100 shadow-sm">
           <div>
             <h1 className="text-xl sm:text-2xl font-extrabold text-zinc-900 tracking-tight">Home Page Content Management</h1>
-            <p className="text-xs text-zinc-500 font-medium mt-0.5">Manage hero videos, titles, slogans, featured model slides, and category lineups.</p>
+            <p className="text-xs text-zinc-500 font-medium mt-0.5">Manage hero videos, titles, slogans, featured model slides, category lineups, and testimonials.</p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -99,6 +113,16 @@ export default function AdminHomePage() {
 
         {/* 3. Category Lineup Section Management */}
         <LineupCategoriesEditor categories={config.categories} onChange={(categories) => setConfig({ ...config, categories })} />
+
+        {/* 4. Testimonials ("Community - Voices of the Continent") */}
+        <TestimonialsEditor
+          testimonials={config.testimonials}
+          onChange={(update) => setConfig((current) => ({ ...current, testimonials: update(current.testimonials) }))}
+          visible={config.visibility.showVoices}
+          onVisibleChange={(showVoices) => setConfig((current) => ({ ...current, visibility: { ...current.visibility, showVoices } }))}
+          errors={testimonialErrors}
+          showErrors={showTestimonialErrors}
+        />
 
         <ActionModal
           isOpen={showResetModal}

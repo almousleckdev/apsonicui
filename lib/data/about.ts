@@ -1,4 +1,3 @@
-import { getLocalizedStories } from './about/stories';
 
 export interface TimelineEvent {
   year: string;
@@ -7,15 +6,6 @@ export interface TimelineEvent {
   iconName: string;
   image?: string;
 }
-
-export interface Story {
-  name: string;
-  role: string;
-  quote: string;
-  image: string;
-}
-
-export { getLocalizedStories };
 
 export const getLocalizedTimeline = (locale: string): TimelineEvent[] => {
   const isZh = locale === 'zh';
