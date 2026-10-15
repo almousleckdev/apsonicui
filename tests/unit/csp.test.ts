@@ -26,6 +26,17 @@ describe('Content-Security-Policy', () => {
     expect(directive(csp, 'default-src')).toBe("default-src 'self'");
   });
 
+  it('lets only the page-builder preview be framed, and only by the same origin', () => {
+    const preview = buildContentSecurityPolicy('n', false, { allowSelfFraming: true });
+    expect(directive(preview, 'frame-ancestors')).toBe("frame-ancestors 'self'");
+    expect(directive(buildContentSecurityPolicy('n', false), 'frame-ancestors')).toBe("frame-ancestors 'none'");
+  });
+
+  it('lets only admin pages frame this origin (the page builder canvas)', () => {
+    expect(directive(buildContentSecurityPolicy('n', false, { frameSelf: true }), 'frame-src')).toContain("'self'");
+    expect(directive(buildContentSecurityPolicy('n', false), 'frame-src')).not.toContain("'self'");
+  });
+
   it('only embeds the third-party frames the site uses', () => {
     const frames = directive(buildContentSecurityPolicy('n', false), 'frame-src');
 

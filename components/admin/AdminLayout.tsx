@@ -37,6 +37,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     }
 
     const titles: Record<string, { zh: string; en: string }> = {
+      pages: { zh: '页面管理', en: 'Pages' },
+      navigation: { zh: '导航管理', en: 'Navigation' },
       'home-page': { zh: '主页内容管理', en: 'Home Page' },
       products: { zh: '产品管理', en: 'Products' },
       categories: { zh: '产品分类', en: 'Categories' },
@@ -56,6 +58,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   };
 
   const { zh: titleZh, en: titleEn } = getPageTitles(pathname);
+  // The page editor is a full-screen workspace with its own top bar; it still sits behind the sign-in check.
+  const isImmersive = /\/admin\/pages\/\d+\/?$/.test(pathname);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -78,6 +82,10 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         </div>
       </div>
     );
+  }
+
+  if (isImmersive) {
+    return <div className="min-h-screen bg-zinc-100 text-zinc-900">{children}</div>;
   }
 
   return (

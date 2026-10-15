@@ -26,27 +26,10 @@ export const Header: React.FC = () => {
   const t = useTranslations('nav');
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const [dynamicNav, setDynamicNav] = useState<Array<{label: string, href: string}>>([]);
-
-  React.useEffect(() => {
-    // Dynamically import to avoid circular dependency or SSR issues
-    import('@/services/cms-pages').then(({ cmsPagesService }) => {
-      cmsPagesService.getNavigationTree().then(tree => {
-        const mapped = tree.map(item => ({
-          // Backend sends labels keyed by locale; fall back to English, then the slug, so a link is never blank.
-          label: item.labels?.[locale] || item.labels?.en || item.slug,
-          href: `/${item.slug}`
-        }));
-        setDynamicNav(mapped);
-      }).catch(err => console.error('Failed to load dynamic nav', err));
-    });
-  }, [locale]);
-
   const navItems = [
     { label: t('products'), href: '/products', hasDropdown: true },
     { label: t('services'), href: '/services' },
     { label: t('contact'), href: '/contact' },
-    ...dynamicNav
   ];
 
   const isTransparentPage = pathname === '/';

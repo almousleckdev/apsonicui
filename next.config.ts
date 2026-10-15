@@ -31,6 +31,16 @@ const nextConfig: NextConfig = {
             : [{ key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" }]),
         ],
       },
+      // The page-builder canvas frames the preview route from the same origin; everything else stays unframeable.
+      // Later entries win for the same header key.
+      {
+        source: "/:locale(en|fr|zh)/preview/:path*",
+        headers: [{ key: "X-Frame-Options", value: "SAMEORIGIN" }],
+      },
+      {
+        source: "/preview/:path*",
+        headers: [{ key: "X-Frame-Options", value: "SAMEORIGIN" }],
+      },
     ];
   },
   async rewrites() {

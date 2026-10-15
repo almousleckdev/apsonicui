@@ -4,7 +4,7 @@
  * Third parties listed here are exactly the ones the site uses: Mapbox, YouTube/Google Maps embeds,
  * Nominatim and GeoJSON from GitHub, and the image hosts configured in next.config.ts.
  */
-export function buildContentSecurityPolicy(nonce: string, isDev: boolean): string {
+export function buildContentSecurityPolicy(nonce: string, isDev: boolean, options: { allowSelfFraming?: boolean; frameSelf?: boolean } = {}): string {
   const directives: Record<string, string[]> = {
     'default-src': ["'self'"],
     'script-src': ["'self'", `'nonce-${nonce}'`, "'strict-dynamic'", ...(isDev ? ["'unsafe-eval'"] : [])],
@@ -29,7 +29,9 @@ export function buildContentSecurityPolicy(nonce: string, isDev: boolean): strin
     'media-src': ["'self'", 'blob:', 'data:'],
     'worker-src': ["'self'", 'blob:'],
     'child-src': ["'self'", 'blob:'],
+    // Only admin pages may frame this origin (the page builder canvas); the public site never does.
     'frame-src': [
+      ...(options.frameSelf ? ["'self'"] : []),
       'https://www.youtube.com',
       'https://www.youtube-nocookie.com',
       'https://maps.google.com',
@@ -38,7 +40,8 @@ export function buildContentSecurityPolicy(nonce: string, isDev: boolean): strin
     'object-src': ["'none'"],
     'base-uri': ["'self'"],
     'form-action': ["'self'"],
-    'frame-ancestors': ["'none'"],
+    // Only the page-builder preview may be framed, and only by this same origin (the builder's canvas).
+    'frame-ancestors': [options.allowSelfFraming ? "'self'" : "'none'"],
   };
 
   const policy = Object.entries(directives)

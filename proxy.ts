@@ -3,6 +3,12 @@ import { NextRequest } from 'next/server';
 import { locales, defaultLocale } from './lib/i18n/locales';
 import { buildContentSecurityPolicy, generateNonce } from './lib/security/csp';
 
+// Page-builder preview routes: /preview/... or /{locale}/preview/...
+const PREVIEW_PATH = /^\/(?:(?:en|fr|zh)\/)?preview\//;
+
+// Admin routes: /admin/... or /{locale}/admin/...
+const ADMIN_PATH = /^\/(?:(?:en|fr|zh)\/)?admin(?:\/|$)/;
+
 const handleI18nRouting = createMiddleware({
   // A list of all locales that are supported
   locales,
@@ -16,7 +22,10 @@ const handleI18nRouting = createMiddleware({
 
 export default function proxy(request: NextRequest) {
   const nonce = generateNonce();
-  const csp = buildContentSecurityPolicy(nonce, process.env.NODE_ENV !== 'production');
+  const csp = buildContentSecurityPolicy(nonce, process.env.NODE_ENV !== 'production', {
+    allowSelfFraming: PREVIEW_PATH.test(request.nextUrl.pathname),
+    frameSelf: ADMIN_PATH.test(request.nextUrl.pathname),
+  });
 
   // Next.js reads the nonce from the request's CSP header and stamps it onto its own scripts.
   const requestHeaders = new Headers(request.headers);

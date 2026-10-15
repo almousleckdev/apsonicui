@@ -1,66 +1,44 @@
-import { notFound } from 'next/navigation';
-import { cmsPagesService } from '@/services/cms-pages';
-import { DynamicCmsPageViewer } from '@/components/features/DynamicCmsPageViewer';
-import { Header } from '@/components/shared/header';
-import { Footer } from '@/components/shared/footer';
-import { Metadata } from 'next';
-import { CmsPageDto } from '@/lib/types/cms-page';
+import { notFound, permanentRedirect } from 'next/navigation';
+import { connection } from 'next/server';
+import type { Metadata } from 'next';
+import { pagesService } from '@/services/pages';
+import { PageRenderer } from '@/components/page-builder/renderer/PageRenderer';
+import { buildPageMetadata } from '@/lib/page-builder/seo';
+import { defaultLocale, isSupportedLocale } from '@/lib/i18n/locales';
+import type { Locale } from '@/lib/page-builder/types';
 
 interface CmsPageProps {
-  params: Promise<{
-    locale: string;
-    slug: string;
-  }>;
+  params: Promise<{ locale: string; slug: string }>;
 }
+
+const asLocale = (value: string): Locale => (isSupportedLocale(value) ? value : defaultLocale);
 
 export async function generateMetadata({ params }: CmsPageProps): Promise<Metadata> {
-  try {
-    const { locale, slug } = await params;
-    const pageData = await cmsPagesService.getPublicPageBySlug(slug);
-    if (!pageData || !pageData.publishedSnapshot) return {};
-
-    const snapshot = pageData.publishedSnapshot as CmsPageDto;
-    const currentTranslation = snapshot.translations?.[locale] || snapshot.translations?.['en'] || {};
-
-    return {
-      title: currentTranslation.seoTitle || currentTranslation.title,
-      description: currentTranslation.seoDescription,
-    };
-  } catch (e) {
-    return {};
-  }
+  await connection();
+  const { locale, slug } = await params;
+  const page = await pagesService.getPublic(slug);
+  return page?.document ? buildPageMetadata(page.document, asLocale(locale)) : {};
 }
 
-async function loadPublishedSnapshot(slug: string): Promise<CmsPageDto | null> {
-  try {
-    const pageData = await cmsPagesService.getPublicPageBySlug(slug);
-    if (!pageData || pageData.status !== 'PUBLISHED' || !pageData.publishedSnapshot) {
-      return null;
-    }
-    return pageData.publishedSnapshot as CmsPageDto;
-  } catch (error) {
-    console.error('Error fetching CMS page:', error);
-    return null;
-  }
-}
-
+/**
+ * Public CMS page. Only the published copy is ever requested; drafts are not reachable from here. Rendered per
+ * request so a publish or unpublish takes effect immediately.
+ */
 export default async function CmsDynamicPage({ params }: CmsPageProps) {
-  const { slug } = await params;
-  const snapshot = await loadPublishedSnapshot(slug);
+  await connection();
+  const { locale, slug } = await params;
+  const page = await pagesService.getPublic(slug);
 
-  // Outside any try/catch: notFound() works by throwing, and must not be swallowed.
-  if (!snapshot) {
-    notFound();
+  // notFound() and permanentRedirect() work by throwing: keep them outside any try/catch.
+  if (!page) notFound();
+  if (page.redirectSlug) {
+    permanentRedirect(locale === defaultLocale ? `/${page.redirectSlug}` : `/${locale}/${page.redirectSlug}`);
   }
+  if (!page.document) notFound();
 
   return (
-    <main className="flex min-h-screen flex-col font-sans">
-      <Header />
-
-      {/* We pass the serialized snapshot directly to the pure React viewer */}
-      <DynamicCmsPageViewer page={snapshot} />
-
-      <Footer />
+    <main className="w-full">
+      <PageRenderer document={page.document} locale={asLocale(locale)} />
     </main>
   );
 }
