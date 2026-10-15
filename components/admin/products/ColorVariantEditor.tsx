@@ -2,6 +2,8 @@ import React from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { ProductColorPayload } from '@/services/product';
 import { SectionImageUpload } from './SectionImageUpload';
+import { T } from '@/components/admin/T';
+import { useAdminText } from '@/context/AdminTextContext';
 
 interface ColorVariantEditorProps {
   colors: ProductColorPayload[];
@@ -12,6 +14,7 @@ export const ColorVariantEditor: React.FC<ColorVariantEditorProps> = ({
   colors,
   onChange,
 }) => {
+  const { t } = useAdminText();
   const addColor = () => {
     onChange([
       ...colors,
@@ -33,15 +36,15 @@ export const ColorVariantEditor: React.FC<ColorVariantEditorProps> = ({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <label className="block text-zinc-900 font-bold text-xs">Color Variants</label>
-          <p className="text-2xs text-zinc-500">Configure motorcycle paint colors and matching photos.</p>
+          <label className="block text-zinc-900 font-bold text-xs"><T id="products.color.title" /></label>
+          <p className="text-2xs text-zinc-500"><T id="products.color.hint" /></p>
         </div>
         <button
           type="button"
           onClick={addColor}
           className="px-3.5 py-1.5 bg-emerald-50 text-brand-green border border-brand-green/30 hover:bg-emerald-100 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1"
         >
-          <Plus className="w-3.5 h-3.5" /> + Add Color
+          <Plus className="w-3.5 h-3.5" /> <T id="products.color.add" />
         </button>
       </div>
 
@@ -59,18 +62,18 @@ export const ColorVariantEditor: React.FC<ColorVariantEditorProps> = ({
                 type="text"
                 value={c.colorName}
                 onChange={(e) => updateColor(i, 'colorName', e.target.value)}
-                placeholder="Color Name (e.g. Red)"
+                placeholder={t('products.color.name')}
                 className="px-3 py-1.5 border border-zinc-200 rounded-xl bg-white text-xs font-bold"
               />
             </div>
-            <button type="button" onClick={() => removeColor(i)} className="text-red-500 hover:text-red-700 p-1.5 cursor-pointer">
+            <button type="button" onClick={() => removeColor(i)} aria-label={t('products.color.remove')} title={t('products.color.remove')} className="text-red-500 hover:text-red-700 p-1.5 cursor-pointer">
               <Trash2 className="w-4 h-4" />
             </button>
           </div>
 
           <SectionImageUpload
-            label="Variant Motorcycle Picture"
-            description="Motorcycle photo matching this color choice"
+            label={<T id="products.color.picture" />}
+            description={<T id="products.color.pictureHint" />}
             value={c.imageUrl}
             onChange={(url) => updateColor(i, 'imageUrl', url)}
           />

@@ -20,7 +20,7 @@ interface Props {
 /** A color: the Apsonic palette, the browser's free picker, or a typed #rrggbb. Empty means "automatic". */
 export function ColorField({ label, labelText, value, onChange, help }: Props) {
   const id = useId();
-  const { t } = useAdminText();
+  const { t, tServer } = useAdminText();
   const current = safeColor(value);
   const [typed, setTyped] = useState<string | null>(null);
   const shown = typed ?? current ?? '';
@@ -44,7 +44,7 @@ export function ColorField({ label, labelText, value, onChange, help }: Props) {
         {PALETTE.map(({ name, hex }) => {
           const selected = current === hex;
           return (
-            <button key={hex} type="button" title={name} aria-label={name} aria-pressed={selected} onClick={() => { onChange(hex); setTyped(null); }}
+            <button key={hex} type="button" title={tServer(name)} aria-label={tServer(name)} aria-pressed={selected} onClick={() => { onChange(hex); setTyped(null); }}
               className={cn('relative h-6 w-6 rounded-full border border-black/15 transition-transform hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-green', selected && 'ring-2 ring-brand-green ring-offset-1')}
               style={{ background: hex }}>
               {selected && <Check className="absolute inset-0 m-auto h-3.5 w-3.5" style={{ color: hex === '#ffffff' || hex === '#f4f4f5' || hex === '#ffd700' ? '#18181b' : '#ffffff' }} aria-hidden />}

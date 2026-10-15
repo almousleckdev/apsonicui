@@ -35,3 +35,10 @@ describe('page builder glossary', () => {
     expect(Object.entries(BUILDER_GLOSSARY).filter(([, zh]) => !zh.trim())).toEqual([]);
   });
 });
+
+describe('page builder palette', () => {
+  it('has a Chinese name for every color of the palette', async () => {
+    const { PALETTE } = await import('@/lib/page-builder/colors');
+    expect(PALETTE.map((c) => c.name).filter((name) => !BUILDER_GLOSSARY[name])).toEqual([]);
+  });
+});

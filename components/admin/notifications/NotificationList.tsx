@@ -5,6 +5,8 @@ import { motion } from 'framer-motion';
 import { CheckCircle2, Send, Globe, ChevronRight, Inbox } from 'lucide-react';
 import type { ContactMessageItem } from '@/services/contact';
 import { EmptyState } from '@/components/ui/empty-state';
+import { T } from '@/components/admin/T';
+import { useAdminText } from '@/context/AdminTextContext';
 
 interface NotificationListProps {
   messages: ContactMessageItem[];
@@ -17,10 +19,11 @@ export const NotificationList: React.FC<NotificationListProps> = ({
   isLoading,
   onSelectMessage,
 }) => {
+  const { t } = useAdminText();
   if (isLoading && messages.length === 0) {
     return (
       <div className="p-16 text-center text-xs font-bold text-zinc-400 bg-white rounded-3xl border border-zinc-100 shadow-sm">
-        Loading visitor notifications...
+        <T id="notifications.loading" />
       </div>
     );
   }
@@ -29,8 +32,8 @@ export const NotificationList: React.FC<NotificationListProps> = ({
     return (
       <EmptyState
         icon={Inbox}
-        title="No Messages Found / 暂无消息"
-        description="There are currently no visitor contact submissions matching this filter tab."
+        title={<T id="notifications.emptyTitle" />}
+        description={<T id="notifications.emptyText" />}
       />
     );
   }
@@ -80,7 +83,7 @@ export const NotificationList: React.FC<NotificationListProps> = ({
                   </h4>
                   <span className="inline-flex items-center gap-1 text-2xs font-bold text-zinc-500 bg-zinc-100 px-2.5 py-0.5 rounded-full">
                     <Globe className="w-3 h-3 text-zinc-400" />
-                    {msg.country || 'Global'}
+                    {msg.country || t('notifications.global')}
                   </span>
                 </div>
                 <span className="text-2xs font-semibold text-zinc-400 shrink-0">{formattedDate}</span>
@@ -94,17 +97,17 @@ export const NotificationList: React.FC<NotificationListProps> = ({
             <div className="hidden sm:flex items-center gap-2 shrink-0">
               {!msg.isRead && (
                 <span className="px-3 py-1 rounded-full text-2xs font-extrabold bg-red-100 text-red-700">
-                  Unread
+                  <T id="notifications.unread" />
                 </span>
               )}
               {msg.isRead && !msg.isReplied && (
                 <span className="px-3 py-1 rounded-full text-2xs font-extrabold bg-blue-100 text-blue-700">
-                  Read
+                  <T id="notifications.read" />
                 </span>
               )}
               {msg.isReplied && (
                 <span className="px-3 py-1 rounded-full text-2xs font-extrabold bg-emerald-100 text-emerald-800">
-                  Replied
+                  <T id="notifications.replied" />
                 </span>
               )}
               <ChevronRight className="w-5 h-5 text-zinc-300 group-hover:text-zinc-600 transition-colors" />

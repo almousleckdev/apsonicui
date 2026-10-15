@@ -9,6 +9,8 @@ import { DataTable } from '@/components/admin/DataTable';
 import { useAuth } from '@/hooks/useAuth';
 import { canDeleteCatalog } from '@/lib/utils/permissions';
 import { ProductListItem } from '@/services/product';
+import { T } from '@/components/admin/T';
+import { useAdminText } from '@/context/AdminTextContext';
 
 interface ProductTableProps {
   products: ProductListItem[];
@@ -25,11 +27,12 @@ export const ProductTable: React.FC<ProductTableProps> = ({
 }) => {
   const { user } = useAuth();
   const allowDelete = canDeleteCatalog(user);
+  const { t } = useAdminText();
 
   const columns: ColumnDef<ProductListItem>[] = [
     {
       accessorKey: 'image',
-      header: 'Model Photo',
+      header: () => <T id="products.columns.photo" />,
       cell: ({ row }) => {
         const prod = row.original;
         return (
@@ -45,7 +48,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
     },
     {
       accessorKey: 'model',
-      header: 'Model / Slug',
+      header: () => <T id="products.columns.model" />,
       cell: ({ row }) => {
         const prod = row.original;
         return (
@@ -61,21 +64,21 @@ export const ProductTable: React.FC<ProductTableProps> = ({
     },
     {
       accessorKey: 'category',
-      header: 'Category',
+      header: () => <T id="products.columns.category" />,
       cell: ({ row }) => (
         <span className="font-bold text-zinc-800">{row.original.category || row.original.categorySlug}</span>
       ),
     },
     {
       accessorKey: 'displacement',
-      header: 'Displacement',
+      header: () => <T id="products.columns.displacement" />,
       cell: ({ row }) => (
         <span className="font-mono text-zinc-600">{row.original.displacement ? `${row.original.displacement} cc` : '—'}</span>
       ),
     },
     {
       accessorKey: 'brand',
-      header: 'Brand',
+      header: () => <T id="products.columns.brand" />,
       cell: ({ row }) => (
         <span className={`px-2.5 py-1 rounded-full text-3xs font-bold uppercase tracking-wider ${row.original.brand === 'apsonic-pro' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}`}>
           {row.original.brand}
@@ -84,7 +87,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
     },
     {
       accessorKey: 'active',
-      header: 'Status',
+      header: () => <T id="products.columns.status" />,
       cell: ({ row }) => {
         const prod = row.original;
         return (
@@ -94,9 +97,9 @@ export const ProductTable: React.FC<ProductTableProps> = ({
             className="flex items-center gap-1.5 cursor-pointer"
           >
             {prod.active ? (
-              <span className="flex items-center gap-1 text-emerald-600 font-bold"><CheckCircle2 className="w-4 h-4" /> Active</span>
+              <span className="flex items-center gap-1 text-emerald-600 font-bold"><CheckCircle2 className="w-4 h-4" /> <T id="products.active" /></span>
             ) : (
-              <span className="flex items-center gap-1 text-zinc-400 font-bold"><XCircle className="w-4 h-4" /> Disabled</span>
+              <span className="flex items-center gap-1 text-zinc-400 font-bold"><XCircle className="w-4 h-4" /> <T id="products.disabled" /></span>
             )}
           </button>
         );
@@ -104,7 +107,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
     },
     {
       id: 'actions',
-      header: () => <div className="text-right">Actions</div>,
+      header: () => <div className="text-right"><T id="products.columns.actions" /></div>,
       cell: ({ row }) => {
         const prod = row.original;
         return (
@@ -113,14 +116,14 @@ export const ProductTable: React.FC<ProductTableProps> = ({
               href={`/products/${prod.slug || prod.id}`}
               target="_blank"
               className="p-2 hover:bg-zinc-100 text-zinc-600 rounded-xl transition-colors"
-              title="View Public Page"
+              title={t('products.viewPublic')}
             >
               <ExternalLink className="w-4 h-4" />
             </Link>
             <Link
               href={`/admin/products/${prod.slug || prod.id}/edit`}
               className="p-2 hover:bg-zinc-100 text-zinc-600 rounded-xl transition-colors"
-              title="Edit Product"
+              title={t('products.editProduct')}
             >
               <Edit2 className="w-4 h-4" />
             </Link>
@@ -129,7 +132,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                 type="button"
                 onClick={() => onDelete(prod.id)}
                 className="p-2 hover:bg-red-50 text-red-500 rounded-xl transition-colors cursor-pointer"
-                title="Delete Product"
+                title={t('products.deleteProduct')}
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -145,8 +148,8 @@ export const ProductTable: React.FC<ProductTableProps> = ({
       columns={columns}
       data={products}
       loading={loading}
-      emptyTitle="No Products Found"
-      emptyDescription="Add your first motorcycle model to build the catalog."
+      emptyTitle={<T id="products.emptyTitle" />}
+      emptyDescription={<T id="products.emptyText" />}
       emptyIcon={Layers}
     />
   );

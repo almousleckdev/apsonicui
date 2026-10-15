@@ -181,6 +181,13 @@ export const BUILDER_GLOSSARY: Readonly<Record<string, string>> = {
   'Draw a line': '绘制分隔线',
   'Line color': '线条颜色',
   Introduction: '简介',
+  // --- color palette names ---
+  'Deep green': '深绿',
+  'Dark green': '墨绿',
+  Gold: '金色',
+  Black: '黑色',
+  Charcoal: '炭灰',
+  Grey: '灰色',
   // --- choices ---
   White: '白色',
   'Light grey': '浅灰',

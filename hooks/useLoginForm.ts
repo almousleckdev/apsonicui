@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTranslations } from 'next-intl';
+import { useAdminText } from '@/context/AdminTextContext';
+import type { AdminKey } from '@/lib/i18n/admin/catalog';
 import { createLoginSchema, type LoginFormData } from '@/lib/schemas/auth';
 import { useAuth } from './useAuth';
 import { ApiError } from '@/services/api-client';
@@ -10,7 +11,9 @@ import { ApiError } from '@/services/api-client';
 export const useLoginForm = () => {
   const router = useRouter();
   const { login } = useAuth();
-  const t = useTranslations('auth');
+  const { t: adminT } = useAdminText();
+  // The sign-in messages live in the admin catalog as login.*; the schema factory asks for them by short key.
+  const t = (key: string) => adminT(`login.${key}` as AdminKey);
   const [errorMessage, setErrorMessage] = useState<string>('');
 
   const {

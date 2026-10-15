@@ -15,6 +15,8 @@ import { GroupFormModal } from '@/components/admin/categories/GroupFormModal';
 import { GroupSection } from '@/components/admin/categories/GroupSection';
 import { categoryService, type CategoryItem, type CreateCategoryPayload } from '@/services/category';
 import { canDeleteCatalog } from '@/lib/utils/permissions';
+import { T } from '@/components/admin/T';
+import { useAdminText } from '@/context/AdminTextContext';
 import {
   PRODUCT_MENU_LIMITS,
   moveGroup,
@@ -43,13 +45,14 @@ const errorMessage = (err: unknown, fallback: string) => (err instanceof Error &
 
 export default function AdminCategoriesPage() {
   const { toast } = useToast();
+  const { t } = useAdminText();
   const { user } = useAuth();
   const allowDelete = canDeleteCatalog(user);
 
   const { data: categories, loading, refetch, setData } = useRemoteList<CategoryItem>(
     ['admin', 'categories'],
     () => categoryService.getAdminCategories(),
-    (e) => toast.error(e.message || 'Failed to load categories')
+    (e) => toast.error(e.message || t('categories.loadFailed'))
   );
   const { groups, loading: groupsLoading, update: updateGroups } = useProductMenuGroups();
 
@@ -101,15 +104,15 @@ export default function AdminCategoriesPage() {
     try {
       if (categoryForm.editing) {
         await categoryService.updateCategory(categoryForm.editing.id, categoryForm.data);
-        toast.success('Category updated.');
+        toast.success(t('categories.updated'));
       } else {
         await categoryService.createCategory(categoryForm.data);
-        toast.success('Category created.');
+        toast.success(t('categories.created'));
       }
       setCategoryForm(null);
       await refetch();
     } catch (err) {
-      toast.error(errorMessage(err, 'Could not save the category'));
+      toast.error(errorMessage(err, t('categories.saveFailed')));
     }
   };
 
@@ -118,11 +121,11 @@ export default function AdminCategoriesPage() {
     setIsDeleting(true);
     try {
       await categoryService.deleteCategory(deletingCategory.id);
-      toast.success(`"${deletingCategory.nameEn || deletingCategory.slug}" deleted.`);
+      toast.success(t('categories.deleted', { name: deletingCategory.nameEn || deletingCategory.slug }));
       setDeletingCategory(null);
       await refetch();
     } catch (err) {
-      toast.error(errorMessage(err, 'Delete failed'));
+      toast.error(errorMessage(err, t('categories.deleteFailed')));
     } finally {
       setIsDeleting(false);
     }
@@ -135,7 +138,7 @@ export default function AdminCategoriesPage() {
       await categoryService.toggleActive(c.id, next);
     } catch (err) {
       setData((rows) => rows.map((r) => (r.id === c.id ? { ...r, active: !next } : r)));
-      toast.error(errorMessage(err, 'Status update failed'));
+      toast.error(errorMessage(err, t('categories.statusFailed')));
     }
   };
 
@@ -144,11 +147,11 @@ export default function AdminCategoriesPage() {
   const saveGroup = async (group: ProductMenuGroup) => {
     await updateGroups((list) => {
       if (!group.id && list.length >= PRODUCT_MENU_LIMITS.maxGroups) {
-        throw new Error(`The menu can have at most ${PRODUCT_MENU_LIMITS.maxGroups} groups.`);
+        throw new Error(t('categories.groupTooMany', { max: PRODUCT_MENU_LIMITS.maxGroups }));
       }
       return upsertGroup(list, group.id ? group : { ...group, id: uniqueGroupId(group.labelEn, list) });
     });
-    toast.success(group.id ? 'Group updated.' : 'Group added.');
+    toast.success(t(group.id ? 'categories.groupUpdated' : 'categories.groupAdded'));
     setGroupForm(null);
   };
 
@@ -156,9 +159,9 @@ export default function AdminCategoriesPage() {
     if (!deletingGroup) return;
     try {
       await updateGroups((list) => removeGroup(list, deletingGroup.id));
-      toast.success('Group removed.');
+      toast.success(t('categories.groupRemoved'));
     } catch (err) {
-      toast.error(errorMessage(err, 'Could not remove the group'));
+      toast.error(errorMessage(err, t('categories.groupRemoveFailed')));
     } finally {
       setDeletingGroup(null);
     }
@@ -168,7 +171,7 @@ export default function AdminCategoriesPage() {
     try {
       await updateGroups((list) => moveGroup(list, id, direction));
     } catch (err) {
-      toast.error(errorMessage(err, 'Could not reorder the groups'));
+      toast.error(errorMessage(err, t('categories.groupReorderFailed')));
     }
   };
 
@@ -176,9 +179,9 @@ export default function AdminCategoriesPage() {
     <div className="space-y-3 font-sans max-w-6xl mx-auto pb-10">
       <AdminPageHeader
         compact
-        title="Categories"
-        subtitle="The Products menu: groups with their pictures, and the categories inside each one, in English, French and Chinese."
-        actionLabel="Add category"
+        title={<T id="categories.title" layout="stack" />}
+        subtitle={<T id="categories.subtitle" />}
+        actionLabel={<T id="categories.add" />}
         onActionClick={() => openCreateCategory()}
         onRefresh={() => refetch()}
         isRefreshing={loading || groupsLoading}
@@ -189,8 +192,8 @@ export default function AdminCategoriesPage() {
           <Search className="w-4 h-4 text-zinc-400 mr-2 shrink-0" />
           <input
             type="text"
-            aria-label="Search categories"
-            placeholder="Search by name or slug..."
+            aria-label={t('categories.searchLabel')}
+            placeholder={t('categories.search')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full bg-transparent text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none"
@@ -205,7 +208,7 @@ export default function AdminCategoriesPage() {
               onClick={() => setBrand(b)}
               className={`px-3 py-1 rounded-lg text-2xs font-bold capitalize transition-colors cursor-pointer ${brand === b ? 'bg-brand-green text-white shadow-sm' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}
             >
-              {b === 'all' ? 'All brands' : b}
+              {b === 'all' ? <T id="categories.allBrands" /> : b}
             </button>
           ))}
           <button
@@ -214,7 +217,7 @@ export default function AdminCategoriesPage() {
             disabled={groups.length >= PRODUCT_MENU_LIMITS.maxGroups}
             className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-2xs font-bold bg-zinc-900 text-white hover:bg-zinc-700 disabled:opacity-50 cursor-pointer sm:ml-2"
           >
-            <Plus className="w-3.5 h-3.5" /> Add group
+            <Plus className="w-3.5 h-3.5" /> <T id="categories.addGroup" />
           </button>
         </div>
       </div>
@@ -243,9 +246,9 @@ export default function AdminCategoriesPage() {
           <header className="flex items-center gap-2 border-b border-amber-200 px-3 py-2.5">
             <Layers className="h-4 w-4 text-amber-700" />
             <div>
-              <h2 className="text-sm font-black text-amber-900">Group removed</h2>
+              <h2 className="text-sm font-black text-amber-900"><T id="categories.orphansTitle" /></h2>
               <p className="text-2xs text-amber-800">
-                These categories point to a group that no longer exists. The site lists them under the first group; edit each one to choose a group.
+                <T id="categories.orphansText" />
               </p>
             </div>
           </header>
@@ -260,7 +263,7 @@ export default function AdminCategoriesPage() {
       <Modal
         isOpen={categoryForm !== null}
         onClose={() => setCategoryForm(null)}
-        title={categoryForm?.editing ? 'Edit category' : 'Add category'}
+        title={t(categoryForm?.editing ? 'categories.formEdit' : 'categories.formAdd')}
       >
         {categoryForm && (
           <CategoryFormModalContent
@@ -290,10 +293,9 @@ export default function AdminCategoriesPage() {
         onClose={() => setDeletingCategory(null)}
         onConfirm={confirmDeleteCategory}
         variant="danger"
-        title="Delete category"
-        description="Delete this category? Products mapped to it will need re-assigning. Its address (slug) stays reserved, so it cannot be reused."
-        confirmLabel="Delete category"
-        cancelLabel="Cancel"
+        title={t('categories.confirmDelete')}
+        description={t('categories.confirmDeleteText')}
+        confirmLabel={<T id="categories.deleteConfirm" />}
         expectedConfirmationName={deletingCategory?.nameEn || deletingCategory?.name || deletingCategory?.slug}
         isLoading={isDeleting}
       />
@@ -303,10 +305,9 @@ export default function AdminCategoriesPage() {
         onClose={() => setDeletingGroup(null)}
         onConfirm={confirmDeleteGroup}
         variant="danger"
-        title="Remove group"
-        description={`Remove "${deletingGroup?.labelEn ?? ''}" from the Products menu? It holds no categories, so nothing else changes.`}
-        confirmLabel="Remove group"
-        cancelLabel="Cancel"
+        title={t('categories.removeGroup')}
+        description={t('categories.removeGroupText', { name: deletingGroup?.labelEn ?? '' })}
+        confirmLabel={<T id="categories.removeGroup" />}
       />
     </div>
   );

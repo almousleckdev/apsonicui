@@ -1,5 +1,8 @@
 'use client';
 
+import { CopyFromLanguage } from '@/components/admin/shared/CopyFromLanguage';
+import { T } from '@/components/admin/T';
+import { useAdminText } from '@/context/AdminTextContext';
 import React, { useState } from 'react';
 import { CollapsibleCard } from '@/components/admin/shared/CollapsibleCard';
 import { CompactMediaField } from '@/components/admin/shared/CompactMediaField';
@@ -12,14 +15,15 @@ interface HeroSectionEditorProps {
 }
 
 const FIELDS = [
-  { key: 'tagline', label: 'Tagline', placeholder: { en: 'Discover Apsonic', fr: 'Découvrir Apsonic', zh: '探索品牌' } },
-  { key: 'title', label: 'Title', placeholder: { en: 'Good Quality, Good Life', fr: 'Bonne qualité pour une meilleure vie', zh: '好质量 好生活' } },
-  { key: 'subtitle', label: 'Subtitle', placeholder: { en: "Built for Africa's rugged roads", fr: "Conçue pour les routes d'Afrique", zh: '专为非洲复杂路况打造' } },
+  { key: 'tagline', label: 'home.hero.tagline', placeholder: 'home.hero.placeholders.tagline' },
+  { key: 'title', label: 'home.hero.heading', placeholder: 'home.hero.placeholders.title' },
+  { key: 'subtitle', label: 'home.hero.subtitle', placeholder: 'home.hero.placeholders.subtitle' },
 ] as const;
 
 const INPUT = 'w-full px-3 py-2 border border-zinc-200 rounded-xl bg-zinc-50 focus:bg-white text-xs font-semibold';
 
 export const HeroSectionEditor: React.FC<HeroSectionEditorProps> = ({ hero, onChange }) => {
+  const { t } = useAdminText();
   const [lang, setLang] = useState<AdminLang>('en');
   const suffix = suffixOf(lang);
 
@@ -31,7 +35,7 @@ export const HeroSectionEditor: React.FC<HeroSectionEditorProps> = ({ hero, onCh
 
   return (
     <CollapsibleCard
-      title="Hero"
+      title={<T id="home.hero.title" />}
       summary={hero.titleEn}
       actions={<LanguageTabs value={lang} onChange={setLang} />}
     >
@@ -40,23 +44,25 @@ export const HeroSectionEditor: React.FC<HeroSectionEditorProps> = ({ hero, onCh
           const key = `${f.key}${suffix}` as keyof HomeHeroConfig;
           return (
             <label key={f.key} className="text-2xs font-bold text-zinc-600">
-              {f.label}
+              <T id={f.label} />
               <input
                 type="text"
                 value={(hero[key] as string | undefined) || ''}
                 onChange={(e) => onChange({ ...hero, [key]: e.target.value })}
-                placeholder={f.placeholder[lang]}
+                placeholder={t(`${f.placeholder}.${lang}`)}
                 className={INPUT}
               />
+              <CopyFromLanguage current={lang} values={{ en: hero[`${f.key}En` as keyof HomeHeroConfig] as string | undefined, fr: hero[`${f.key}Fr` as keyof HomeHeroConfig] as string | undefined, zh: hero[`${f.key}Zh` as keyof HomeHeroConfig] as string | undefined }}
+                onCopy={(text) => onChange({ ...hero, [key]: text })} />
             </label>
           );
         })}
       </div>
-      {lang !== 'en' && <p className="mt-2 text-2xs text-zinc-400">Empty fields show the English text to visitors.</p>}
+      {lang !== 'en' && <p className="mt-2 text-2xs text-zinc-400"><T id="home.hero.emptyFallback" /></p>}
 
       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3 border-t border-zinc-50 pt-3">
-        <CompactMediaField label="Background 1 (video or image)" value={hero.videos?.[0]} onChange={(u) => updateVideoUrl(0, u)} accept="video/*,image/*" />
-        <CompactMediaField label="Background 2 (video or image)" value={hero.videos?.[1]} onChange={(u) => updateVideoUrl(1, u)} accept="video/*,image/*" />
+        <CompactMediaField label={t('home.hero.background1')} value={hero.videos?.[0]} onChange={(u) => updateVideoUrl(0, u)} accept="video/*,image/*" />
+        <CompactMediaField label={t('home.hero.background2')} value={hero.videos?.[1]} onChange={(u) => updateVideoUrl(1, u)} accept="video/*,image/*" />
       </div>
     </CollapsibleCard>
   );

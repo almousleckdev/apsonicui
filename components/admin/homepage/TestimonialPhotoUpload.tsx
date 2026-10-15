@@ -1,5 +1,7 @@
 'use client';
 
+import { T } from '@/components/admin/T';
+import { useAdminText } from '@/context/AdminTextContext';
 import React, { useRef, useState } from 'react';
 import Image from 'next/image';
 import { Camera, Loader2, X } from 'lucide-react';
@@ -19,6 +21,7 @@ interface TestimonialPhotoUploadProps {
 /** Round photo picker. Upload only: the stored value is always a path on this site, never a typed-in address. */
 export const TestimonialPhotoUpload: React.FC<TestimonialPhotoUploadProps> = ({ value, name, onChange }) => {
   const { toast } = useToast();
+  const { t } = useAdminText();
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -27,15 +30,15 @@ export const TestimonialPhotoUpload: React.FC<TestimonialPhotoUploadProps> = ({ 
     event.target.value = '';
     if (!file) return;
     if (file.size > MAX_PHOTO_BYTES) {
-      toast.error('That photo is larger than 5 MB. Please choose a smaller image (a square photo of about 400 x 400 px is plenty).');
+      toast.error(t('home.photo.tooLarge'));
       return;
     }
     setUploading(true);
     try {
       onChange(await uploadMediaFile(file));
-      toast.success('Photo uploaded. Remember to save your changes.');
+      toast.success(t('home.photo.uploaded'));
     } catch (error) {
-      toast.error(getErrorMessage(error, 'Upload failed. Please try again.'));
+      toast.error(getErrorMessage(error, t('home.photo.failed')));
     } finally {
       setUploading(false);
     }
@@ -48,7 +51,7 @@ export const TestimonialPhotoUpload: React.FC<TestimonialPhotoUploadProps> = ({ 
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={uploading}
-          aria-label={value ? `Change photo of ${name || 'this person'}` : 'Upload photo'}
+          aria-label={value ? t('home.photo.change', { name: name || t('home.photo.thisPerson') }) : t('home.photo.upload')}
           className="group relative h-16 w-16 overflow-hidden rounded-full border border-zinc-200 bg-zinc-100 flex items-center justify-center cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-green/40"
         >
           {value ? (
@@ -65,7 +68,7 @@ export const TestimonialPhotoUpload: React.FC<TestimonialPhotoUploadProps> = ({ 
           <button
             type="button"
             onClick={() => onChange('')}
-            aria-label="Remove photo"
+            aria-label={t('home.photo.remove')}
             className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-zinc-900 text-white shadow cursor-pointer hover:bg-red-600"
           >
             <X className="h-3 w-3" />
@@ -74,8 +77,8 @@ export const TestimonialPhotoUpload: React.FC<TestimonialPhotoUploadProps> = ({ 
         <input ref={inputRef} type="file" accept={ACCEPTED_TYPES} onChange={handleFile} className="hidden" />
       </div>
       <div className="text-2xs leading-snug text-zinc-500">
-        <p className="font-bold text-zinc-700">Photo</p>
-        <p>Click the circle to {value ? 'change' : 'upload'}. Square image, JPG/PNG/WebP, max 5 MB.</p>
+        <p className="font-bold text-zinc-700"><T id="home.photo.label" /></p>
+        <p><T id={value ? 'home.photo.hintChange' : 'home.photo.hintUpload'} /></p>
       </div>
     </div>
   );

@@ -77,6 +77,9 @@ describe('section operations', () => {
     const doc = withSections();
     expect(setHidden(doc, 'a', true).sections[0].hidden).toBe(true);
     expect(setStyle(doc, 'a', 'background', 'dark').sections[0].style.background).toBe('dark');
+    // Numbers and switches keep their type: the server refuses "180" where it expects 180.
+    expect(setStyle(doc, 'a', 'headingSize', 180).sections[0].style.headingSize).toBe(180);
+    expect(setStyle(doc, 'a', 'backgroundFixed', true).sections[0].style.backgroundFixed).toBe(true);
     expect(updateSection(doc, 'missing', (s) => s)).toBe(doc);
   });
 });

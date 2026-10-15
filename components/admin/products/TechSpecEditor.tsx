@@ -1,6 +1,8 @@
 import React from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { ProductSpecPayload } from '@/services/product';
+import { T } from '@/components/admin/T';
+import { useAdminText } from '@/context/AdminTextContext';
 
 interface TechSpecEditorProps {
   specs: ProductSpecPayload[];
@@ -32,6 +34,7 @@ export const TechSpecEditor: React.FC<TechSpecEditorProps> = ({
   specs,
   onChange,
 }) => {
+  const { t } = useAdminText();
   const addSpec = (isKeyMetric = false) => {
     onChange([
       ...specs,
@@ -72,8 +75,8 @@ export const TechSpecEditor: React.FC<TechSpecEditorProps> = ({
     <div className="space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
-          <label className="block text-zinc-900 font-bold text-xs">Technical Specifications Table</label>
-          <p className="text-2xs text-zinc-500">Type key metrics and detailed engineering spec rows.</p>
+          <label className="block text-zinc-900 font-bold text-xs"><T id="products.spec.title" /></label>
+          <p className="text-2xs text-zinc-500"><T id="products.spec.hint" /></p>
         </div>
         <div className="flex items-center gap-2">
           {specs.length === 0 && (
@@ -82,7 +85,7 @@ export const TechSpecEditor: React.FC<TechSpecEditorProps> = ({
               onClick={populateDefaults}
               className="px-3 py-1.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-xs font-bold rounded-xl transition-all cursor-pointer"
             >
-              Fill Template Specs
+              <T id="products.spec.fillTemplate" />
             </button>
           )}
           <button
@@ -90,14 +93,14 @@ export const TechSpecEditor: React.FC<TechSpecEditorProps> = ({
             onClick={() => addSpec(true)}
             className="px-3 py-1.5 bg-emerald-50 text-brand-green border border-brand-green/30 hover:bg-emerald-100 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1"
           >
-            <Plus className="w-3.5 h-3.5" /> + Key Metric
+            <Plus className="w-3.5 h-3.5" /> <T id="products.spec.keyMetric" />
           </button>
           <button
             type="button"
             onClick={() => addSpec(false)}
             className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1 shadow-sm"
           >
-            <Plus className="w-3.5 h-3.5" /> + Spec Row
+            <Plus className="w-3.5 h-3.5" /> <T id="products.spec.row" />
           </button>
         </div>
       </div>
@@ -109,21 +112,21 @@ export const TechSpecEditor: React.FC<TechSpecEditorProps> = ({
               type="text"
               value={s.specKey}
               onChange={(e) => updateSpec(i, 'specKey', e.target.value)}
-              placeholder="Specification Name (e.g. MAX SPEED, Wheelbase)"
+              placeholder={t('products.spec.name')}
               className="flex-1 px-3 py-1.5 border border-zinc-200 rounded-lg bg-white text-xs font-bold focus:outline-none"
             />
             <input
               type="text"
               value={s.specValue}
               onChange={(e) => updateSpec(i, 'specValue', e.target.value)}
-              placeholder="Value (e.g. 95, 1225)"
+              placeholder={t('products.spec.value')}
               className="flex-1 px-3 py-1.5 border border-zinc-200 rounded-lg bg-white text-xs focus:outline-none"
             />
             <input
               type="text"
               value={s.unit || ''}
               onChange={(e) => updateSpec(i, 'unit', e.target.value)}
-              placeholder="Unit (KM/H, MM)"
+              placeholder={t('products.spec.unit')}
               className="w-24 px-2.5 py-1.5 border border-zinc-200 rounded-lg bg-white text-xs focus:outline-none"
             />
             <label className="flex items-center gap-1.5 text-2xs font-bold text-zinc-700 px-2 cursor-pointer bg-white py-1.5 border border-zinc-200 rounded-lg">
@@ -133,9 +136,9 @@ export const TechSpecEditor: React.FC<TechSpecEditorProps> = ({
                 onChange={(e) => updateSpec(i, 'isKeyMetric', e.target.checked)}
                 className="rounded border-zinc-300 text-brand-green focus:ring-brand-green"
               />
-              Top Metric
+              <T id="products.spec.topMetric" />
             </label>
-            <button type="button" onClick={() => removeSpec(i)} className="text-red-500 hover:text-red-700 p-1.5 cursor-pointer">
+            <button type="button" onClick={() => removeSpec(i)} aria-label={t('products.spec.remove')} title={t('products.spec.remove')} className="text-red-500 hover:text-red-700 p-1.5 cursor-pointer">
               <Trash2 className="w-4 h-4" />
             </button>
           </div>

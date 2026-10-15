@@ -92,7 +92,8 @@ export function setHidden(doc: PageDocument, id: string, hidden: boolean): PageD
   return updateSection(doc, id, (s) => ({ ...s, hidden }));
 }
 
-export function setStyle(doc: PageDocument, id: string, key: keyof SectionStyle, value: string): PageDocument {
+/** Sets one style value as it is (text, number or true/false), so the server's type checks see what the editor chose. */
+export function setStyle(doc: PageDocument, id: string, key: keyof SectionStyle, value: string | number | boolean): PageDocument {
   return updateSection(doc, id, (s) => ({ ...s, style: { ...s.style, [key]: value } }));
 }
 

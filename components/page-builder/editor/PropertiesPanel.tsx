@@ -12,7 +12,7 @@ import { fillEmptyTranslations, fillSectionTranslations } from '@/lib/page-build
 import { addListItem, applicableStyleFields, moveListItem, removeListItem, setContent, setHidden, setStyle } from '@/lib/page-builder/document';
 import { groupFields, isFieldVisible } from '@/lib/page-builder/fields';
 import { SectionIcon } from '../renderer/registry';
-import type { FieldDef, Locale, PageDocument, PageSection, SectionDefinition } from '@/lib/page-builder/types';
+import type { FieldDef, Locale, PageDocument, PageSection, SectionDefinition, SectionStyle } from '@/lib/page-builder/types';
 import { FieldControl, type FieldContext, type Path } from './fields/FieldControl';
 
 interface Props {
@@ -50,7 +50,7 @@ export function PropertiesPanel({ section, sectionIndex, definition, styleFields
 
   const styleCtx: FieldContext = useMemo(() => ({
     ...contentCtx,
-    onChange: (path, value) => edit((d) => setStyle(d, id, path[0] as 'background' | 'paddingTop' | 'paddingBottom' | 'width', String(value)), `style:${id}`),
+    onChange: (path, value) => edit((d) => setStyle(d, id, path[0] as keyof SectionStyle, value as string | number | boolean), `style:${id}`),
   }), [contentCtx, edit, id]);
 
   // Other languages that have text this language is missing, to copy across as a starting point for the translation.

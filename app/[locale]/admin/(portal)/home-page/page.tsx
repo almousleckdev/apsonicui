@@ -1,4 +1,6 @@
 'use client';
+import { T } from '@/components/admin/T';
+import { useAdminText } from '@/context/AdminTextContext';
 import { ActionModal } from "@/components/admin/ActionModal";
 
 import React, { useState, useEffect } from 'react';
@@ -17,6 +19,7 @@ export default function AdminHomePage() {
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { t } = useAdminText();
   // Problems are only shown after a first attempt to save, so a fresh "Add Testimonial" row is not red straight away.
   const [showTestimonialErrors, setShowTestimonialErrors] = useState(false);
   const testimonialErrors = validateTestimonials(config.testimonials);
@@ -39,7 +42,7 @@ export default function AdminHomePage() {
     e.preventDefault();
     if (Object.keys(testimonialErrors).length > 0) {
       setShowTestimonialErrors(true);
-      toast.error('Some testimonials are incomplete. Please fix the highlighted fields before saving.');
+      toast.error(t('home.testimonialsIncomplete'));
       document.getElementById('testimonials-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
     }
@@ -49,7 +52,7 @@ export default function AdminHomePage() {
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to save the home page');
+      toast.error(err instanceof Error ? err.message : t('home.saveFailed'));
     }
   };
 
@@ -65,12 +68,12 @@ export default function AdminHomePage() {
       setConfig(def);
       setShowResetModal(false);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to reset the home page');
+      toast.error(err instanceof Error ? err.message : t('home.resetFailed'));
     }
   };
 
   if (loading) {
-    return <><div className="p-8 text-center text-zinc-500 font-medium">Loading config...</div></>;
+    return <><div className="p-8 text-center text-zinc-500 font-medium"><T id="home.loading" /></div></>;
   }
 
   return (
@@ -79,14 +82,14 @@ export default function AdminHomePage() {
         {/* Top Control Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white px-4 py-3 rounded-2xl border border-zinc-100 shadow-sm">
           <div>
-            <h1 className="text-base font-extrabold text-zinc-900 tracking-tight">Home page</h1>
-            <p className="text-2xs text-zinc-500 font-medium">Hero, models, lineup and testimonials, in English, French and Chinese.</p>
+            <h1 className="text-base font-extrabold text-zinc-900 tracking-tight"><T id="home.title" layout="stack" /></h1>
+            <p className="text-2xs text-zinc-500 font-medium"><T id="home.subtitle" /></p>
           </div>
 
           <div className="flex items-center gap-3">
             {saved && (
               <span className="flex items-center gap-1.5 text-emerald-600 text-xs font-bold bg-emerald-50 px-3.5 py-2.5 rounded-xl border border-emerald-200/60 animate-in fade-in">
-                <CheckCircle2 className="w-4 h-4 text-brand-green" /> Saved Successfully!
+                <CheckCircle2 className="w-4 h-4 text-brand-green" /> <T id="home.saved" />
               </span>
             )}
             <button
@@ -94,13 +97,13 @@ export default function AdminHomePage() {
               onClick={handleReset}
               className="inline-flex items-center gap-2 px-3 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-bold text-2xs uppercase tracking-wider rounded-lg transition-all cursor-pointer"
             >
-              <RefreshCw className="w-3.5 h-3.5" /> Reset
+              <RefreshCw className="w-3.5 h-3.5" /> <T id="home.reset" />
             </button>
             <button
               type="submit"
               className="inline-flex items-center gap-2 px-4 py-2 bg-brand-green text-white font-bold text-2xs uppercase tracking-wider rounded-lg hover:bg-green-700 transition-all cursor-pointer"
             >
-              <Save className="w-3.5 h-3.5" /> Save changes
+              <Save className="w-3.5 h-3.5" /> <T id="home.save" />
             </button>
           </div>
         </div>
@@ -129,10 +132,9 @@ export default function AdminHomePage() {
           onClose={() => setShowResetModal(false)}
           onConfirm={confirmReset}
           variant="danger"
-          title="Reset Homepage Config"
-          description="Are you sure you want to reset the homepage content to system defaults? All custom videos, slogans, and lineup data will be lost."
-          confirmLabel="Reset Defaults"
-          cancelLabel="Cancel"
+          title={t('home.resetTitle')}
+          description={t('home.resetText')}
+          confirmLabel={<T id="home.resetConfirm" />}
           expectedConfirmationName="RESET"
         />
       </form>

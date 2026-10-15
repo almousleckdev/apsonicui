@@ -9,9 +9,12 @@ import { ProfileHeaderCard } from '@/components/admin/profile/ProfileHeaderCard'
 import { AccountInfoSection } from '@/components/admin/profile/AccountInfoSection';
 import { PasswordChangeSection } from '@/components/admin/profile/PasswordChangeSection';
 import { Save, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { T } from '@/components/admin/T';
+import { useAdminText } from '@/context/AdminTextContext';
 
 export default function AdminProfilePage() {
   const { updateUser } = useAuth();
+  const { t } = useAdminText();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
@@ -77,12 +80,12 @@ export default function AdminProfilePage() {
         if (updated) {
           setProfile(updated);
           updateUser(updated);
-          setSuccessMsg('Profile picture updated and saved successfully!');
+          setSuccessMsg(t('profile.avatarSaved'));
         }
       }
     } catch (err: unknown) {
       console.error('Avatar upload error:', err);
-      setErrorMsg(err instanceof Error ? err.message : 'Failed to process profile picture.');
+      setErrorMsg(err instanceof Error ? err.message : t('profile.avatarFailed'));
     } finally {
       setUploadingAvatar(false);
       if (avatarInputRef.current) avatarInputRef.current.value = '';
@@ -96,11 +99,11 @@ export default function AdminProfilePage() {
 
     if (newPassword) {
       if (!currentPassword) {
-        setErrorMsg('Please enter your current password to set a new password.');
+        setErrorMsg(t('profile.needCurrent'));
         return;
       }
       if (newPassword !== confirmPassword) {
-        setErrorMsg('New password and confirm password do not match.');
+        setErrorMsg(t('profile.mismatch'));
         return;
       }
     }
@@ -130,10 +133,10 @@ export default function AdminProfilePage() {
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
-      setSuccessMsg('Profile details and security settings saved successfully!');
+      setSuccessMsg(t('profile.saved'));
     } catch (err: unknown) {
       console.error('Save profile error:', err);
-      setErrorMsg(err instanceof Error ? err.message : 'Failed to update profile.');
+      setErrorMsg(err instanceof Error ? err.message : t('profile.saveFailed'));
     } finally {
       setSaving(false);
     }
@@ -152,10 +155,10 @@ export default function AdminProfilePage() {
         <div className="max-w-4xl mx-auto space-y-8 pb-20 font-sans">
           <div>
             <h1 className="text-3xl font-extrabold tracking-tight text-zinc-950">
-              Admin Profile Settings
+              <T id="profile.title" layout="stack" />
             </h1>
             <p className="text-xs text-zinc-500 mt-1">
-              Manage your administrator credentials, personal details, profile picture, and account security.
+              <T id="profile.subtitle" />
             </p>
           </div>
 
@@ -176,7 +179,7 @@ export default function AdminProfilePage() {
           {loading ? (
             <div className="p-16 text-center flex flex-col items-center justify-center gap-3">
               <Loader2 className="w-8 h-8 text-brand-green animate-spin" />
-              <p className="text-xs font-semibold text-zinc-500">Loading profile details...</p>
+              <p className="text-xs font-semibold text-zinc-500"><T id="profile.loading" /></p>
             </div>
           ) : (
             <form onSubmit={handleSaveProfile} className="space-y-8">
@@ -217,7 +220,7 @@ export default function AdminProfilePage() {
                   className="px-8 py-3 bg-brand-green text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-xl shadow-brand-green/20 hover:bg-green-700 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                  <span>Save Changes</span>
+                  <span><T id="profile.save" /></span>
                 </button>
               </div>
             </form>

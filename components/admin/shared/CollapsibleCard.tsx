@@ -4,9 +4,9 @@ import React, { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 
 interface Props {
-  title: string;
+  title: React.ReactNode;
   /** One line shown next to the title while the card is closed, e.g. "3 items". */
-  summary?: string;
+  summary?: React.ReactNode;
   defaultOpen?: boolean;
   /** Controls kept in the header (language tabs, "Add" button). */
   actions?: React.ReactNode;

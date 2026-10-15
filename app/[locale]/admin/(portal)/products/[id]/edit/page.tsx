@@ -9,12 +9,15 @@ import { categoryService, CategoryItem } from '@/services/category';
 import { useToast } from '@/components/ui/Toast';
 import { Loader2, Save } from 'lucide-react';
 import { getErrorMessage } from '@/lib/utils/errors';
+import { T } from '@/components/admin/T';
+import { useAdminText } from '@/context/AdminTextContext';
 
 export default function AdminEditProductPage() {
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
   const { toast } = useToast();
+  const { t } = useAdminText();
 
   const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [formData, setFormData] = useState<CreateProductPayload | null>(null);
@@ -44,10 +47,10 @@ export default function AdminEditProductPage() {
       setLoading(false);
     }).catch((e) => {
       console.error(e);
-      toast.error(e instanceof Error ? e.message : 'Failed to load product details');
+      toast.error(e instanceof Error ? e.message : t('products.page.loadFailed'));
       setLoading(false);
     });
-  }, [id, toast]);
+  }, [id, toast, t]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,10 +58,10 @@ export default function AdminEditProductPage() {
     setSaving(true);
     try {
       await productService.updateProduct(id, formData);
-      toast.success('Product updated successfully!');
+      toast.success(t('products.page.updated'));
       router.push('/admin/products');
     } catch (err: unknown) {
-      toast.error(getErrorMessage(err, 'Error updating product'));
+      toast.error(getErrorMessage(err, t('products.page.updateFailed')));
     } finally {
       setSaving(false);
     }
@@ -77,7 +80,7 @@ export default function AdminEditProductPage() {
               onClick={() => router.push('/admin/products')}
               className="px-5 py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer"
             >
-              Cancel
+              <T id="products.page.cancel" />
             </button>
             <button
               type="submit"
@@ -86,7 +89,7 @@ export default function AdminEditProductPage() {
               className="inline-flex items-center gap-2 px-6 py-2.5 bg-brand-green hover:bg-green-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-brand-green/20 transition-all cursor-pointer disabled:opacity-50"
             >
               <Save className="w-3.5 h-3.5" />
-              <span>{saving ? 'Saving...' : 'Save Changes'}</span>
+              <span><T id={saving ? 'products.page.saving' : 'products.page.save'} /></span>
             </button>
           </div>
         </div>
@@ -96,7 +99,7 @@ export default function AdminEditProductPage() {
           {loading || !formData ? (
             <div className="flex items-center justify-center py-20 gap-3">
               <Loader2 className="w-6 h-6 text-brand-green animate-spin" />
-              <span className="text-xs font-bold text-zinc-500">Loading Product Data...</span>
+              <span className="text-xs font-bold text-zinc-500"><T id="products.page.loading" /></span>
             </div>
           ) : (
             <ProductFormContent

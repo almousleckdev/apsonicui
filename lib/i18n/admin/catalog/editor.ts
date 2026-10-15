@@ -152,6 +152,14 @@ export const editor = {
       addressHint: ['Lowercase letters, numbers and hyphens.', '小写字母、数字和连字符。'],
     },
   },
+  pageRoute: {
+    notFound: ['This page does not exist.', '此页面不存在。'],
+    notFoundOrDeleted: ['This page does not exist (or was deleted).', '此页面不存在（或已被删除）。'],
+    forbidden: ['You do not have permission to edit pages.', '您没有编辑页面的权限。'],
+    failed: ['The page could not be loaded. Check your connection and try again.', '无法加载页面，请检查网络后重试。'],
+    loading: ['Loading the editor', '正在加载编辑器'],
+    back: ['Back to pages', '返回页面列表'],
+  },
   publishDialog: {
       title: ['Publish this page', '发布此页面'],
       checking: ['Saving and checking the page…', '正在保存并检查页面…'],

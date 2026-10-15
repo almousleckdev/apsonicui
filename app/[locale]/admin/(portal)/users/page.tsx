@@ -8,6 +8,8 @@ import { UserEditModal } from '@/components/admin/users/UserEditModal';
 import { ActionModal } from '@/components/admin/ActionModal';
 import { useAdminUsers } from '@/components/admin/users/useAdminUsers';
 import { AlertTriangle } from 'lucide-react';
+import { T } from '@/components/admin/T';
+import { useAdminText } from '@/context/AdminTextContext';
 
 export default function AdminUsersPage() {
   const {
@@ -32,6 +34,8 @@ export default function AdminUsersPage() {
     filteredUsers,
   } = useAdminUsers();
 
+  const { t } = useAdminText();
+
   const handleConfirmDelete = async () => {
     if (deletingUser !== null) {
       await handleDeleteUser(deletingUser.id);
@@ -43,9 +47,9 @@ export default function AdminUsersPage() {
       <div className="space-y-6 font-sans max-w-7xl mx-auto">
         {/* Unified Admin Page Header Banner */}
         <AdminPageHeader
-          title="Users Management"
-          subtitle="Manage administrator credentials, roles, and platform permissions."
-          actionLabel="Create User"
+          title={<T id="users.title" layout="stack" />}
+          subtitle={<T id="users.subtitle" />}
+          actionLabel={<T id="users.create" />}
           onActionClick={handleOpenCreateModal}
           onRefresh={fetchUserList}
           isRefreshing={loading}
@@ -90,10 +94,9 @@ export default function AdminUsersPage() {
           onClose={() => setDeletingUser(null)}
           onConfirm={handleConfirmDelete}
           variant="danger"
-          title="Delete User Account"
-          description="Are you sure you want to delete this system user? All associated session tokens and administrator rights will be permanently revoked."
-          confirmLabel="Delete User"
-          cancelLabel="Cancel"
+          title={t('users.confirmDelete')}
+          description={t('users.confirmDeleteText')}
+          confirmLabel={<T id="users.deleteConfirm" />}
           expectedConfirmationName={deletingUser?.username}
           isLoading={deleting}
         />

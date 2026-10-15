@@ -5,6 +5,8 @@ import Image from 'next/image';
 import { Film, ImageIcon, Link2, Loader2, Upload, X } from 'lucide-react';
 import { mediaService } from '@/services/media';
 import { useToast } from '@/components/ui/Toast';
+import { T } from '@/components/admin/T';
+import { useAdminText } from '@/context/AdminTextContext';
 
 interface Props {
   label?: string;
@@ -21,6 +23,7 @@ const isRenderable = (v?: string) => !!v && (v.startsWith('/') || v.startsWith('
 /** One-line upload control: small thumbnail, file name and a button, instead of a large preview box. */
 export function CompactMediaField({ label, value, onChange, accept = 'image/*', allowAddress = false }: Props) {
   const { toast } = useToast();
+  const { t } = useAdminText();
   const input = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [typing, setTyping] = useState(false);
@@ -35,16 +38,16 @@ export function CompactMediaField({ label, value, onChange, accept = 'image/*', 
       const res = await mediaService.uploadFile(file);
       if (res?.fileUrl) {
         onChange(res.fileUrl);
-        toast.success('Uploaded. Remember to save your changes.');
+        toast.success(t('media.uploaded'));
       }
     } catch (err) {
-      toast.error('Upload failed: ' + (err instanceof Error ? err.message : String(err)));
+      toast.error(t('media.uploadFailed', { reason: err instanceof Error ? err.message : String(err) }));
     } finally {
       setUploading(false);
     }
   };
 
-  const name = value ? decodeURIComponent(value.split('/').pop() || value) : 'No file yet';
+  const name = value ? decodeURIComponent(value.split('/').pop() || value) : t('media.noFile');
 
   const apply = () => {
     const next = address.trim();
@@ -70,11 +73,11 @@ export function CompactMediaField({ label, value, onChange, accept = 'image/*', 
           <p className="text-2xs text-zinc-400 truncate" title={value}>{name}</p>
         </div>
         {value && (
-          <button type="button" onClick={() => onChange('')} aria-label="Remove file" title="Remove"
+          <button type="button" onClick={() => onChange('')} aria-label={t('media.removeFile')} title={t('common.remove')}
             className="shrink-0 rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 cursor-pointer"><X className="w-3.5 h-3.5" /></button>
         )}
         {allowAddress && (
-          <button type="button" onClick={() => setTyping((t) => !t)} aria-label="Use an address instead" title="Use an address instead" aria-expanded={typing}
+          <button type="button" onClick={() => setTyping((t) => !t)} aria-label={t('media.useAddress')} title={t('media.useAddress')} aria-expanded={typing}
             className="shrink-0 rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 cursor-pointer"><Link2 className="w-3.5 h-3.5" /></button>
         )}
         <button
@@ -84,16 +87,16 @@ export function CompactMediaField({ label, value, onChange, accept = 'image/*', 
           className="inline-flex items-center gap-1.5 shrink-0 px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-2xs font-bold text-zinc-700 disabled:opacity-60 cursor-pointer"
         >
           {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
-          {value ? 'Replace' : 'Upload'}
+          <T id={value ? 'common.replace' : 'common.upload'} />
         </button>
         <input ref={input} type="file" accept={accept} onChange={upload} className="hidden" />
       </div>
       {typing && (
         <div className="mt-2 flex gap-2">
           <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); apply(); } }}
-            placeholder="/images/photo.jpg or https://…" aria-label="Picture address"
+            placeholder={t('media.addressPlaceholder')} aria-label={t('media.addressLabel')}
             className="min-w-0 flex-1 rounded-lg border border-zinc-200 px-3 py-1.5 text-xs focus:border-brand-green focus:outline-none focus:ring-2 focus:ring-brand-green/20" />
-          <button type="button" onClick={apply} className="shrink-0 rounded-lg bg-brand-green px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-green-hover cursor-pointer">Use</button>
+          <button type="button" onClick={apply} className="shrink-0 rounded-lg bg-brand-green px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-green-hover cursor-pointer"><T id="media.use" /></button>
         </div>
       )}
     </div>

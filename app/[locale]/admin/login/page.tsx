@@ -5,10 +5,11 @@ import { AdminLoginHero } from '@/components/admin/login/AdminLoginHero';
 import { AdminLoginForm } from '@/components/admin/login/AdminLoginForm';
 import { ADMIN_AUTH_CONSTANTS } from '@/lib/constants/auth';
 import { locales } from '@/lib/i18n/locales';
+import { AdminTextSwitch } from '@/components/admin/AdminTextSwitch';
 
 export const metadata: Metadata = {
-  title: '管理员登录 | APSONIC 企业管理门户',
-  description: 'APSONIC 企业 CMS 管理员登录门户',
+  title: '管理员登录 Admin sign-in | APSONIC',
+  description: 'APSONIC 企业 CMS 管理员登录门户 · APSONIC enterprise CMS administrator portal',
 };
 
 export function generateStaticParams() {
@@ -54,9 +55,10 @@ export default async function AdminLoginPage({ params }: AdminLoginPageProps) {
               />
             </div>
           </Link>
+          <AdminTextSwitch className="bg-white/15 [&_button]:text-white/80 [&_button[aria-checked=true]]:bg-white [&_button[aria-checked=true]]:text-zinc-900" />
         </header>
 
-        {/* Hero & Login Card Grid forced to Chinese locale */}
+        {/* Hero & sign-in card */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center my-auto py-8">
             <AdminLoginHero />
             <AdminLoginForm />

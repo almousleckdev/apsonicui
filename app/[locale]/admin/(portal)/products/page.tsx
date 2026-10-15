@@ -8,13 +8,16 @@ import { productService, ProductListItem } from '@/services/product';
 import { ProductTable } from '@/components/admin/products/ProductTable';
 import { useToast } from '@/components/ui/Toast';
 import { Search } from 'lucide-react';
+import { T } from '@/components/admin/T';
+import { useAdminText } from '@/context/AdminTextContext';
 
 export default function AdminProductsPage() {
   const { toast } = useToast();
+  const { t } = useAdminText();
   const { data: products, loading, refetch: fetchData } = useRemoteList<ProductListItem>(
     ['admin', 'products'],
     () => productService.getAdminProducts(),
-    (e) => toast.error(e.message || 'Failed to load products')
+    (e) => toast.error(e.message || t('products.loadFailed'))
   );
   const [search, setSearch] = useState('');
   const [selectedBrand, setSelectedBrand] = useState<string>('all');
@@ -26,11 +29,11 @@ export default function AdminProductsPage() {
     setIsDeleting(true);
     try {
       await productService.deleteProduct(deletingProduct.id);
-      toast.success(`Product "${deletingProduct.model}" deleted successfully.`);
+      toast.success(t('products.deleted', { name: deletingProduct.model }));
       setDeletingProduct(null);
       fetchData();
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Delete failed');
+      toast.error(err instanceof Error ? err.message : t('products.deleteFailed'));
     } finally {
       setIsDeleting(false);
     }
@@ -39,10 +42,10 @@ export default function AdminProductsPage() {
   const handleToggleActive = async (id: number | string, current: boolean) => {
     try {
       await productService.toggleActive(id, !current);
-      toast.success(`Product status ${!current ? 'activated' : 'disabled'} successfully.`);
+      toast.success(t(!current ? 'products.activated' : 'products.disabledToast'));
       fetchData();
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Status toggle failed');
+      toast.error(err instanceof Error ? err.message : t('products.toggleFailed'));
     }
   };
 
@@ -63,9 +66,9 @@ export default function AdminProductsPage() {
       <div className="space-y-6 font-sans max-w-7xl mx-auto">
         {/* Unified Admin Page Header */}
         <AdminPageHeader
-          title="Products Management"
-          subtitle="Manage motorcycle models, technical specifications, and section images."
-          actionLabel="Add Product"
+          title={<T id="products.title" layout="stack" />}
+          subtitle={<T id="products.subtitle" />}
+          actionLabel={<T id="products.add" />}
           actionHref="/admin/products/new"
           onRefresh={fetchData}
           isRefreshing={loading}
@@ -77,7 +80,7 @@ export default function AdminProductsPage() {
             <Search className="w-4 h-4 text-zinc-400" />
             <input
               type="text"
-              placeholder="Search model name, slug, category..."
+              placeholder={t('products.search')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full bg-transparent text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none"
@@ -90,7 +93,7 @@ export default function AdminProductsPage() {
                 onClick={() => setSelectedBrand(b)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold capitalize transition-colors cursor-pointer ${selectedBrand === b ? 'bg-brand-green text-white shadow-sm' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}
               >
-                {b === 'all' ? 'All Brands' : b}
+                {b === 'all' ? <T id="products.allBrands" /> : b}
               </button>
             ))}
           </div>
@@ -113,10 +116,9 @@ export default function AdminProductsPage() {
           onClose={() => setDeletingProduct(null)}
           onConfirm={confirmDelete}
           variant="danger"
-          title="Delete Product"
-          description="Are you sure you want to delete this motorcycle model? This will remove it from the catalog and customer-facing pages."
-          confirmLabel="Delete Product"
-          cancelLabel="Cancel"
+          title={t('products.confirmDelete')}
+          description={t('products.confirmDeleteText')}
+          confirmLabel={<T id="products.deleteConfirm" />}
           expectedConfirmationName={deletingProduct?.model}
           isLoading={isDeleting}
         />

@@ -2,6 +2,8 @@ import React from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { ProductSpecBannerPayload } from '@/services/product';
 import { SectionImageUpload } from './SectionImageUpload';
+import { T } from '@/components/admin/T';
+import { useAdminText } from '@/context/AdminTextContext';
 
 interface SpecBannerEditorProps {
   banners: ProductSpecBannerPayload[];
@@ -12,6 +14,7 @@ export const SpecBannerEditor: React.FC<SpecBannerEditorProps> = ({
   banners,
   onChange,
 }) => {
+  const { t } = useAdminText();
   const addBanner = () => {
     onChange([
       ...banners,
@@ -42,10 +45,10 @@ export const SpecBannerEditor: React.FC<SpecBannerEditorProps> = ({
       <div className="flex items-center justify-between">
         <div>
           <label className="block text-zinc-900 font-bold text-xs">
-            Specification Section Banners (Section 3, 4, 5...)
+            <T id="products.banner.title" />
           </label>
           <p className="text-2xs text-zinc-500">
-            Upload full-bleed pictures for Frame, Carrier, Engine, and other technical highlight sections.
+            <T id="products.banner.hint" />
           </p>
         </div>
         <button
@@ -53,7 +56,7 @@ export const SpecBannerEditor: React.FC<SpecBannerEditorProps> = ({
           onClick={addBanner}
           className="px-3.5 py-1.5 bg-emerald-50 text-brand-green border border-brand-green/30 hover:bg-emerald-100 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1"
         >
-          <Plus className="w-3.5 h-3.5" /> + Add Section
+          <Plus className="w-3.5 h-3.5" /> <T id="products.banner.add" />
         </button>
       </div>
 
@@ -64,17 +67,17 @@ export const SpecBannerEditor: React.FC<SpecBannerEditorProps> = ({
               type="text"
               value={b.title}
               onChange={(e) => updateBanner(i, 'title', e.target.value)}
-              placeholder="Section Title"
+              placeholder={t('products.banner.sectionTitle')}
               className="px-3 py-1.5 border border-zinc-200 rounded-xl bg-white text-xs font-bold w-1/2"
             />
-            <button type="button" onClick={() => removeBanner(i)} className="text-red-500 hover:text-red-700 p-1.5 cursor-pointer">
+            <button type="button" onClick={() => removeBanner(i)} aria-label={t('products.banner.remove')} title={t('products.banner.remove')} className="text-red-500 hover:text-red-700 p-1.5 cursor-pointer">
               <Trash2 className="w-4 h-4" />
             </button>
           </div>
 
           <SectionImageUpload
-            label="Section Full-Bleed Picture"
-            description="Banner photo for this feature"
+            label={<T id="products.banner.picture" />}
+            description={<T id="products.banner.pictureHint" />}
             value={b.imageUrl}
             onChange={(url) => updateBanner(i, 'imageUrl', url)}
           />

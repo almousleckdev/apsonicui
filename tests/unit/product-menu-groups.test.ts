@@ -53,11 +53,11 @@ describe('product menu groups', () => {
 
   describe('validateGroup (one group in the admin form)', () => {
     it('requires an English name and a picture', () => {
-      expect(validateGroup(g('a', '', ''))).toEqual(['The English name is required.', 'A picture is required.']);
+      expect(validateGroup(g('a', '', '')).map((p) => p.key)).toEqual(['categories.problems.needEnglishName', 'categories.problems.needPicture']);
       expect(validateGroup(g('a'))).toEqual([]);
     });
     it('rejects a picture that is not a site path', () => {
-      expect(validateGroup(g('a', 'A', 'https://evil.example/x.png'))).toEqual(['The picture must be an uploaded image.']);
+      expect(validateGroup(g('a', 'A', 'https://evil.example/x.png')).map((p) => p.key)).toEqual(['categories.problems.pictureNotUploaded']);
     });
     it('limits name length in every language', () => {
       expect(validateGroup({ ...g('a'), labelZh: 'x'.repeat(41) })).toHaveLength(1);

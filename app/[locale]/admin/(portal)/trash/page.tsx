@@ -15,17 +15,24 @@ import {
   TrashResourceType
 } from '@/services/trash';
 import { Trash2, RefreshCcw, Trash, Info } from 'lucide-react';
+import { T } from '@/components/admin/T';
+import { useAdminText } from '@/context/AdminTextContext';
+import { useToast } from '@/components/ui/Toast';
+import type { AdminKey } from '@/lib/i18n/admin/catalog';
 
-const TABS: { id: TrashResourceType; label: string }[] = [
-  { id: 'products', label: 'Products' },
-  { id: 'categories', label: 'Categories' },
-  { id: 'news', label: 'News' },
-  { id: 'users', label: 'Users' },
-  { id: 'notifications', label: 'Notifications' },
+const TABS: { id: TrashResourceType; label: AdminKey }[] = [
+  { id: 'products', label: 'trash.tabs.products' },
+  { id: 'categories', label: 'trash.tabs.categories' },
+  { id: 'news', label: 'trash.tabs.news' },
+  { id: 'users', label: 'trash.tabs.users' },
+  { id: 'notifications', label: 'trash.tabs.notifications' },
 ];
 
 export default function TrashPage() {
   const [activeTab, setActiveTab] = useState<TrashResourceType>('products');
+  const { t } = useAdminText();
+  const { toast } = useToast();
+  const tabName = t(TABS.find((tab) => tab.id === activeTab)!.label);
 
   // Modal states
   const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
@@ -55,7 +62,7 @@ export default function TrashPage() {
       setIsRestoreModalOpen(false);
     } catch (e) {
       console.error('Failed to restore item', e);
-      alert('Failed to restore item. Please try again.');
+      toast.error(t('trash.restoreFailed'));
     }
   };
 
@@ -72,7 +79,7 @@ export default function TrashPage() {
       setIsDeleteModalOpen(false);
     } catch (e) {
       console.error('Failed to delete item', e);
-      alert('Failed to delete item. Please try again.');
+      toast.error(t('trash.deleteFailed'));
     }
   };
 
@@ -88,66 +95,66 @@ export default function TrashPage() {
       setIsClearModalOpen(false);
     } catch (e) {
       console.error('Failed to clear trash', e);
-      alert('Failed to clear trash. Please try again.');
+      toast.error(t('trash.clearFailed'));
     }
   };
 
   const columns = useMemo<ColumnDef<TrashItem>[]>(() => [
     {
       accessorKey: 'title',
-      header: 'Original Name/Title',
+      header: () => <T id="trash.columns.name" />,
       cell: ({ row }) => (
-        <span className="font-bold text-zinc-900">{row.original.title || `Item #${row.original.id}`}</span>
+        <span className="font-bold text-zinc-900">{row.original.title || t('trash.item', { id: row.original.id })}</span>
       ),
     },
     {
       accessorKey: 'deletedAt',
-      header: 'Deleted At',
+      header: () => <T id="trash.columns.deletedAt" />,
       cell: ({ row }) => (
         <span className="text-zinc-500">
-          {row.original.deletedAt ? new Date(row.original.deletedAt).toLocaleString() : 'Unknown'}
+          {row.original.deletedAt ? new Date(row.original.deletedAt).toLocaleString() : t('trash.unknown')}
         </span>
       ),
     },
     {
       accessorKey: 'deletedBy',
-      header: 'Deleted By',
+      header: () => <T id="trash.columns.deletedBy" />,
       cell: ({ row }) => (
-        <span className="text-zinc-500">{row.original.deletedBy || 'System'}</span>
+        <span className="text-zinc-500">{row.original.deletedBy || t('trash.system')}</span>
       ),
     },
     {
       id: 'actions',
-      header: () => <div className="text-right">Actions</div>,
+      header: () => <div className="text-right"><T id="trash.columns.actions" /></div>,
       cell: ({ row }) => (
         <div className="flex justify-end gap-2">
           <button
             onClick={() => confirmRestore(row.original)}
             className="p-1.5 text-zinc-400 hover:text-brand-green hover:bg-green-50 rounded-lg transition-colors cursor-pointer"
-            title="Restore"
+            title={t('trash.restore')}
           >
             <RefreshCcw className="w-4 h-4" />
           </button>
           <button
             onClick={() => confirmDelete(row.original)}
             className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-            title="Delete Permanently"
+            title={t('trash.deletePermanently')}
           >
             <Trash2 className="w-4 h-4" />
           </button>
         </div>
       ),
     },
-  ], [activeTab]);
+  ], [t]);
 
   return (
     <>
       <div className="space-y-6 max-w-7xl mx-auto">
         
         <AdminPageHeader
-          title="Trash Management"
-          subtitle="View and restore soft-deleted items (3-month retention)"
-          actionLabel={`Clear ${activeTab} Trash`}
+          title={<T id="trash.title" layout="stack" />}
+          subtitle={<T id="trash.subtitle" />}
+          actionLabel={t('trash.clear', { type: tabName })}
           actionIcon={Trash}
           onActionClick={confirmClearTrash}
           onRefresh={loadData}
@@ -169,7 +176,7 @@ export default function TrashPage() {
                     : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
                 }`}
               >
-                {tab.label}
+                <T id={tab.label} />
               </button>
             );
           })}
@@ -180,8 +187,8 @@ export default function TrashPage() {
           columns={columns}
           data={items}
           loading={isLoading}
-          emptyTitle={`No items in ${activeTab} trash`}
-          emptyDescription="Deleted items will appear here and are retained for 3 months."
+          emptyTitle={t('trash.emptyTitle', { type: tabName })}
+          emptyDescription={<T id="trash.emptyText" />}
           emptyIcon={Info}
         />
 
@@ -190,9 +197,9 @@ export default function TrashPage() {
           isOpen={isRestoreModalOpen}
           onClose={() => setIsRestoreModalOpen(false)}
           onConfirm={handleRestore}
-          title="Restore Item"
-          description={`Are you sure you want to restore "${itemToRestore?.title || 'this item'}"? It will be moved back to its original location.`}
-          confirmLabel="Restore Item"
+          title={t('trash.restoreTitle')}
+          description={t('trash.restoreText', { title: itemToRestore?.title || t('trash.thisItem') })}
+          confirmLabel={<T id="trash.restore" />}
           variant="primary"
         />
 
@@ -200,9 +207,9 @@ export default function TrashPage() {
           isOpen={isDeleteModalOpen}
           onClose={() => setIsDeleteModalOpen(false)}
           onConfirm={handlePermanentDelete}
-          title="Delete Permanently"
-          description={`Are you sure you want to permanently delete "${itemToDelete?.title || 'this item'}"? This action cannot be undone.`}
-          confirmLabel="Delete Permanently"
+          title={t('trash.deleteTitle')}
+          description={t('trash.deleteText', { title: itemToDelete?.title || t('trash.thisItem') })}
+          confirmLabel={<T id="trash.deletePermanently" />}
           variant="danger"
           expectedConfirmationName="DELETE"
         />
@@ -211,9 +218,9 @@ export default function TrashPage() {
           isOpen={isClearModalOpen}
           onClose={() => setIsClearModalOpen(false)}
           onConfirm={handleClearTrash}
-          title={`Clear ${activeTab} Trash`}
-          description={`Are you sure you want to permanently delete ALL items in the ${activeTab} trash? This action cannot be undone.`}
-          confirmLabel={`Clear ${activeTab} Trash`}
+          title={t('trash.clearTitle', { type: tabName })}
+          description={t('trash.clearText', { type: tabName })}
+          confirmLabel={t('trash.clear', { type: tabName })}
           variant="danger"
           expectedConfirmationName="CLEAR TRASH"
         />

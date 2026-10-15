@@ -6,9 +6,11 @@ import { userService } from '@/services/auth-service';
 import type { UserManagementItem, CreateUserPayload, UpdateUserPayload } from '@/lib/types/auth';
 
 import { useToast } from '@/components/ui/Toast';
+import { useAdminText } from '@/context/AdminTextContext';
 
 export function useAdminUsers() {
   const { toast } = useToast();
+  const { t } = useAdminText();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState('ALL');
 
@@ -27,11 +29,11 @@ export function useAdminUsers() {
     () => userService.getUsersList(searchQuery, selectedRole),
     (err) => {
       console.error(err);
-      toast.error('Failed to fetch user list');
+      toast.error(t('users.loadFailed'));
     },
     { keepPrevious: true }
   );
-  const error = loadError ? loadError.message || 'Failed to fetch user list' : null;
+  const error = loadError ? loadError.message || t('users.loadFailed') : null;
 
   const handleOpenCreateModal = () => {
     setEditingUser(null);
@@ -50,10 +52,10 @@ export function useAdminUsers() {
         enabled: editingUser.enabled,
       };
       await userService.updateUser(editingUser.id, updatePayload);
-      toast.success('User updated successfully!');
+      toast.success(t('users.updated'));
     } else {
       await userService.createUser(payload);
-      toast.success('User created successfully!');
+      toast.success(t('users.created'));
     }
     await fetchUserList();
   };
@@ -61,11 +63,11 @@ export function useAdminUsers() {
   const handleToggleStatus = async (user: UserManagementItem) => {
     try {
       await userService.toggleUserStatus(user.id, !user.enabled);
-      toast.success(`User account ${!user.enabled ? 'activated' : 'suspended'} successfully.`);
+      toast.success(t(!user.enabled ? 'users.activated' : 'users.suspendedToast'));
       await fetchUserList();
     } catch (err: unknown) {
       console.error(err);
-      toast.error(err instanceof Error ? err.message : 'Failed to update user status');
+      toast.error(err instanceof Error ? err.message : t('users.statusFailed'));
     }
   };
 
@@ -73,12 +75,12 @@ export function useAdminUsers() {
     setDeleting(true);
     try {
       await userService.deleteUser(id);
-      toast.success('User account deleted successfully.');
+      toast.success(t('users.deleted'));
       setDeletingUser(null);
       await fetchUserList();
     } catch (err: unknown) {
       console.error(err);
-      toast.error(err instanceof Error ? err.message : 'Failed to delete user');
+      toast.error(err instanceof Error ? err.message : t('users.deleteFailed'));
     } finally {
       setDeleting(false);
     }

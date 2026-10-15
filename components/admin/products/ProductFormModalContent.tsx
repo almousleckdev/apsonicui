@@ -6,6 +6,8 @@ import { TechSpecEditor } from './TechSpecEditor';
 import { CategoryItem } from '@/services/category';
 import { CreateProductPayload } from '@/services/product';
 import { FileText, Image as ImageIcon } from 'lucide-react';
+import { T } from '@/components/admin/T';
+import { useAdminText } from '@/context/AdminTextContext';
 
 interface ProductFormContentProps {
   formData: CreateProductPayload;
@@ -33,6 +35,7 @@ export const ProductFormContent: React.FC<ProductFormContentProps> = ({
   isEditing,
   onSubmit,
 }) => {
+  const { t } = useAdminText();
   const [activeTab, setActiveTab] = useState<'basic' | 'sections' | 'colors' | 'specs'>('basic');
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
   const [specMode, setSpecMode] = useState<'image' | 'table'>(
@@ -60,28 +63,28 @@ export const ProductFormContent: React.FC<ProductFormContentProps> = ({
           onClick={() => setActiveTab('basic')}
           className={`px-4 py-2 rounded-xl font-bold transition-all cursor-pointer ${activeTab === 'basic' ? 'bg-brand-green text-white shadow-sm' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}
         >
-          1. Basic Info
+          <T id="products.form.tabs.basic" />
         </button>
         <button
           type="button"
           onClick={() => setActiveTab('sections')}
           className={`px-4 py-2 rounded-xl font-bold transition-all cursor-pointer ${activeTab === 'sections' ? 'bg-brand-green text-white shadow-sm' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}
         >
-          2. Detail Section Pictures
+          <T id="products.form.tabs.sections" />
         </button>
         <button
           type="button"
           onClick={() => setActiveTab('colors')}
           className={`px-4 py-2 rounded-xl font-bold transition-all cursor-pointer ${activeTab === 'colors' ? 'bg-brand-green text-white shadow-sm' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}
         >
-          3. Colors & Variants
+          <T id="products.form.tabs.colors" />
         </button>
         <button
           type="button"
           onClick={() => setActiveTab('specs')}
           className={`px-4 py-2 rounded-xl font-bold transition-all cursor-pointer ${activeTab === 'specs' ? 'bg-brand-green text-white shadow-sm' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}
         >
-          4. Technical Specs
+          <T id="products.form.tabs.specs" />
         </button>
       </div>
 
@@ -90,18 +93,18 @@ export const ProductFormContent: React.FC<ProductFormContentProps> = ({
         <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-zinc-700 font-bold mb-1">Model Name</label>
+              <label className="block text-zinc-700 font-bold mb-1"><T id="products.form.modelName" /></label>
               <input
                 type="text"
                 required
                 value={formData.modelName}
                 onChange={(e) => handleModelNameChange(e.target.value)}
-                placeholder="e.g. AP110-A PLUS"
+                placeholder={t('products.form.modelPlaceholder')}
                 className="w-full px-3 py-2 border border-zinc-200 rounded-xl bg-zinc-50 focus:bg-white focus:outline-none"
               />
             </div>
             <div>
-              <label className="block text-zinc-700 font-bold mb-1">Slug (URL identifier - auto-generated)</label>
+              <label className="block text-zinc-700 font-bold mb-1"><T id="products.form.slug" /></label>
               <input
                 type="text"
                 value={formData.slug || ''}
@@ -109,7 +112,7 @@ export const ProductFormContent: React.FC<ProductFormContentProps> = ({
                   setIsSlugManuallyEdited(true);
                   setFormData((prev) => ({ ...prev, slug: e.target.value }));
                 }}
-                placeholder="e.g. ap110-a-plus"
+                placeholder={t('products.form.slugPlaceholder')}
                 className="w-full px-3 py-2 border border-zinc-200 rounded-xl bg-zinc-50 focus:bg-white focus:outline-none font-mono"
               />
             </div>
@@ -117,7 +120,7 @@ export const ProductFormContent: React.FC<ProductFormContentProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="block text-zinc-700 font-bold mb-1">Category</label>
+              <label className="block text-zinc-700 font-bold mb-1"><T id="products.form.category" /></label>
               <select
                 value={formData.categoryId}
                 onChange={(e) => setFormData({ ...formData, categoryId: Number(e.target.value) })}
@@ -131,7 +134,7 @@ export const ProductFormContent: React.FC<ProductFormContentProps> = ({
               </select>
             </div>
             <div>
-              <label className="block text-zinc-700 font-bold mb-1">Brand</label>
+              <label className="block text-zinc-700 font-bold mb-1"><T id="products.form.brand" /></label>
               <select
                 value={formData.brand}
                 onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
@@ -142,7 +145,7 @@ export const ProductFormContent: React.FC<ProductFormContentProps> = ({
               </select>
             </div>
             <div>
-              <label className="block text-zinc-700 font-bold mb-1">Displacement (cc)</label>
+              <label className="block text-zinc-700 font-bold mb-1"><T id="products.form.displacement" /></label>
               <input
                 type="number"
                 value={formData.displacement || ''}
@@ -154,8 +157,8 @@ export const ProductFormContent: React.FC<ProductFormContentProps> = ({
           </div>
 
           <SectionImageUpload
-            label="Catalog Cover Picture"
-            description="The primary photo displayed in the motorcycle catalog list"
+            label={<T id="products.form.cover" />}
+            description={<T id="products.form.coverHint" />}
             value={formData.coverImageUrl}
             onChange={(url) => setFormData({ ...formData, coverImageUrl: url })}
           />
@@ -168,7 +171,7 @@ export const ProductFormContent: React.FC<ProductFormContentProps> = ({
                 onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
                 className="rounded border-zinc-300 text-brand-green"
               />
-              Featured on Homepage
+              <T id="products.form.featured" />
             </label>
             <label className="flex items-center gap-2 font-bold cursor-pointer">
               <input
@@ -177,7 +180,7 @@ export const ProductFormContent: React.FC<ProductFormContentProps> = ({
                 onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
                 className="rounded border-zinc-300 text-brand-green"
               />
-              Active in Catalog
+              <T id="products.form.activeInCatalogue" />
             </label>
           </div>
         </div>
@@ -187,15 +190,15 @@ export const ProductFormContent: React.FC<ProductFormContentProps> = ({
       {activeTab === 'sections' && (
         <div className="space-y-4">
           <SectionImageUpload
-            label="1. Hero Section Picture (Top Full-Bleed Parallax)"
-            description="Upload the main high-res hero picture for the top of the product page"
+            label={<T id="products.form.hero" />}
+            description={<T id="products.form.heroHint" />}
             value={formData.heroImageUrl}
             onChange={(url) => setFormData({ ...formData, heroImageUrl: url })}
           />
 
           <SectionImageUpload
-            label="2. Key Features / Performance Picture (Full-Bleed)"
-            description="Upload the performance section full-bleed image"
+            label={<T id="products.form.performance" />}
+            description={<T id="products.form.performanceHint" />}
             value={formData.performanceImageUrl}
             onChange={(url) => setFormData({ ...formData, performanceImageUrl: url })}
           />
@@ -221,7 +224,7 @@ export const ProductFormContent: React.FC<ProductFormContentProps> = ({
       {activeTab === 'specs' && (
         <div className="space-y-6">
           <div className="bg-zinc-50 border border-zinc-200/80 rounded-2xl p-4 space-y-3">
-            <label className="block text-zinc-900 font-bold text-xs">Technical Specs Format Mode</label>
+            <label className="block text-zinc-900 font-bold text-xs"><T id="products.form.specMode" /></label>
             <div className="flex flex-wrap gap-3">
               <button
                 type="button"
@@ -236,7 +239,7 @@ export const ProductFormContent: React.FC<ProductFormContentProps> = ({
                 }`}
               >
                 <ImageIcon className="w-4 h-4" />
-                <span>Upload Spec Sheet / Blueprint Image</span>
+                <span><T id="products.form.specImage" /></span>
               </button>
               <button
                 type="button"
@@ -251,18 +254,18 @@ export const ProductFormContent: React.FC<ProductFormContentProps> = ({
                 }`}
               >
                 <FileText className="w-4 h-4" />
-                <span>Structured Technical Specs Table</span>
+                <span><T id="products.form.specTable" /></span>
               </button>
             </div>
             <p className="text-2xs text-zinc-500">
-              Select one format: upload a graphical spec banner OR configure a structured specification table.
+              <T id="products.form.specHint" />
             </p>
           </div>
 
           {specMode === 'image' ? (
             <SectionImageUpload
-              label="Technical Spec Sheet / Exploded View Banner Image"
-              description="Upload a blueprint, schematic diagram, or spec picture."
+              label={<T id="products.form.specImageLabel" />}
+              description={<T id="products.form.specImageHint" />}
               value={formData.aestheticBgImage || ''}
               onChange={(url) => setFormData({ ...formData, aestheticBgImage: url, specs: [] })}
             />

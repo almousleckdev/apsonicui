@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { User, Mail } from 'lucide-react';
+import { T } from '@/components/admin/T';
 
 interface AccountInfoSectionProps {
   firstName: string;
@@ -27,12 +28,12 @@ export const AccountInfoSection: React.FC<AccountInfoSectionProps> = ({
   return (
     <div className="bg-white p-8 rounded-3xl border border-zinc-100 shadow-sm space-y-6 font-sans">
       <h4 className="text-base font-bold text-zinc-950 flex items-center gap-2 border-b border-zinc-100 pb-3">
-        <User className="w-4 h-4 text-brand-green" /> Personal Information
+        <User className="w-4 h-4 text-brand-green" /> <T id="profile.personal" />
       </h4>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div>
-          <label className="block text-xs font-bold text-zinc-700 mb-2">First Name</label>
+          <label className="block text-xs font-bold text-zinc-700 mb-2"><T id="profile.firstName" /></label>
           <input
             type="text"
             value={firstName}
@@ -43,7 +44,7 @@ export const AccountInfoSection: React.FC<AccountInfoSectionProps> = ({
         </div>
 
         <div>
-          <label className="block text-xs font-bold text-zinc-700 mb-2">Last Name</label>
+          <label className="block text-xs font-bold text-zinc-700 mb-2"><T id="profile.lastName" /></label>
           <input
             type="text"
             value={lastName}
@@ -54,7 +55,7 @@ export const AccountInfoSection: React.FC<AccountInfoSectionProps> = ({
         </div>
 
         <div>
-          <label className="block text-xs font-bold text-zinc-700 mb-2">Username</label>
+          <label className="block text-xs font-bold text-zinc-700 mb-2"><T id="profile.username" /></label>
           <input
             type="text"
             required
@@ -66,7 +67,7 @@ export const AccountInfoSection: React.FC<AccountInfoSectionProps> = ({
 
         <div>
           <label className="block text-xs font-bold text-zinc-700 mb-2 flex items-center gap-1.5">
-            <Mail className="w-3.5 h-3.5 text-zinc-400" /> Email Address
+            <Mail className="w-3.5 h-3.5 text-zinc-400" /> <T id="profile.email" />
           </label>
           <input
             type="email"

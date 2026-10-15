@@ -9,6 +9,8 @@ import { categoryService, CategoryItem } from '@/services/category';
 import { useToast } from '@/components/ui/Toast';
 import { Save } from 'lucide-react';
 import { getErrorMessage } from '@/lib/utils/errors';
+import { T } from '@/components/admin/T';
+import { useAdminText } from '@/context/AdminTextContext';
 
 const INITIAL_FORM: CreateProductPayload = {
   modelName: '',
@@ -31,6 +33,7 @@ const INITIAL_FORM: CreateProductPayload = {
 export default function AdminNewProductPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const { t } = useAdminText();
   const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [formData, setFormData] = useState<CreateProductPayload>(INITIAL_FORM);
   const [loading, setLoading] = useState(false);
@@ -49,10 +52,10 @@ export default function AdminNewProductPage() {
     setLoading(true);
     try {
       await productService.createProduct(formData);
-      toast.success('Product created successfully!');
+      toast.success(t('products.page.created'));
       router.push('/admin/products');
     } catch (err: unknown) {
-      toast.error(getErrorMessage(err, 'Error creating product'));
+      toast.error(getErrorMessage(err, t('products.page.createFailed')));
     } finally {
       setLoading(false);
     }
@@ -71,7 +74,7 @@ export default function AdminNewProductPage() {
               onClick={() => router.push('/admin/products')}
               className="px-5 py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer"
             >
-              Cancel
+              <T id="products.page.cancel" />
             </button>
             <button
               type="submit"
@@ -80,7 +83,7 @@ export default function AdminNewProductPage() {
               className="inline-flex items-center gap-2 px-6 py-2.5 bg-brand-green hover:bg-green-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-brand-green/20 transition-all cursor-pointer disabled:opacity-50"
             >
               <Save className="w-3.5 h-3.5" />
-              <span>{loading ? 'Creating...' : 'Create Product'}</span>
+              <span><T id={loading ? 'products.page.creating' : 'products.page.create'} /></span>
             </button>
           </div>
         </div>

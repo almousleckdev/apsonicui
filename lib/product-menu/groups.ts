@@ -1,3 +1,4 @@
+import type { AdminProblem } from '@/lib/i18n/admin/problem';
 import { isSafeImagePath } from '@/lib/media/safe-path';
 
 export type MenuLocale = 'en' | 'fr' | 'zh';
@@ -72,17 +73,17 @@ export function sanitizeGroups(raw: unknown): ProductMenuGroup[] {
 }
 
 /** Problems with one group as the admin edits it, including the required picture. Empty when it can be saved. */
-export function validateGroup(group: ProductMenuGroup): string[] {
-  const errors: string[] = [];
-  if (!clean(group.labelEn)) errors.push('The English name is required.');
+export function validateGroup(group: ProductMenuGroup): AdminProblem[] {
+  const errors: AdminProblem[] = [];
+  if (!clean(group.labelEn)) errors.push({ key: 'categories.problems.needEnglishName' });
   for (const label of [group.labelEn, group.labelFr, group.labelZh]) {
     if (clean(label).length > PRODUCT_MENU_LIMITS.label) {
-      errors.push(`Names are limited to ${PRODUCT_MENU_LIMITS.label} characters.`);
+      errors.push({ key: 'categories.problems.nameTooLong', values: { max: PRODUCT_MENU_LIMITS.label } });
       break;
     }
   }
-  if (!clean(group.image)) errors.push('A picture is required.');
-  else if (!isSafeImagePath(group.image)) errors.push('The picture must be an uploaded image.');
+  if (!clean(group.image)) errors.push({ key: 'categories.problems.needPicture' });
+  else if (!isSafeImagePath(group.image)) errors.push({ key: 'categories.problems.pictureNotUploaded' });
   return errors;
 }
 

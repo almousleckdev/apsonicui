@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Edit2, ImageIcon, Trash2 } from 'lucide-react';
 import { isSafeImagePath } from '@/lib/media/safe-path';
 import type { CategoryItem } from '@/services/category';
+import { useAdminText } from '@/context/AdminTextContext';
 
 interface Props {
   category: CategoryItem;
@@ -17,6 +18,8 @@ interface Props {
 /** One category as a compact line: picture, names in the three languages, brand, status and actions. */
 export function CategoryRow({ category: c, canDelete, onToggleActive, onEdit, onDelete }: Props) {
   const active = c.active ?? true;
+  const { t } = useAdminText();
+  const name = c.nameEn || c.slug;
   return (
     <li className="grid grid-cols-[auto_minmax(0,1fr)_auto] md:grid-cols-[auto_minmax(0,1.3fr)_minmax(0,1.5fr)_auto_auto_auto] items-center gap-x-3 gap-y-1 px-3 py-2">
       <div className="relative h-10 w-14 shrink-0 overflow-hidden rounded-lg border border-zinc-100 bg-zinc-50 flex items-center justify-center">
@@ -44,7 +47,7 @@ export function CategoryRow({ category: c, canDelete, onToggleActive, onEdit, on
         type="button"
         role="switch"
         aria-checked={active}
-        aria-label={`${active ? 'Disable' : 'Enable'} ${c.nameEn || c.slug}`}
+        aria-label={t(active ? 'categories.row.disable' : 'categories.row.enable', { name })}
         onClick={() => onToggleActive(c)}
         className={`relative h-5 w-9 rounded-full transition-colors cursor-pointer ${active ? 'bg-brand-green' : 'bg-zinc-300'}`}
       >
@@ -52,11 +55,11 @@ export function CategoryRow({ category: c, canDelete, onToggleActive, onEdit, on
       </button>
 
       <div className="flex items-center justify-end gap-0.5">
-        <button type="button" onClick={() => onEdit(c)} aria-label={`Edit ${c.nameEn || c.slug}`} className="p-1.5 rounded-lg text-zinc-600 hover:bg-zinc-100 cursor-pointer">
+        <button type="button" onClick={() => onEdit(c)} aria-label={t('categories.row.edit', { name })} className="p-1.5 rounded-lg text-zinc-600 hover:bg-zinc-100 cursor-pointer">
           <Edit2 className="h-3.5 w-3.5" />
         </button>
         {canDelete && (
-          <button type="button" onClick={() => onDelete(c)} aria-label={`Delete ${c.nameEn || c.slug}`} className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 cursor-pointer">
+          <button type="button" onClick={() => onDelete(c)} aria-label={t('categories.row.delete', { name })} className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 cursor-pointer">
             <Trash2 className="h-3.5 w-3.5" />
           </button>
         )}

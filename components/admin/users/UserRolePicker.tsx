@@ -3,6 +3,8 @@
 import React from 'react';
 import { ShieldCheck, ShieldAlert, Edit3, UserCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { T } from '@/components/admin/T';
+import type { AdminKey } from '@/lib/i18n/admin/catalog';
 
 interface UserRolePickerProps {
   role: string;
@@ -10,40 +12,40 @@ interface UserRolePickerProps {
   canAssignSuperAdmin?: boolean;
 }
 
-const ROLES = [
+const ROLES: Array<{ id: string; title: string; badge: AdminKey; icon: typeof ShieldAlert; desc: AdminKey; permissions: string[]; superAdminOnly: boolean }> = [
   {
     id: 'ROLE_SUPER_ADMIN',
     title: 'SUPER_ADMIN',
-    badge: 'Full Root Control',
+    badge: 'users.picker.SUPER_ADMIN.badge',
     icon: ShieldAlert,
-    desc: 'Complete control: create/manage admins, permissions, full delete & block capabilities across the entire system.',
+    desc: 'users.picker.SUPER_ADMIN.text',
     permissions: ['ALL Permissions', 'MANAGE_USERS', 'MANAGE_ROLES', 'DELETE ALL'],
     superAdminOnly: true,
   },
   {
     id: 'ROLE_ADMIN',
     title: 'ADMIN',
-    badge: 'Management',
+    badge: 'users.picker.ADMIN.badge',
     icon: ShieldCheck,
-    desc: 'Catalog & Content Management: Create, edit, toggle active status, and delete products, categories, news stories.',
+    desc: 'users.picker.ADMIN.text',
     permissions: ['READ_PRODUCTS', 'WRITE_PRODUCTS', 'DELETE_PRODUCTS', 'READ_CATEGORIES', 'WRITE_CATEGORIES', 'DELETE_CATEGORIES', 'WRITE_NEWS'],
     superAdminOnly: false,
   },
   {
     id: 'ROLE_EDITOR',
     title: 'EDITOR',
-    badge: 'Content Only',
+    badge: 'users.picker.EDITOR.badge',
     icon: Edit3,
-    desc: 'Content Authoring: Create and edit products, categories, and news drafts. Cannot delete catalog entities or manage users.',
+    desc: 'users.picker.EDITOR.text',
     permissions: ['READ_PRODUCTS', 'WRITE_PRODUCTS', 'READ_CATEGORIES', 'WRITE_CATEGORIES', 'READ_NEWS', 'WRITE_NEWS'],
     superAdminOnly: false,
   },
   {
     id: 'ROLE_USER',
     title: 'USER',
-    badge: 'Standard Access',
+    badge: 'users.picker.USER.badge',
     icon: UserCheck,
-    desc: 'Regular registered customer access. No administrative privileges.',
+    desc: 'users.picker.USER.text',
     permissions: ['READ_ONLY'],
     superAdminOnly: false,
   },
@@ -60,10 +62,10 @@ export const UserRolePicker: React.FC<UserRolePickerProps> = ({
     <div className="space-y-3 font-sans">
       <div className="flex items-center justify-between">
         <label className="text-xs font-bold text-zinc-800 uppercase tracking-wider block">
-          Assign Role & Explicit Permissions
+          <T id="users.picker.title" />
         </label>
         <span className="text-2xs text-zinc-400 font-medium">
-          Select exact role level
+          <T id="users.picker.hint" />
         </span>
       </div>
 
@@ -96,7 +98,7 @@ export const UserRolePicker: React.FC<UserRolePickerProps> = ({
                       {r.title}
                     </span>
                     <span className="ml-2 px-2 py-0.5 rounded-full text-4xs font-bold uppercase tracking-wider bg-zinc-100 text-zinc-600">
-                      {r.badge}
+                      <T id={r.badge} />
                     </span>
                   </div>
                 </div>
@@ -106,7 +108,7 @@ export const UserRolePicker: React.FC<UserRolePickerProps> = ({
               </div>
 
               <p className="text-2xs text-zinc-500 leading-relaxed font-medium">
-                {r.desc}
+                <T id={r.desc} />
               </p>
 
               <div className="pt-2 border-t border-zinc-100 flex flex-wrap gap-1">

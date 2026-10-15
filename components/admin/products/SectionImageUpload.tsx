@@ -3,10 +3,12 @@ import Image from 'next/image';
 import { Upload, X, Loader2 } from 'lucide-react';
 import { mediaService } from '@/services/media';
 import { useToast } from '@/components/ui/Toast';
+import { T } from '@/components/admin/T';
+import { useAdminText } from '@/context/AdminTextContext';
 
 interface SectionImageUploadProps {
-  label: string;
-  description?: string;
+  label: React.ReactNode;
+  description?: React.ReactNode;
   value?: string;
   onChange: (url: string) => void;
   accept?: string;
@@ -20,6 +22,7 @@ export const SectionImageUpload: React.FC<SectionImageUploadProps> = ({
   accept = 'image/*,video/*',
 }) => {
   const { toast } = useToast();
+  const { t } = useAdminText();
   const [uploading, setUploading] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -33,10 +36,10 @@ export const SectionImageUpload: React.FC<SectionImageUploadProps> = ({
       const res = await mediaService.uploadFile(file);
       if (res?.fileUrl) {
         onChange(res.fileUrl);
-        toast.success('Media uploaded. Please remember to save your changes.');
+        toast.success(t('products.upload.done'));
       }
     } catch (err) {
-      toast.error('Upload failed: ' + (err instanceof Error ? err.message : String(err)));
+      toast.error(t('products.upload.failed', { reason: err instanceof Error ? err.message : String(err) }));
     } finally {
       setUploading(false);
       e.target.value = '';
@@ -61,7 +64,7 @@ export const SectionImageUpload: React.FC<SectionImageUploadProps> = ({
           ) : (
             <Upload className="w-3.5 h-3.5" />
           )}
-          <span>{uploading ? 'Uploading...' : 'Upload File'}</span>
+          <span><T id={uploading ? 'products.upload.uploading' : 'products.upload.button'} /></span>
         </button>
         <input 
           type="file" 
@@ -86,7 +89,7 @@ export const SectionImageUpload: React.FC<SectionImageUploadProps> = ({
             <div className="relative w-full h-48 bg-zinc-100 flex items-center justify-center">
               <Image
                 src={value}
-                alt={label}
+                alt=""
                 fill
                 className="object-contain p-2"
                 unoptimized
@@ -97,7 +100,7 @@ export const SectionImageUpload: React.FC<SectionImageUploadProps> = ({
             type="button"
             onClick={() => onChange('')}
             className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black/80 text-white rounded-full transition-opacity opacity-80 hover:opacity-100 shadow-md cursor-pointer"
-            title="Remove media"
+            title={t('products.upload.remove')} aria-label={t('products.upload.remove')}
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -114,7 +117,7 @@ export const SectionImageUpload: React.FC<SectionImageUploadProps> = ({
             e.preventDefault();
           }
         }}
-        placeholder="Image/video path or uploaded URL (/uploads/... or https://...)"
+        placeholder={t('products.upload.placeholder')}
         className="w-full px-3 py-2 border border-zinc-200 rounded-xl bg-white text-xs text-zinc-900 focus:outline-none focus:ring-2 focus:ring-brand-green/20"
       />
     </div>

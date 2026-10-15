@@ -41,7 +41,6 @@ export const EditorFloatingPlusMenu: React.FC<FloatingPlusMenuProps> = ({
     <FloatingMenu
       editor={editor}
       shouldShow={({ state }) => {
-  const { t } = useAdminText();
         const { $from } = state.selection;
         const currentLineText = $from.parent.textContent;
         return $from.parent.type.name === 'paragraph' && currentLineText === '';

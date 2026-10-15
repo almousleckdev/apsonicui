@@ -1,6 +1,8 @@
 'use client';
 
 import React from 'react';
+import { T } from '@/components/admin/T';
+import type { AdminKey } from '@/lib/i18n/admin/catalog';
 
 export type NotificationStatusTab = 'all' | 'unread' | 'read' | 'replied';
 
@@ -15,11 +17,11 @@ export const NotificationTabs: React.FC<NotificationTabsProps> = ({
   onTabChange,
   unreadCount,
 }) => {
-  const tabs: { id: NotificationStatusTab; label: string; badge?: number; color?: string }[] = [
-    { id: 'all', label: 'All Messages / 全部消息' },
-    { id: 'unread', label: 'Unread / 未读', badge: unreadCount, color: 'bg-red-500 text-white' },
-    { id: 'read', label: 'Read / 已读' },
-    { id: 'replied', label: 'Replied / 已回复' },
+  const tabs: { id: NotificationStatusTab; label: AdminKey; badge?: number; color?: string }[] = [
+    { id: 'all', label: 'notifications.tabs.all' },
+    { id: 'unread', label: 'notifications.tabs.unread', badge: unreadCount, color: 'bg-red-500 text-white' },
+    { id: 'read', label: 'notifications.tabs.read' },
+    { id: 'replied', label: 'notifications.tabs.replied' },
   ];
 
   return (
@@ -36,7 +38,7 @@ export const NotificationTabs: React.FC<NotificationTabsProps> = ({
                 : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
             }`}
           >
-            <span>{t.label}</span>
+            <T id={t.label} />
             {Boolean(t.badge && t.badge > 0) && (
               <span className={`px-2 py-0.5 rounded-full text-3xs font-black ${t.color}`}>
                 {t.badge}

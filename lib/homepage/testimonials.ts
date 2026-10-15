@@ -1,3 +1,4 @@
+import type { AdminProblem } from '@/lib/i18n/admin/problem';
 import { isSafeImagePath } from '@/lib/media/safe-path';
 import type { HomeTestimonialItem } from '@/lib/types/homepage';
 
@@ -55,16 +56,7 @@ export function resolveTestimonials(items: HomeTestimonialItem[] | undefined, lo
   return (items ?? []).map((item) => resolveTestimonial(item, locale)).filter((t): t is ResolvedTestimonial => t !== null);
 }
 
-export interface TestimonialErrors {
-  name?: string;
-  image?: string;
-  quoteEn?: string;
-  roleEn?: string;
-  roleFr?: string;
-  roleZh?: string;
-  quoteFr?: string;
-  quoteZh?: string;
-}
+export type TestimonialErrors = Partial<Record<'name' | 'image' | 'quoteEn' | 'quoteFr' | 'quoteZh' | 'roleEn' | 'roleFr' | 'roleZh', AdminProblem>>;
 
 /** Field-level problems per testimonial id. An empty object means the list can be saved. */
 export function validateTestimonials(items: HomeTestimonialItem[]): Record<string, TestimonialErrors> {
@@ -72,17 +64,17 @@ export function validateTestimonials(items: HomeTestimonialItem[]): Record<strin
   for (const item of items) {
     const errors: TestimonialErrors = {};
     const name = clean(item.name);
-    if (!name) errors.name = 'Name is required.';
-    else if (name.length > TESTIMONIAL_LIMITS.name) errors.name = `Keep the name under ${TESTIMONIAL_LIMITS.name} characters.`;
+    if (!name) errors.name = { key: 'home.problems.nameRequired' };
+    else if (name.length > TESTIMONIAL_LIMITS.name) errors.name = { key: 'home.problems.nameTooLong', values: { max: TESTIMONIAL_LIMITS.name } };
 
-    if (clean(item.image) && !isSafeImagePath(item.image)) errors.image = 'Upload the photo again (only uploaded images are allowed).';
+    if (clean(item.image) && !isSafeImagePath(item.image)) errors.image = { key: 'home.problems.photoNotUploaded' };
 
-    if (!clean(item.quoteEn)) errors.quoteEn = 'The English quote is required; it is shown when a translation is missing.';
-    for (const [field, label] of [['quoteEn', 'English'], ['quoteFr', 'French'], ['quoteZh', 'Chinese']] as const) {
-      if (clean(item[field]).length > TESTIMONIAL_LIMITS.quote) errors[field] = `The ${label} quote is over ${TESTIMONIAL_LIMITS.quote} characters.`;
+    if (!clean(item.quoteEn)) errors.quoteEn = { key: 'home.problems.quoteRequired' };
+    for (const field of ['quoteEn', 'quoteFr', 'quoteZh'] as const) {
+      if (clean(item[field]).length > TESTIMONIAL_LIMITS.quote) errors[field] = { key: 'home.problems.quoteTooLong', values: { max: TESTIMONIAL_LIMITS.quote } };
     }
-    for (const [field, label] of [['roleEn', 'English'], ['roleFr', 'French'], ['roleZh', 'Chinese']] as const) {
-      if (clean(item[field]).length > TESTIMONIAL_LIMITS.role) errors[field] = `The ${label} role is over ${TESTIMONIAL_LIMITS.role} characters.`;
+    for (const field of ['roleEn', 'roleFr', 'roleZh'] as const) {
+      if (clean(item[field]).length > TESTIMONIAL_LIMITS.role) errors[field] = { key: 'home.problems.roleTooLong', values: { max: TESTIMONIAL_LIMITS.role } };
     }
     if (Object.keys(errors).length > 0) result[item.id] = errors;
   }

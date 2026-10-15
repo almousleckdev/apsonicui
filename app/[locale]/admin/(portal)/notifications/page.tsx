@@ -13,6 +13,7 @@ import { AdminBackNav } from '@/components/admin/AdminBackNav';
 import { NotificationTabs, NotificationStatusTab } from '@/components/admin/notifications/NotificationTabs';
 import { NotificationList } from '@/components/admin/notifications/NotificationList';
 import { ContactMessageModal } from '@/components/admin/ContactMessageModal';
+import { T } from '@/components/admin/T';
 
 export default function AdminNotificationsPage() {
   const [currentTab, setCurrentTab] = useState<NotificationStatusTab>('all');
@@ -47,7 +48,7 @@ export default function AdminNotificationsPage() {
             <AdminBackNav href="/admin/dashboard" />
             <span className="text-zinc-300">|</span>
             <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
-              Visitor Contact Submissions
+              <T id="notifications.title" />
             </span>
           </div>
 
@@ -57,7 +58,7 @@ export default function AdminNotificationsPage() {
             className="px-3 py-1.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 rounded-xl transition-all cursor-pointer flex items-center gap-2 text-xs font-bold"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-            <span>Refresh</span>
+            <span><T id="common.refresh" /></span>
           </button>
         </div>
 

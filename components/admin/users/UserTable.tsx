@@ -8,6 +8,8 @@ import { DataTable } from '@/components/admin/DataTable';
 import { useAuth } from '@/hooks/useAuth';
 import { canManageUsers } from '@/lib/utils/permissions';
 import type { UserManagementItem } from '@/lib/types/auth';
+import { T } from '@/components/admin/T';
+import { useAdminText } from '@/context/AdminTextContext';
 
 interface UserTableProps {
   loading: boolean;
@@ -26,11 +28,12 @@ export const UserTable: React.FC<UserTableProps> = ({
 }) => {
   const { user: currentUser } = useAuth();
   const allowDelete = canManageUsers(currentUser);
+  const { t } = useAdminText();
 
   const columns: ColumnDef<UserManagementItem>[] = [
     {
       accessorKey: 'username',
-      header: 'User Profile',
+      header: () => <T id="users.columns.profile" />,
       cell: ({ row }) => {
         const user = row.original;
         const displayName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username;
@@ -49,7 +52,7 @@ export const UserTable: React.FC<UserTableProps> = ({
               <div className="font-bold text-zinc-900 text-sm flex items-center gap-1.5">
                 {displayName}
                 {user.roles?.includes('ROLE_SUPER_ADMIN') && (
-                  <span title="Super Administrator">
+                  <span title={t('users.superAdmin')}>
                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                   </span>
                 )}
@@ -62,12 +65,12 @@ export const UserTable: React.FC<UserTableProps> = ({
     },
     {
       accessorKey: 'email',
-      header: 'Email Address',
+      header: () => <T id="users.columns.email" />,
       cell: ({ row }) => <span className="text-zinc-600 font-mono text-xs">{row.original.email}</span>,
     },
     {
       accessorKey: 'roles',
-      header: 'Assigned Roles',
+      header: () => <T id="users.columns.roles" />,
       cell: ({ row }) => {
         const roles = row.original.roles || [];
         return (
@@ -92,7 +95,7 @@ export const UserTable: React.FC<UserTableProps> = ({
     },
     {
       accessorKey: 'enabled',
-      header: 'Status',
+      header: () => <T id="users.columns.status" />,
       cell: ({ row }) => {
         const user = row.original;
         return (
@@ -102,9 +105,9 @@ export const UserTable: React.FC<UserTableProps> = ({
             className="flex items-center gap-1.5 cursor-pointer"
           >
             {user.enabled ? (
-              <span className="flex items-center gap-1 text-emerald-600 font-bold"><CheckCircle2 className="w-4 h-4" /> Active</span>
+              <span className="flex items-center gap-1 text-emerald-600 font-bold"><CheckCircle2 className="w-4 h-4" /> <T id="users.active" /></span>
             ) : (
-              <span className="flex items-center gap-1 text-zinc-400 font-bold"><XCircle className="w-4 h-4" /> Suspended</span>
+              <span className="flex items-center gap-1 text-zinc-400 font-bold"><XCircle className="w-4 h-4" /> <T id="users.suspended" /></span>
             )}
           </button>
         );
@@ -112,7 +115,7 @@ export const UserTable: React.FC<UserTableProps> = ({
     },
     {
       id: 'actions',
-      header: () => <div className="text-right">Actions</div>,
+      header: () => <div className="text-right"><T id="users.columns.actions" /></div>,
       cell: ({ row }) => {
         const user = row.original;
         return (
@@ -121,7 +124,7 @@ export const UserTable: React.FC<UserTableProps> = ({
               type="button"
               onClick={() => onEdit(user)}
               className="p-2 hover:bg-zinc-100 text-zinc-600 rounded-xl transition-colors cursor-pointer"
-              title="Edit User"
+              title={t('users.edit')}
             >
               <Edit2 className="w-4 h-4" />
             </button>
@@ -130,7 +133,7 @@ export const UserTable: React.FC<UserTableProps> = ({
                 type="button"
                 onClick={() => onDelete(user)}
                 className="p-2 hover:bg-red-50 text-red-500 rounded-xl transition-colors cursor-pointer"
-                title="Delete User"
+                title={t('users.delete')}
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -146,8 +149,8 @@ export const UserTable: React.FC<UserTableProps> = ({
       columns={columns}
       data={users}
       loading={loading}
-      emptyTitle="No Matching Users Found"
-      emptyDescription="No user accounts found matching your query."
+      emptyTitle={<T id="users.emptyTitle" />}
+      emptyDescription={<T id="users.emptyText" />}
       emptyIcon={Users}
     />
   );
