@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { SectionImageUpload } from '@/components/admin/products/SectionImageUpload';
+import { CollapsibleCard } from '@/components/admin/shared/CollapsibleCard';
+import { CompactMediaField } from '@/components/admin/shared/CompactMediaField';
+import { LanguageTabs, suffixOf, type AdminLang } from '@/components/admin/shared/LanguageTabs';
 import { HomeHeroConfig } from '@/lib/types/homepage';
 
 interface HeroSectionEditorProps {
@@ -9,7 +11,18 @@ interface HeroSectionEditorProps {
   onChange: (hero: HomeHeroConfig) => void;
 }
 
+const FIELDS = [
+  { key: 'tagline', label: 'Tagline', placeholder: { en: 'Discover Apsonic', fr: 'Découvrir Apsonic', zh: '探索品牌' } },
+  { key: 'title', label: 'Title', placeholder: { en: 'Good Quality, Good Life', fr: 'Bonne qualité pour une meilleure vie', zh: '好质量 好生活' } },
+  { key: 'subtitle', label: 'Subtitle', placeholder: { en: "Built for Africa's rugged roads", fr: "Conçue pour les routes d'Afrique", zh: '专为非洲复杂路况打造' } },
+] as const;
+
+const INPUT = 'w-full px-3 py-2 border border-zinc-200 rounded-xl bg-zinc-50 focus:bg-white text-xs font-semibold';
+
 export const HeroSectionEditor: React.FC<HeroSectionEditorProps> = ({ hero, onChange }) => {
+  const [lang, setLang] = useState<AdminLang>('en');
+  const suffix = suffixOf(lang);
+
   const updateVideoUrl = (index: number, url: string) => {
     const nextVideos = [...(hero.videos || ['/videos/hero2.mp4', '/videos/723_1770449481.mp4'])];
     nextVideos[index] = url;
@@ -17,85 +30,34 @@ export const HeroSectionEditor: React.FC<HeroSectionEditorProps> = ({ hero, onCh
   };
 
   return (
-    <div className="bg-white rounded-3xl p-6 sm:p-8 border border-zinc-100 shadow-sm space-y-6 font-sans">
-      <div>
-        <h2 className="text-lg font-bold text-zinc-900">Hero Section (Title, Subtitle & Media Backgrounds)</h2>
-        <p className="text-xs text-zinc-500">Configure the top full-screen video or image background slideshow and slogan texts.</p>
+    <CollapsibleCard
+      title="Hero"
+      summary={hero.titleEn}
+      actions={<LanguageTabs value={lang} onChange={setLang} />}
+    >
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        {FIELDS.map((f) => {
+          const key = `${f.key}${suffix}` as keyof HomeHeroConfig;
+          return (
+            <label key={f.key} className="text-[11px] font-bold text-zinc-600">
+              {f.label}
+              <input
+                type="text"
+                value={(hero[key] as string | undefined) || ''}
+                onChange={(e) => onChange({ ...hero, [key]: e.target.value })}
+                placeholder={f.placeholder[lang]}
+                className={INPUT}
+              />
+            </label>
+          );
+        })}
       </div>
+      {lang !== 'en' && <p className="mt-2 text-[11px] text-zinc-400">Empty fields show the English text to visitors.</p>}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
-          <label className="block text-zinc-700 font-bold text-xs mb-1">Tagline (EN)</label>
-          <input
-            type="text"
-            value={hero.taglineEn || ''}
-            onChange={(e) => onChange({ ...hero, taglineEn: e.target.value })}
-            placeholder="Discover Apsonic"
-            className="w-full px-3 py-2 border border-zinc-200 rounded-xl bg-zinc-50 focus:bg-white text-xs font-semibold"
-          />
-        </div>
-        <div>
-          <label className="block text-zinc-700 font-bold text-xs mb-1">Title (EN)</label>
-          <input
-            type="text"
-            value={hero.titleEn || ''}
-            onChange={(e) => onChange({ ...hero, titleEn: e.target.value })}
-            placeholder="Good Quality, Good Life"
-            className="w-full px-3 py-2 border border-zinc-200 rounded-xl bg-zinc-50 focus:bg-white text-xs font-semibold"
-          />
-        </div>
-        <div>
-          <label className="block text-zinc-700 font-bold text-xs mb-1">Subtitle (EN)</label>
-          <input
-            type="text"
-            value={hero.subtitleEn || ''}
-            onChange={(e) => onChange({ ...hero, subtitleEn: e.target.value })}
-            placeholder="APSONIC Motorcycles - Built for Africa's Rugged Roads"
-            className="w-full px-3 py-2 border border-zinc-200 rounded-xl bg-zinc-50 focus:bg-white text-xs font-semibold"
-          />
-        </div>
+      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3 border-t border-zinc-50 pt-3">
+        <CompactMediaField label="Background 1 (video or image)" value={hero.videos?.[0]} onChange={(u) => updateVideoUrl(0, u)} accept="video/*,image/*" />
+        <CompactMediaField label="Background 2 (video or image)" value={hero.videos?.[1]} onChange={(u) => updateVideoUrl(1, u)} accept="video/*,image/*" />
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-zinc-700 font-bold text-xs mb-1">Title (ZH)</label>
-          <input
-            type="text"
-            value={hero.titleZh || ''}
-            onChange={(e) => onChange({ ...hero, titleZh: e.target.value })}
-            placeholder="好质量 好生活"
-            className="w-full px-3 py-2 border border-zinc-200 rounded-xl bg-zinc-50 focus:bg-white text-xs font-semibold"
-          />
-        </div>
-        <div>
-          <label className="block text-zinc-700 font-bold text-xs mb-1">Subtitle (ZH)</label>
-          <input
-            type="text"
-            value={hero.subtitleZh || ''}
-            onChange={(e) => onChange({ ...hero, subtitleZh: e.target.value })}
-            placeholder="APSONIC 摩托车 - 专为非洲复杂路况打造"
-            className="w-full px-3 py-2 border border-zinc-200 rounded-xl bg-zinc-50 focus:bg-white text-xs font-semibold"
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-        <SectionImageUpload
-          label="Hero Background Media 1 (Video or High-Res Image)"
-          description="Upload or set URL for first background slide"
-          value={hero.videos?.[0] || ''}
-          onChange={(url) => updateVideoUrl(0, url)}
-          accept="video/*,image/*"
-        />
-
-        <SectionImageUpload
-          label="Hero Background Media 2 (Video or High-Res Image)"
-          description="Upload or set URL for second background slide"
-          value={hero.videos?.[1] || ''}
-          onChange={(url) => updateVideoUrl(1, url)}
-          accept="video/*,image/*"
-        />
-      </div>
-    </div>
+    </CollapsibleCard>
   );
 };

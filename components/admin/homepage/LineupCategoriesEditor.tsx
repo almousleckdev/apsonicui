@@ -1,8 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
-import { SectionImageUpload } from '@/components/admin/products/SectionImageUpload';
+import { CollapsibleCard } from '@/components/admin/shared/CollapsibleCard';
+import { CompactMediaField } from '@/components/admin/shared/CompactMediaField';
+import { LanguageTabs, type AdminLang } from '@/components/admin/shared/LanguageTabs';
 import { HomeCategoryItem } from '@/lib/types/homepage';
 
 interface LineupCategoriesEditorProps {
@@ -10,7 +12,13 @@ interface LineupCategoriesEditorProps {
   onChange: (categories: HomeCategoryItem[]) => void;
 }
 
+const NAME_FIELD: Record<AdminLang, 'name' | 'nameFr' | 'nameZh'> = { en: 'name', fr: 'nameFr', zh: 'nameZh' };
+const PLACEHOLDER: Record<AdminLang, string> = { en: 'Name (English)', fr: 'Nom (français)', zh: '名称（中文）' };
+const INPUT = 'w-full px-3 py-2 border border-zinc-200 rounded-xl bg-white text-xs';
+
 export const LineupCategoriesEditor: React.FC<LineupCategoriesEditorProps> = ({ categories, onChange }) => {
+  const [lang, setLang] = useState<AdminLang>('en');
+
   const addCategory = () => {
     onChange([
       ...categories,
@@ -25,72 +33,38 @@ export const LineupCategoriesEditor: React.FC<LineupCategoriesEditorProps> = ({ 
     ]);
   };
 
-  const removeCategory = (idx: number) => {
-    onChange(categories.filter((_, i) => i !== idx));
-  };
+  const updateCategory = <K extends keyof HomeCategoryItem>(id: string, field: K, val: HomeCategoryItem[K]) =>
+    onChange(categories.map((c) => (c.id === id ? { ...c, [field]: val } : c)));
 
-  const updateCategory = <K extends keyof HomeCategoryItem>(idx: number, field: K, val: HomeCategoryItem[K]) => {
-    const updated = [...categories];
-    updated[idx] = { ...updated[idx], [field]: val };
-    onChange(updated);
-  };
+  const field = NAME_FIELD[lang];
 
   return (
-    <div className="bg-white rounded-3xl p-6 sm:p-8 border border-zinc-100 shadow-sm space-y-6 font-sans">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-bold text-zinc-900">Lineup Categories Carousel (Section 3)</h2>
-          <p className="text-xs text-zinc-500">Manage categories, titles, and pictures displayed in the lineup carousel.</p>
-        </div>
-        <button
-          type="button"
-          onClick={addCategory}
-          className="inline-flex items-center gap-1.5 px-4 py-2 bg-brand-green text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-green-700 cursor-pointer shadow-sm"
-        >
-          <Plus className="w-4 h-4" /> Add Category
-        </button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {categories.map((c, i) => (
-          <div key={c.id} className="border border-zinc-200/80 rounded-2xl p-4 bg-zinc-50/50 space-y-3">
-            <div className="flex items-center justify-between gap-2">
-              <input
-                type="text"
-                value={c.name}
-                onChange={(e) => updateCategory(i, 'name', e.target.value)}
-                placeholder="Name (EN)"
-                className="px-3 py-1.5 border border-zinc-200 rounded-xl bg-white text-xs font-bold w-1/3"
-              />
-              <input
-                type="text"
-                value={c.nameZh || ''}
-                onChange={(e) => updateCategory(i, 'nameZh', e.target.value)}
-                placeholder="Name (ZH)"
-                className="px-3 py-1.5 border border-zinc-200 rounded-xl bg-white text-xs font-bold w-1/3"
-              />
-              <input
-                type="text"
-                value={c.href || ''}
-                onChange={(e) => updateCategory(i, 'href', e.target.value)}
-                placeholder="Link (/products)"
-                className="px-3 py-1.5 border border-zinc-200 rounded-xl bg-white text-xs w-1/4"
-              />
-              <button type="button" onClick={() => removeCategory(i)} className="text-red-500 hover:text-red-700 p-1.5 cursor-pointer">
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
-
-            <SectionImageUpload
-              label="Lineup Category Picture"
-              description="Photo for this category in the homepage carousel"
-              value={c.image}
-              onChange={(url) => updateCategory(i, 'image', url)}
-              accept="image/*"
-            />
-          </div>
+    <CollapsibleCard
+      title="Lineup carousel"
+      summary={`${categories.length} categor${categories.length === 1 ? 'y' : 'ies'}`}
+      defaultOpen={false}
+      actions={
+        <>
+          <LanguageTabs value={lang} onChange={setLang} />
+          <button type="button" onClick={addCategory} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-green text-white font-bold text-[11px] rounded-lg hover:bg-green-700 cursor-pointer">
+            <Plus className="w-3.5 h-3.5" /> Add
+          </button>
+        </>
+      }
+    >
+      {lang !== 'en' && <p className="mb-2 text-[11px] text-zinc-400">Empty names show the English text to visitors.</p>}
+      <ul className="divide-y divide-zinc-100">
+        {categories.map((c) => (
+          <li key={c.id} className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_auto] gap-2 items-center py-2.5">
+            <CompactMediaField value={c.image} onChange={(url) => updateCategory(c.id, 'image', url)} />
+            <input className={`${INPUT} font-bold`} value={c[field] || ''} onChange={(e) => updateCategory(c.id, field, e.target.value)} placeholder={PLACEHOLDER[lang]} aria-label={PLACEHOLDER[lang]} />
+            <input className={INPUT} value={c.href || ''} onChange={(e) => updateCategory(c.id, 'href', e.target.value)} placeholder="Link (/products)" aria-label="Link" />
+            <button type="button" aria-label="Remove category" onClick={() => onChange(categories.filter((x) => x.id !== c.id))} className="justify-self-end p-2 rounded-lg text-red-500 hover:bg-red-50 cursor-pointer">
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </li>
         ))}
-      </div>
-    </div>
+      </ul>
+    </CollapsibleCard>
   );
 };

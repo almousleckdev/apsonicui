@@ -14,6 +14,8 @@ export interface AdminPageHeaderProps {
   onRefresh?: () => void;
   isRefreshing?: boolean;
   actionVariant?: 'primary' | 'danger';
+  /** Smaller title bar for pages that need the room for content. */
+  compact?: boolean;
 }
 
 export const AdminPageHeader: React.FC<AdminPageHeaderProps> = ({
@@ -26,15 +28,16 @@ export const AdminPageHeader: React.FC<AdminPageHeaderProps> = ({
   onRefresh,
   isRefreshing = false,
   actionVariant = 'primary',
+  compact = false,
 }) => {
   const buttonVariantClass = actionVariant === 'danger'
     ? 'bg-red-600 text-white shadow-lg shadow-red-600/20 hover:bg-red-700'
     : 'bg-brand-green text-white shadow-lg shadow-brand-green/20 hover:bg-green-700';
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-zinc-100 shadow-sm font-sans">
+    <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white border border-zinc-100 shadow-sm font-sans ${compact ? 'px-4 py-3 rounded-2xl' : 'p-6 rounded-3xl'}`}>
       <div>
-        <h1 className="text-xl sm:text-2xl font-extrabold text-zinc-900 tracking-tight">{title}</h1>
+        <h1 className={`font-extrabold text-zinc-900 tracking-tight ${compact ? 'text-base' : 'text-xl sm:text-2xl'}`}>{title}</h1>
         <p className="text-xs text-zinc-500 font-medium mt-0.5">{subtitle}</p>
       </div>
 

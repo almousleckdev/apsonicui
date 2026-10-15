@@ -138,11 +138,12 @@ export default function AdminCategoriesPage() {
 
   return (
     <>
-      <div className="space-y-6 font-sans max-w-7xl mx-auto">
+      <div className="space-y-3 font-sans max-w-6xl mx-auto">
         {/* Unified Admin Page Header */}
         <AdminPageHeader
-          title="Categories Management"
-          subtitle="Configure models classification, brands, and ordering."
+          title="Categories"
+          subtitle="Vehicle categories, their menu group, and names in English, French and Chinese."
+          compact
           actionLabel="Add Category"
           onActionClick={openCreateModal}
           onRefresh={fetchCategories}
@@ -152,8 +153,8 @@ export default function AdminCategoriesPage() {
         <ProductMenuGroupsEditor groups={menuGroups} categories={categories} onSaved={setMenuGroups} />
 
         {/* Filters */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-3xl border border-zinc-100 shadow-sm">
-          <div className="relative w-full sm:w-80 flex items-center bg-zinc-50 border border-zinc-200/80 rounded-2xl px-3 py-2">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white px-3 py-2 rounded-2xl border border-zinc-100 shadow-sm">
+          <div className="relative w-full sm:w-80 flex items-center bg-zinc-50 border border-zinc-200/80 rounded-xl px-3 py-1.5">
             <Search className="w-4 h-4 text-zinc-400 mr-2 shrink-0" />
             <input
               type="text"
@@ -168,7 +169,7 @@ export default function AdminCategoriesPage() {
               <button
                 key={b}
                 onClick={() => setSelectedBrand(b)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold capitalize transition-colors cursor-pointer ${selectedBrand === b ? 'bg-brand-green text-white shadow-sm' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}
+                className={`px-3 py-1 rounded-lg text-[11px] font-bold capitalize transition-colors cursor-pointer ${selectedBrand === b ? 'bg-brand-green text-white shadow-sm' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}
               >
                 {b === 'all' ? 'All Categories' : b}
               </button>

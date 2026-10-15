@@ -2,13 +2,16 @@
 
 import React from 'react';
 import { Plus, Trash2 } from 'lucide-react';
-import { SectionImageUpload } from '@/components/admin/products/SectionImageUpload';
+import { CollapsibleCard } from '@/components/admin/shared/CollapsibleCard';
+import { CompactMediaField } from '@/components/admin/shared/CompactMediaField';
 import { HomeFeaturedModelItem } from '@/lib/types/homepage';
 
 interface FeaturedModelsEditorProps {
   models: HomeFeaturedModelItem[];
   onChange: (models: HomeFeaturedModelItem[]) => void;
 }
+
+const INPUT = 'w-full px-3 py-2 border border-zinc-200 rounded-xl bg-white text-xs';
 
 export const FeaturedModelsEditor: React.FC<FeaturedModelsEditorProps> = ({ models, onChange }) => {
   const addModel = () => {
@@ -28,72 +31,35 @@ export const FeaturedModelsEditor: React.FC<FeaturedModelsEditorProps> = ({ mode
     ]);
   };
 
-  const removeModel = (idx: number) => {
-    onChange(models.filter((_, i) => i !== idx));
-  };
-
-  const updateModel = <K extends keyof HomeFeaturedModelItem>(idx: number, field: K, val: HomeFeaturedModelItem[K]) => {
-    const updated = [...models];
-    updated[idx] = { ...updated[idx], [field]: val };
-    onChange(updated);
-  };
+  // Edits are matched by id so they always apply to the right row.
+  const updateModel = <K extends keyof HomeFeaturedModelItem>(id: string, field: K, val: HomeFeaturedModelItem[K]) =>
+    onChange(models.map((m) => (m.id === id ? { ...m, [field]: val } : m)));
 
   return (
-    <div className="bg-white rounded-3xl p-6 sm:p-8 border border-zinc-100 shadow-sm space-y-6 font-sans">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-bold text-zinc-900">Featured Models Showcase (Section 2)</h2>
-          <p className="text-xs text-zinc-500">Manage motorcycle models, names, and images displayed in the interactive showcase slider.</p>
-        </div>
-        <button
-          type="button"
-          onClick={addModel}
-          className="inline-flex items-center gap-1.5 px-4 py-2 bg-brand-green text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-green-700 cursor-pointer shadow-sm"
-        >
-          <Plus className="w-4 h-4" /> Add Model
+    <CollapsibleCard
+      title="Featured models"
+      summary={`${models.length} model${models.length === 1 ? '' : 's'}`}
+      defaultOpen={false}
+      actions={
+        <button type="button" onClick={addModel} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-green text-white font-bold text-[11px] rounded-lg hover:bg-green-700 cursor-pointer">
+          <Plus className="w-3.5 h-3.5" /> Add model
         </button>
-      </div>
-
-      <div className="space-y-4">
-        {models.map((m, i) => (
-          <div key={m.id} className="border border-zinc-200/80 rounded-2xl p-4 bg-zinc-50/50 space-y-3">
-            <div className="flex items-center justify-between gap-3">
-              <input
-                type="text"
-                value={m.name}
-                onChange={(e) => updateModel(i, 'name', e.target.value)}
-                placeholder="Model Name (e.g. AP125-30 ALOBA)"
-                className="px-3 py-1.5 border border-zinc-200 rounded-xl bg-white text-xs font-bold w-1/3"
-              />
-              <input
-                type="text"
-                value={m.watermark || ''}
-                onChange={(e) => updateModel(i, 'watermark', e.target.value)}
-                placeholder="Watermark (APSONIC)"
-                className="px-3 py-1.5 border border-zinc-200 rounded-xl bg-white text-xs w-1/3"
-              />
-              <input
-                type="text"
-                value={m.href || ''}
-                onChange={(e) => updateModel(i, 'href', e.target.value)}
-                placeholder="Target URL (/products)"
-                className="px-3 py-1.5 border border-zinc-200 rounded-xl bg-white text-xs w-1/4"
-              />
-              <button type="button" onClick={() => removeModel(i)} className="text-red-500 hover:text-red-700 p-1.5 cursor-pointer">
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
-
-            <SectionImageUpload
-              label="Model Photo"
-              description="Upload or update main showcase image for this model"
-              value={m.image}
-              onChange={(url) => updateModel(i, 'image', url)}
-              accept="image/*"
-            />
-          </div>
+      }
+    >
+      <p className="mb-3 text-[11px] text-zinc-400">Model names are product names, so they are the same in English, French and Chinese.</p>
+      <ul className="divide-y divide-zinc-100">
+        {models.map((m) => (
+          <li key={m.id} className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.2fr)_repeat(3,minmax(0,1fr))_auto] gap-2 items-center py-2.5">
+            <CompactMediaField value={m.image} onChange={(url) => updateModel(m.id, 'image', url)} />
+            <input className={`${INPUT} font-bold`} value={m.name} onChange={(e) => updateModel(m.id, 'name', e.target.value)} placeholder="Model name" aria-label="Model name" />
+            <input className={INPUT} value={m.watermark || ''} onChange={(e) => updateModel(m.id, 'watermark', e.target.value)} placeholder="Watermark" aria-label="Watermark" />
+            <input className={INPUT} value={m.href || ''} onChange={(e) => updateModel(m.id, 'href', e.target.value)} placeholder="Link (/products)" aria-label="Link" />
+            <button type="button" aria-label="Remove model" onClick={() => onChange(models.filter((x) => x.id !== m.id))} className="justify-self-end p-2 rounded-lg text-red-500 hover:bg-red-50 cursor-pointer">
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </li>
         ))}
-      </div>
-    </div>
+      </ul>
+    </CollapsibleCard>
   );
 };

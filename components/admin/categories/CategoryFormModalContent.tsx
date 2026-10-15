@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { CreateCategoryPayload } from '@/services/category';
 import { groupLabel, type ProductMenuGroup } from '@/lib/product-menu/groups';
-import { SectionImageUpload } from '@/components/admin/products/SectionImageUpload';
+import { CompactMediaField } from '@/components/admin/shared/CompactMediaField';
+import { LanguageTabs, type AdminLang } from '@/components/admin/shared/LanguageTabs';
 
 interface CategoryFormModalContentProps {
   formData: CreateCategoryPayload;
@@ -20,8 +21,20 @@ export const CategoryFormModalContent: React.FC<CategoryFormModalContentProps> =
   onSubmit,
   onCancel,
 }) => {
+  const [lang, setLang] = useState<AdminLang>('en');
+  const nameKey = ({ en: 'nameEn', fr: 'nameFr', zh: 'nameZh' } as const)[lang];
+  const NAME_PLACEHOLDER: Record<AdminLang, string> = { en: 'Street / Knight / Off-Road', fr: 'Urbaine', zh: '街车 / 骑士车 / 越野车' };
+
   return (
-    <form onSubmit={onSubmit} className="space-y-4 text-xs font-medium font-sans">
+    <form
+      onSubmit={(e) => {
+        if (!formData.nameEn.trim()) {
+          e.preventDefault();
+          setLang('en'); // the English name is the required fallback
+          return;
+        }
+        onSubmit(e);
+      }} className="space-y-4 text-xs font-medium font-sans">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div>
           <label className="block text-zinc-700 font-bold mb-1">Slug (Identifier)</label>
@@ -65,46 +78,36 @@ export const CategoryFormModalContent: React.FC<CategoryFormModalContentProps> =
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div>
-          <label className="block text-zinc-700 font-bold mb-1">Name (EN)</label>
-          <input
-            type="text"
-            required
-            value={formData.nameEn}
-            onChange={(e) => setFormData({ ...formData, nameEn: e.target.value })}
-            placeholder="Street / Knight / Off-Road"
-            className="w-full px-3 py-2 border border-zinc-200 rounded-xl bg-zinc-50 focus:bg-white focus:outline-none"
-          />
+      <div>
+        <div className="mb-1 flex items-center justify-between gap-2">
+          <label htmlFor="category-name" className="block text-zinc-700 font-bold">
+            Name {lang === 'en' && '*'}
+          </label>
+          <LanguageTabs value={lang} onChange={setLang} />
         </div>
-        <div>
-          <label className="block text-zinc-700 font-bold mb-1">Name (FR)</label>
-          <input
-            type="text"
-            value={formData.nameFr || ''}
-            onChange={(e) => setFormData({ ...formData, nameFr: e.target.value })}
-            placeholder="Urbaine"
-            className="w-full px-3 py-2 border border-zinc-200 rounded-xl bg-zinc-50 focus:bg-white focus:outline-none"
-          />
-        </div>
-        <div>
-          <label className="block text-zinc-700 font-bold mb-1">Name (ZH)</label>
-          <input
-            type="text"
-            value={formData.nameZh || ''}
-            onChange={(e) => setFormData({ ...formData, nameZh: e.target.value })}
-            placeholder="街车 / 骑士车 / 越野车"
-            className="w-full px-3 py-2 border border-zinc-200 rounded-xl bg-zinc-50 focus:bg-white focus:outline-none"
-          />
-        </div>
+        <input
+          id="category-name"
+          type="text"
+          required={lang === 'en'}
+          value={formData[nameKey] || ''}
+          onChange={(e) => setFormData({ ...formData, [nameKey]: e.target.value })}
+          placeholder={NAME_PLACEHOLDER[lang]}
+          className="w-full px-3 py-2 border border-zinc-200 rounded-xl bg-zinc-50 focus:bg-white focus:outline-none"
+        />
+        {lang !== 'en' ? (
+          <p className="mt-1 text-[11px] text-zinc-400">If empty, visitors using this language see the English name.</p>
+        ) : !formData.nameEn.trim() ? (
+          <p className="mt-1 text-[11px] text-zinc-400">The English name is required.</p>
+        ) : null}
       </div>
 
-      <SectionImageUpload
-        label="Category Cover Picture"
-        description="Select or upload a model photo for this category tab & navigation dropdown"
-        value={formData.imageUrl}
-        onChange={(url) => setFormData((prev) => ({ ...prev, imageUrl: url }))}
-      />
+      <div>
+        <label className="block text-zinc-700 font-bold mb-1">Cover picture</label>
+        <CompactMediaField
+          value={formData.imageUrl}
+          onChange={(url) => setFormData((prev) => ({ ...prev, imageUrl: url }))}
+        />
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>

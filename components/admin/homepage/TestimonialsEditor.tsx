@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ArrowDown, ArrowUp, MessageSquareQuote, Plus, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, ChevronDown, MessageSquareQuote, Plus, Trash2 } from 'lucide-react';
 import { TestimonialCard } from '@/components/features/testimonial-card';
 import { TestimonialPhotoUpload } from '@/components/admin/homepage/TestimonialPhotoUpload';
 import {
@@ -52,6 +52,9 @@ export const TestimonialsEditor: React.FC<TestimonialsEditorProps> = ({
   showErrors,
 }) => {
   const [lang, setLang] = useState<TestimonialLocale>('en');
+  // Folded by default to keep the page short; opens by itself when saving found problems here.
+  const [openByUser, setOpenByUser] = useState(false);
+  const open = openByUser || showErrors;
   const suffix = LANGUAGES.find((l) => l.code === lang)!.suffix;
   const langLabel = LANGUAGES.find((l) => l.code === lang)!.label;
   const atLimit = testimonials.length >= TESTIMONIAL_LIMITS.maxItems;
@@ -59,20 +62,17 @@ export const TestimonialsEditor: React.FC<TestimonialsEditorProps> = ({
   const update = (id: string, patch: Partial<HomeTestimonialItem>) => onChange((current) => patchTestimonial(current, id, patch));
 
   return (
-    <section id="testimonials-section" className="bg-white rounded-3xl p-6 sm:p-8 border border-zinc-100 shadow-sm space-y-6 font-sans scroll-mt-6">
+    <section id="testimonials-section" className="bg-white rounded-2xl p-4 border border-zinc-100 shadow-sm space-y-4 font-sans scroll-mt-6">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex items-start gap-3">
-          <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-green/10 text-brand-green">
-            <MessageSquareQuote className="h-5 w-5" />
+        <button type="button" aria-expanded={open} onClick={() => setOpenByUser((o) => !o)} className="flex items-center gap-2 text-left cursor-pointer min-w-0">
+          <ChevronDown className={`h-4 w-4 shrink-0 text-zinc-400 transition-transform ${open ? '' : '-rotate-90'}`} />
+          <MessageSquareQuote className="h-4 w-4 shrink-0 text-brand-green" />
+          <h2 className="text-sm font-black text-zinc-900">Testimonials</h2>
+          <span className="text-[11px] font-medium text-zinc-400 truncate">
+            {testimonials.length} item{testimonials.length === 1 ? '' : 's'} &middot; &ldquo;Voices of the Continent&rdquo;
           </span>
-          <div>
-            <h2 className="text-lg font-bold text-zinc-900">Testimonials (Section 5)</h2>
-            <p className="text-xs text-zinc-500">
-              The &ldquo;Community &middot; Voices of the Continent&rdquo; cards on the homepage. Each card below is previewed exactly as visitors see it.
-            </p>
-          </div>
-        </div>
+        </button>
 
         <div className="flex items-center gap-4 shrink-0">
           <label className="flex items-center gap-2.5 cursor-pointer select-none">
@@ -89,16 +89,21 @@ export const TestimonialsEditor: React.FC<TestimonialsEditorProps> = ({
           </label>
           <button
             type="button"
-            onClick={() => onChange(addTestimonial)}
+            onClick={() => {
+              setOpenByUser(true);
+              onChange(addTestimonial);
+            }}
             disabled={atLimit}
             title={atLimit ? `Maximum ${TESTIMONIAL_LIMITS.maxItems} testimonials` : undefined}
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-brand-green text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-green-700 cursor-pointer shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-green text-white font-bold text-[11px] rounded-lg hover:bg-green-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Plus className="w-4 h-4" /> Add Testimonial
+            <Plus className="w-3.5 h-3.5" /> Add
           </button>
         </div>
       </div>
 
+      {open && (
+        <div className="space-y-4">
       {!visible && (
         <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-xs font-medium text-amber-800">
           This section is hidden on the homepage. Your testimonials are kept; switch it on to show them again.
@@ -247,6 +252,8 @@ export const TestimonialsEditor: React.FC<TestimonialsEditorProps> = ({
               </article>
             );
           })}
+        </div>
+      )}
         </div>
       )}
     </section>
