@@ -1,0 +1,283 @@
+'use client';
+
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { DndContext, KeyboardSensor, PointerSensor, closestCenter, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core';
+import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { useQuery } from '@tanstack/react-query';
+import { AlertTriangle, ChevronDown, FileText, Heading, Home, Link2, Loader2, Plus, RotateCcw } from 'lucide-react';
+import { ActionModal } from '@/components/admin/ActionModal';
+import { LanguageTabs, type AdminLang } from '@/components/admin/shared/LanguageTabs';
+import { useToast } from '@/components/ui/Toast';
+import { ApiError } from '@/services/api-client';
+import { navigationService } from '@/services/navigation';
+import { cn } from '@/lib/utils';
+import { getErrorMessage } from '@/lib/utils/errors';
+import { localized } from '@/lib/page-builder/document';
+import { canHaveChildren, countItems, find, flatten, indent, insertAfter, moveDown, moveTo, moveUp, newMenuItem, outdent, remove, treesEqual, update, warningsFor } from '@/lib/navigation/tree';
+import { BUILT_IN_ROUTES, MENU_MAX_DEPTH, type ItemKind, type MenuItem, type MenuKey, type MenuView } from '@/lib/navigation/types';
+import { ItemForm } from './ItemForm';
+import { MenuItemRow } from './MenuItemRow';
+import { MenuPreview } from './MenuPreview';
+
+const MENU_NAME: Record<MenuKey, string> = { header: 'header menu', footer: 'footer menu' };
+const ADD_OPTIONS: Array<{ kind: ItemKind; label: string; hint: string; Icon: typeof FileText }> = [
+  { kind: 'PAGE', label: 'A page', hint: 'One of your pages', Icon: FileText },
+  { kind: 'ROUTE', label: 'A built-in page', hint: 'Products, Services, Contact…', Icon: Home },
+  { kind: 'EXTERNAL', label: 'A web link', hint: 'Another website', Icon: Link2 },
+  { kind: 'GROUP', label: 'A heading', hint: 'Groups items into a dropdown or column', Icon: Heading },
+];
+
+interface Problem { path: string; message: string }
+
+/** Loads one menu, then hands it to the editor. */
+export function MenuEditor({ menu }: { menu: MenuKey }) {
+  const [view, setView] = useState<MenuView | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    navigationService.get(menu)
+      .then((v) => { if (!cancelled) setView(v); })
+      .catch((e) => { if (!cancelled) setError(getErrorMessage(e, 'The menu could not be loaded.')); });
+    return () => { cancelled = true; };
+  }, [menu]);
+
+  if (error) return <p role="alert" className="rounded-xl bg-red-50 p-6 text-sm font-semibold text-red-700">{error}</p>;
+  if (!view) return <div className="flex items-center justify-center gap-2 py-24 text-sm font-medium text-zinc-500" role="status"><Loader2 className="h-5 w-5 animate-spin" /> Loading the {MENU_NAME[menu]}…</div>;
+  return <MenuEditorBody menu={menu} initial={view} />;
+}
+
+function MenuEditorBody({ menu, initial }: { menu: MenuKey; initial: MenuView }) {
+  const { toast } = useToast();
+  const maxDepth = MENU_MAX_DEPTH[menu];
+  const [server, setServer] = useState(initial);
+  const [items, setItems] = useState<MenuItem[]>(initial.draft);
+  const [selectedId, setSelectedId] = useState<string | null>(initial.draft[0]?.id ?? null);
+  const [locale, setLocale] = useState<AdminLang>('en');
+  const [busy, setBusy] = useState<'save' | 'publish' | 'discard' | null>(null);
+  const [problems, setProblems] = useState<Problem[]>([]);
+  const [conflict, setConflict] = useState(false);
+  const [confirm, setConfirm] = useState<'publish' | 'discard' | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
+
+  const { data: pageOptions = [] } = useQuery({ queryKey: ['nav-page-options'], queryFn: () => navigationService.pageOptions() });
+  const pagesById = useMemo(() => new Map(pageOptions.map((p) => [p.id, p])), [pageOptions]);
+
+  const dirty = !treesEqual(items, server.draft);
+  const flat = useMemo(() => flatten(items), [items]);
+  const selected = selectedId ? find(items, selectedId) : undefined;
+  const usedPageIds = useMemo(() => new Set(flat.flatMap((f) => (f.item.pageId ? [f.item.pageId] : []))), [flat]);
+  const usedRoutes = useMemo(() => new Set(flat.flatMap((f) => (f.item.route ? [f.item.route] : []))), [flat]);
+
+  useEffect(() => {
+    const warn = (e: BeforeUnloadEvent) => { if (dirty) e.preventDefault(); };
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [dirty]);
+
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }), useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }));
+  const onDragEnd = (e: DragEndEvent) => { if (e.over) setItems((current) => moveTo(current, String(e.active.id), String(e.over!.id), maxDepth)); };
+
+  const labelFor = useCallback((item: MenuItem) => localized(item.labels, locale) || (item.kind === 'GROUP' ? 'Untitled heading' : 'No label yet'), [locale]);
+  const subtitleFor = (item: MenuItem) => {
+    if (item.kind === 'PAGE') { const p = item.pageId ? pagesById.get(item.pageId) : undefined; return p ? `/${p.slug}${p.status !== 'PUBLISHED' ? ` · ${p.status.toLowerCase()}` : ''}` : 'No page chosen'; }
+    if (item.kind === 'ROUTE') return item.route ? (BUILT_IN_ROUTES.find((r) => r.route === item.route)?.label ?? item.route) : 'No page chosen';
+    if (item.kind === 'EXTERNAL') return item.url || 'No address yet';
+    return item.children.length > 0 ? `Heading · ${item.children.length} item${item.children.length === 1 ? '' : 's'}` : 'Heading · empty';
+  };
+
+  /** Turns a server path like items[1].children[0].labels.en into the name of the item it refers to. */
+  const describeProblem = (path: string): { who: string; id?: string } => {
+    const steps = [...path.matchAll(/(?:items|children)\[(\d+)\]/g)].map((m) => Number(m[1]));
+    let list = items;
+    let target: MenuItem | undefined;
+    for (const index of steps) { target = list[index]; if (!target) break; list = target.children; }
+    return target ? { who: localized(target.labels, 'en') || 'Untitled item', id: target.id } : { who: 'Menu' };
+  };
+
+  const adopt = (view: MenuView) => { setServer(view); setItems(view.draft); setProblems([]); setConflict(false); };
+
+  const run = async (kind: 'save' | 'publish' | 'discard', action: () => Promise<MenuView>, success: string): Promise<boolean> => {
+    setBusy(kind);
+    try {
+      adopt(await action());
+      toast.success(success);
+      return true;
+    } catch (e) {
+      if (e instanceof ApiError && e.status === 409) setConflict(true);
+      else if (e instanceof ApiError && e.details?.errors?.length) setProblems(e.details.errors.map((x) => ({ path: x.field, message: x.message })));
+      else toast.error(getErrorMessage(e, 'That did not work.'));
+      return false;
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const save = () => run('save', () => navigationService.saveDraft(menu, server.version, items), 'Draft saved. Visitors still see the published menu.');
+  const publish = async () => {
+    setConfirm(null);
+    if (dirty) {
+      setBusy('save');
+      try {
+        const saved = await navigationService.saveDraft(menu, server.version, items);
+        setServer(saved);
+        setBusy(null);
+        await run('publish', () => navigationService.publish(menu, saved.version), `The ${MENU_NAME[menu]} is live.`);
+      } catch (e) {
+        setBusy(null);
+        if (e instanceof ApiError && e.status === 409) setConflict(true);
+        else if (e instanceof ApiError && e.details?.errors?.length) setProblems(e.details.errors.map((x) => ({ path: x.field, message: x.message })));
+        else toast.error(getErrorMessage(e, 'That did not work.'));
+      }
+      return;
+    }
+    await run('publish', () => navigationService.publish(menu, server.version), `The ${MENU_NAME[menu]} is live.`);
+  };
+  const discard = async () => { setConfirm(null); await run('discard', () => navigationService.discard(menu, server.version), 'Back to the published menu.'); };
+  const reload = async () => { try { adopt(await navigationService.get(menu)); toast.success('Loaded the latest version.'); } catch (e) { toast.error(getErrorMessage(e, 'Could not reload.')); } };
+
+  const add = (kind: ItemKind) => {
+    const item = newMenuItem(kind);
+    setItems((current) => insertAfter(current, selected ? selected.id : null, item));
+    setSelectedId(item.id);
+    setAddOpen(false);
+  };
+
+  const total = countItems(items);
+  const publishDisabled = busy !== null || (!dirty && !server.hasUnpublishedChanges && server.configured);
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-zinc-200 bg-white px-4 py-3">
+        <div className="flex items-center gap-3">
+          <StatusChip server={server} dirty={dirty} />
+          <p className="text-xs text-zinc-500">{total} {total === 1 ? 'item' : 'items'}{!server.configured && menu === 'footer' ? ' · publishing replaces the built-in footer links' : ''}</p>
+        </div>
+        <div className="flex items-center gap-2">
+          {(dirty || server.hasUnpublishedChanges) && server.configured && (
+            <button type="button" onClick={() => (dirty ? setItems(server.draft) : setConfirm('discard'))} disabled={busy !== null}
+              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold text-zinc-600 hover:bg-zinc-100 disabled:opacity-50">
+              <RotateCcw className="h-3.5 w-3.5" aria-hidden /> {dirty ? 'Undo my changes' : 'Back to published'}
+            </button>
+          )}
+          <button type="button" onClick={save} disabled={!dirty || busy !== null}
+            className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 px-4 py-2 text-xs font-bold text-zinc-700 hover:bg-zinc-50 disabled:opacity-40">
+            {busy === 'save' && <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />} Save draft
+          </button>
+          <button type="button" onClick={() => setConfirm('publish')} disabled={publishDisabled}
+            className="inline-flex items-center gap-2 rounded-lg bg-brand-green px-5 py-2 text-xs font-extrabold uppercase tracking-wide text-white hover:bg-brand-green-hover disabled:cursor-not-allowed disabled:opacity-50">
+            {(busy === 'publish') && <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />} Publish
+          </button>
+        </div>
+      </div>
+
+      {conflict && (
+        <div role="alert" className="flex flex-wrap items-center gap-3 rounded-xl bg-red-600 px-4 py-2.5 text-xs font-semibold text-white">
+          <AlertTriangle className="h-4 w-4" aria-hidden /> Someone else changed this menu. Your changes were not saved.
+          <button type="button" onClick={reload} className="rounded-md bg-white px-2.5 py-1 font-bold text-red-700">Load the latest version (discards my changes)</button>
+        </div>
+      )}
+      {problems.length > 0 && (
+        <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+          <p className="flex items-center gap-2 text-sm font-extrabold text-red-700"><AlertTriangle className="h-4 w-4" aria-hidden /> Please fix these first</p>
+          <ul className="mt-1.5 space-y-1">
+            {problems.map((p, i) => { const d = describeProblem(p.path); return (
+              <li key={i} className="text-xs text-red-800">
+                {d.id ? <button type="button" onClick={() => setSelectedId(d.id!)} className="font-bold underline underline-offset-2">{d.who}</button> : <span className="font-bold">{d.who}</span>}
+                <span className="ml-1.5">{p.message}</span>
+              </li>); })}
+          </ul>
+        </div>
+      )}
+
+      <section aria-labelledby="preview-heading" className="space-y-2">
+        <div className="flex items-center justify-between">
+          <h2 id="preview-heading" className="text-[11px] font-extrabold uppercase tracking-[0.15em] text-zinc-400">Preview of your draft</h2>
+          <LanguageTabs value={locale} onChange={setLocale} />
+        </div>
+        <MenuPreview menu={menu} items={items} locale={locale} pages={pagesById} />
+      </section>
+
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
+        <section aria-label="Menu items" className="rounded-2xl border border-zinc-200 bg-white">
+          <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-3">
+            <div>
+              <h2 className="text-sm font-extrabold text-zinc-900">Menu items</h2>
+              <p className="text-[11px] text-zinc-500">Drag to reorder. Use → to put an item under the one above it.</p>
+            </div>
+            <div className="relative">
+              <button type="button" onClick={() => setAddOpen((o) => !o)} aria-haspopup="menu" aria-expanded={addOpen}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-brand-green px-3.5 py-2 text-xs font-extrabold text-white hover:bg-brand-green-hover">
+                <Plus className="h-4 w-4" aria-hidden /> Add item <ChevronDown className="h-3.5 w-3.5 opacity-80" aria-hidden />
+              </button>
+              {addOpen && (
+                <div role="menu" className="absolute right-0 top-full z-20 mt-1 w-64 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-xl">
+                  {ADD_OPTIONS.map(({ kind, label, hint, Icon }) => (
+                    <button key={kind} type="button" role="menuitem" onClick={() => add(kind)} className="flex w-full items-start gap-3 px-3 py-2 text-left hover:bg-zinc-50">
+                      <Icon className="mt-0.5 h-4 w-4 text-brand-green" aria-hidden />
+                      <span><span className="block text-xs font-bold text-zinc-800">{label}</span><span className="block text-[11px] text-zinc-500">{hint}</span></span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="p-3">
+            {flat.length === 0 ? (
+              <p className="rounded-lg border border-dashed border-zinc-300 px-4 py-10 text-center text-sm text-zinc-500">This menu is empty. Use <strong>Add item</strong> to start.</p>
+            ) : (
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+                <SortableContext items={flat.map((f) => f.item.id)} strategy={verticalListSortingStrategy}>
+                  <ul className="space-y-1.5">
+                    {flat.map((f) => {
+                      const prev = f.index > 0 ? flat.find((x) => x.parentId === f.parentId && x.index === f.index - 1)?.item : undefined;
+                      return (
+                        <MenuItemRow key={f.item.id} item={f.item} depth={f.depth} label={labelFor(f.item)} subtitle={subtitleFor(f.item)} selected={f.item.id === selectedId}
+                          warnings={warningsFor(f.item)} canMoveUp={f.index > 0} canMoveDown={f.index < f.siblings - 1}
+                          canIndent={!!prev && canHaveChildren(prev) && indent(items, f.item.id, maxDepth) !== items} canOutdent={f.parentId !== null}
+                          onSelect={() => setSelectedId(f.item.id)}
+                          onUp={() => setItems((c) => moveUp(c, f.item.id))} onDown={() => setItems((c) => moveDown(c, f.item.id))}
+                          onIndent={() => setItems((c) => indent(c, f.item.id, maxDepth))} onOutdent={() => setItems((c) => outdent(c, f.item.id))} />
+                      );
+                    })}
+                  </ul>
+                </SortableContext>
+              </DndContext>
+            )}
+          </div>
+        </section>
+
+        <aside aria-label="Item settings" className="self-start rounded-2xl border border-zinc-200 bg-white lg:sticky lg:top-4">
+          <div className="border-b border-zinc-100 px-4 py-3">
+            <h2 className="text-sm font-extrabold text-zinc-900">{selected ? 'Item settings' : 'No item selected'}</h2>
+          </div>
+          <div className="p-4">
+            {selected ? (
+              <ItemForm key={selected.id} item={selected} pages={pageOptions} usedPageIds={usedPageIds} usedRoutes={usedRoutes}
+                issues={problems.filter((p) => describeProblem(p.path).id === selected.id).map((p) => p.message)}
+                onChange={(change) => setItems((c) => update(c, selected.id, change))}
+                onRemove={() => { setItems((c) => remove(c, selected.id)); setSelectedId(null); }} />
+            ) : (
+              <p className="text-xs text-zinc-500">Select an item to change its label, target or visibility.</p>
+            )}
+          </div>
+        </aside>
+      </div>
+
+      <ActionModal
+        isOpen={confirm === 'publish'} onClose={() => setConfirm(null)} onConfirm={publish} variant="brand"
+        title={`Publish the ${MENU_NAME[menu]}?`}
+        description={`The new menu replaces the current one on every page of the website straight away.${menu === 'footer' ? ' It also replaces the built-in footer links.' : ''}`}
+        confirmLabel="Publish" />
+      <ActionModal
+        isOpen={confirm === 'discard'} onClose={() => setConfirm(null)} onConfirm={discard} variant="warning"
+        title="Go back to the published menu?" description="Your saved draft changes will be thrown away. The live menu is not affected." confirmLabel="Discard draft" />
+    </div>
+  );
+}
+
+function StatusChip({ server, dirty }: { server: MenuView; dirty: boolean }) {
+  const text = dirty ? 'Unsaved changes' : server.hasUnpublishedChanges ? 'Draft not published' : server.configured ? 'Published' : 'Not published yet';
+  const tone = dirty ? 'bg-amber-100 text-amber-800' : server.hasUnpublishedChanges || !server.configured ? 'bg-zinc-100 text-zinc-600' : 'bg-brand-green/10 text-brand-green';
+  return <span className={cn('rounded-full px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider', tone)}>{text}</span>;
+}

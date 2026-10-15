@@ -11,6 +11,9 @@ import { ProductsDropdown } from '../features/products-dropdown';
 import { NavMenu } from './header/NavMenu';
 import { LanguageSelector } from './header/LanguageSelector';
 import { MobileNavDrawer } from './header/MobileNavDrawer';
+import { useSiteNavigation } from '@/hooks/useSiteNavigation';
+import { toSiteItems, type SiteNavItem } from '@/lib/navigation/site';
+import type { Locale } from '@/lib/page-builder/types';
 import { cn } from '@/lib/utils';
 
 const DROPDOWN_CLOSE_DELAY = 150;
@@ -26,11 +29,14 @@ export const Header: React.FC = () => {
   const t = useTranslations('nav');
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const navItems = [
-    { label: t('products'), href: '/products', hasDropdown: true },
-    { label: t('services'), href: '/services' },
-    { label: t('contact'), href: '/contact' },
+  // The menu administrators publish in the CMS; until one is published (or if it cannot be loaded) the built-in menu stays.
+  const published = useSiteNavigation('header').data;
+  const builtIn: SiteNavItem[] = [
+    { id: 'products', label: t('products'), href: '/products', hasDropdown: true, newTab: false, external: false, children: [] },
+    { id: 'services', label: t('services'), href: '/services', newTab: false, external: false, children: [] },
+    { id: 'contact', label: t('contact'), href: '/contact', newTab: false, external: false, children: [] },
   ];
+  const navItems = published?.configured ? toSiteItems(published.items, locale as Locale) : builtIn;
 
   const isTransparentPage = pathname === '/';
 

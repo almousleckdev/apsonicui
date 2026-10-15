@@ -12,6 +12,7 @@ import { usePageEditor } from '@/hooks/page-builder/usePageEditor';
 import { useSectionTypes } from '@/hooks/page-builder/useSectionTypes';
 import { pagesService } from '@/services/pages';
 import { getErrorMessage } from '@/lib/utils/errors';
+import { readLocaleCookie, writeLocaleCookie } from '@/lib/page-builder/locale-cookie';
 import { createSection, duplicateSection, insertSection, moveSection, newId, removeSection, setHidden } from '@/lib/page-builder/document';
 import type { Locale, PageDetail } from '@/lib/page-builder/types';
 import { SectionIcon } from '../renderer/registry';
@@ -20,10 +21,11 @@ import { PageSettingsPanel } from './PageSettingsPanel';
 import { Device, PreviewFrame } from './PreviewFrame';
 import { describeIssue, PublishDialog } from './PublishDialog';
 import { PropertiesPanel } from './PropertiesPanel';
+import { RevisionsDrawer } from './RevisionsDrawer';
 import { STRUCTURE_END_ID, StructureList } from './StructureList';
 import { TopBar } from './TopBar';
 
-type Confirm = 'unpublish' | 'archive' | null;
+type Confirm = 'unpublish' | 'archive' | { restore: number } | null;
 
 /** The full-screen page editor: outline on the left, the real page in the middle, settings on the right. */
 export function EditorShell({ initial }: { initial: PageDetail }) {
@@ -35,11 +37,16 @@ export function EditorShell({ initial }: { initial: PageDetail }) {
   const { user } = useAuth();
   const can = useCallback((permission: string) => !!user?.permissions?.includes(permission), [user]);
 
-  const [locale, setLocale] = useState<Locale>('en');
+  // The visitor's saved language, read before the editor changes it, and put back when the editor closes.
+  const [originalLocale] = useState(readLocaleCookie);
+  // The canvas frame follows the saved language cookie for English, so set it before the first frame loads.
+  const [locale, setLocaleState] = useState<Locale>(() => { writeLocaleCookie('en'); return 'en'; });
+  const setLocale = useCallback((next: Locale) => { writeLocaleCookie(next); setLocaleState(next); }, []);
   const [device, setDevice] = useState<Device>('desktop');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [addIndex, setAddIndex] = useState<number | null>(null);
   const [publishOpen, setPublishOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
   const [confirm, setConfirm] = useState<Confirm>(null);
   const [busy, setBusy] = useState(false);
   const [dragType, setDragType] = useState<string | null>(null);
@@ -104,6 +111,10 @@ export function EditorShell({ initial }: { initial: PageDetail }) {
     if (from >= 0 && to >= 0 && from !== to) edit((d) => moveSection(d, from, to));
   };
 
+  // Previewing another language makes the site remember that language for this browser. Put the editor's own
+  // setting back when they leave, so working in French does not silently switch their later browsing.
+  useEffect(() => () => writeLocaleCookie(originalLocale), [originalLocale]);
+
   // --- keyboard shortcuts --------------------------------------------------------------------------------------
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -152,7 +163,13 @@ export function EditorShell({ initial }: { initial: PageDetail }) {
     setBusy(true);
     try {
       const saved = editor.dirty ? await editor.save() : page;
-      if (confirm === 'unpublish') {
+      if (confirm !== null && typeof confirm === 'object') {
+        const restored = await pagesService.rollback(saved.id, confirm.restore, saved.version);
+        editor.adopt(restored);
+        setSelectedId(null);
+        toast.success(`Version #${confirm.restore} restored to your draft. It is not published.`);
+        setHistoryOpen(false);
+      } else if (confirm === 'unpublish') {
         editor.adopt(await pagesService.unpublish(saved.id, saved.version));
         toast.success('Page unpublished. It is no longer visible to visitors.');
       } else if (confirm === 'archive') {
@@ -182,7 +199,7 @@ export function EditorShell({ initial }: { initial: PageDetail }) {
         onDevice={setDevice} onLocale={setLocale} onUndo={editor.undo} onRedo={editor.redo}
         onSettings={() => setSelectedId(null)} onPreview={openPreview}
         onPublish={() => setPublishOpen(true)} onSaveNow={() => { void editor.save().catch(() => undefined); }}
-        onDuplicate={duplicate} onUnpublish={() => setConfirm('unpublish')} onArchive={() => setConfirm('archive')}
+        onDuplicate={duplicate} onUnpublish={() => setConfirm('unpublish')} onArchive={() => setConfirm('archive')} onHistory={() => setHistoryOpen(true)}
       />
 
       {editor.label === 'conflict' && (
@@ -238,6 +255,12 @@ export function EditorShell({ initial }: { initial: PageDetail }) {
             )}
           </main>
 
+          {historyOpen && (
+            <RevisionsDrawer pageId={page.id} definitions={byType} canRestore={can('RESTORE_PAGES') && page.status !== 'ARCHIVED'}
+              restoreBlockedReason={page.status === 'ARCHIVED' ? 'Restore the page from the pages list first.' : 'You do not have permission to restore versions.'}
+              onRestore={async (n) => setConfirm({ restore: n })} onClose={() => setHistoryOpen(false)} />
+          )}
+
           <aside className="w-[340px] shrink-0 border-l border-zinc-200 bg-white" aria-label="Settings">
             {selected ? (
               <PropertiesPanel
@@ -277,14 +300,20 @@ export function EditorShell({ initial }: { initial: PageDetail }) {
       <ActionModal
         isOpen={confirm !== null} onClose={() => setConfirm(null)} onConfirm={runConfirmed} isLoading={busy}
         variant={confirm === 'archive' ? 'danger' : 'warning'}
-        title={confirm === 'archive' ? 'Archive this page?' : 'Unpublish this page?'}
-        description={confirm === 'archive'
-          ? 'The page is taken offline and becomes read-only. You can restore it later from the pages list.'
-          : 'Visitors will no longer be able to see this page. Your draft stays as it is and you can publish it again.'}
-        confirmLabel={confirm === 'archive' ? 'Archive' : 'Unpublish'}
+        title={isRestore(confirm) ? `Restore version #${confirm.restore}?` : confirm === 'archive' ? 'Archive this page?' : 'Unpublish this page?'}
+        description={isRestore(confirm)
+          ? 'Your current draft is replaced by this version. It is not published, and the version you are replacing stays in the history.'
+          : confirm === 'archive'
+            ? 'The page is taken offline and becomes read-only. You can restore it later from the pages list.'
+            : 'Visitors will no longer be able to see this page. Your draft stays as it is and you can publish it again.'}
+        confirmLabel={isRestore(confirm) ? 'Restore to draft' : confirm === 'archive' ? 'Archive' : 'Unpublish'}
       />
     </div>
   );
+}
+
+function isRestore(confirm: Confirm): confirm is { restore: number } {
+  return confirm !== null && typeof confirm === 'object';
 }
 
 function Banner({ tone, icon, children }: { tone: 'error' | 'warn'; icon: React.ReactNode; children: React.ReactNode }) {

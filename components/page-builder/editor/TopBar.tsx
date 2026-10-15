@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { AlertTriangle, ArrowLeft, Archive, Check, CloudOff, Copy, ExternalLink, Loader2, MoreHorizontal, Monitor, Redo2, Smartphone, Tablet, Undo2, Undo, Settings2 } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, Archive, Check, CloudOff, Copy, ExternalLink, Loader2, MoreHorizontal, Monitor, Redo2, Smartphone, Tablet, Undo2, Undo, Settings2, History } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LanguageTabs, type AdminLang } from '@/components/admin/shared/LanguageTabs';
 import type { SaveLabel } from '@/hooks/page-builder/usePageEditor';
@@ -40,6 +40,7 @@ interface Props {
   onDuplicate: () => void;
   onUnpublish: () => void;
   onArchive: () => void;
+  onHistory: () => void;
 }
 
 const DEVICES: Array<{ id: Device; label: string; Icon: typeof Monitor }> = [
@@ -56,7 +57,7 @@ export function TopBar(p: Props) {
       </Link>
       <div className="h-6 w-px bg-zinc-200" aria-hidden />
 
-      <button type="button" onClick={p.onSettings} className="group flex min-w-0 max-w-[260px] flex-col items-start rounded-lg px-2 py-1 text-left hover:bg-zinc-100" title="Page settings">
+      <button type="button" onClick={p.onSettings} className="group flex min-w-0 max-w-[220px] shrink flex-col items-start rounded-lg px-2 py-1 text-left hover:bg-zinc-100" title="Page settings">
         <span className="flex w-full items-center gap-1.5">
           <span className="truncate text-sm font-extrabold text-zinc-900">{p.title || 'Untitled page'}</span>
           <Settings2 className="h-3.5 w-3.5 shrink-0 text-zinc-400 group-hover:text-zinc-700" aria-hidden />
@@ -64,11 +65,12 @@ export function TopBar(p: Props) {
         <span className="truncate text-[11px] text-zinc-500">/{p.slug}</span>
       </button>
 
-      <span className={cn('hidden rounded-full px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider sm:inline', STATUS_STYLES[p.status])}>
-        {p.status === 'PUBLISHED' && p.hasUnpublishedChanges ? 'Published · changes not live' : p.status}
+      <span className={cn('hidden shrink-0 whitespace-nowrap rounded-full px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider sm:inline', STATUS_STYLES[p.status])}
+        title={p.status === 'PUBLISHED' && p.hasUnpublishedChanges ? 'The live page does not have your latest changes yet. Publish to update it.' : undefined}>
+        {p.status === 'PUBLISHED' && p.hasUnpublishedChanges ? 'Changes not live' : p.status}
       </span>
 
-      <div className="mx-auto flex items-center gap-3">
+      <div className="mx-auto flex shrink-0 items-center gap-3">
         <div role="radiogroup" aria-label="Preview size" className="inline-flex rounded-xl bg-zinc-100 p-0.5">
           {DEVICES.map(({ id, label, Icon }) => (
             <button key={id} type="button" role="radio" aria-checked={p.device === id} aria-label={label} title={label} onClick={() => p.onDevice(id)}
@@ -88,13 +90,13 @@ export function TopBar(p: Props) {
       </div>
 
       <button type="button" onClick={p.onPreview}
-        className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-bold text-zinc-700 hover:bg-zinc-50">
+        className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-bold text-zinc-700 hover:bg-zinc-50">
         <ExternalLink className="h-3.5 w-3.5" aria-hidden /> Preview
       </button>
 
       <button type="button" onClick={p.onPublish} disabled={!p.canPublish || p.publishDisabled}
         title={p.canPublish ? undefined : 'You do not have permission to publish pages'}
-        className="inline-flex items-center gap-1.5 rounded-lg bg-brand-green px-4 py-1.5 text-xs font-extrabold uppercase tracking-wide text-white transition-colors hover:bg-brand-green-hover disabled:cursor-not-allowed disabled:opacity-50">
+        className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg bg-brand-green px-4 py-1.5 text-xs font-extrabold uppercase tracking-wide text-white transition-colors hover:bg-brand-green-hover disabled:cursor-not-allowed disabled:opacity-50">
         {p.publishLabel}
       </button>
 
@@ -124,8 +126,8 @@ function SaveChip({ label, onSaveNow }: { label: SaveLabel; onSaveNow: () => voi
   const c = config[label];
   return (
     <button type="button" onClick={onSaveNow} disabled={label === 'saved' || label === 'saving' || label === 'conflict'} aria-live="polite" title="Save now (Ctrl/⌘ S)"
-      className={cn('hidden items-center gap-1.5 rounded-lg px-2 py-1.5 text-[11px] font-bold lg:inline-flex', c.tone, label === 'unsaved' && 'hover:bg-amber-50')}>
-      {c.icon}{c.text}
+      aria-label={c.text} className={cn('inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-2 py-1.5 text-[11px] font-bold', c.tone, label === 'unsaved' && 'hover:bg-amber-50')}>
+      {c.icon}<span className="hidden xl:inline">{c.text}</span>
     </button>
   );
 }
@@ -155,6 +157,7 @@ function MoreMenu(p: Props) {
       <BarButton label="More actions" onClick={() => setOpen((o) => !o)}><MoreHorizontal className="h-4 w-4" /></BarButton>
       {open && (
         <div role="menu" className="absolute right-0 top-full z-50 mt-1 w-52 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-xl">
+          {item('Version history', History, p.onHistory)}
           {item('Duplicate page', Copy, p.onDuplicate)}
           {p.canManage && p.status === 'PUBLISHED' && item('Unpublish', Undo, p.onUnpublish)}
           {p.canManage && p.status !== 'ARCHIVED' && item('Archive page', Archive, p.onArchive, true)}

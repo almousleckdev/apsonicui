@@ -3,8 +3,13 @@
 import React from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/lib/i18n/navigation";
-import { SOCIAL_LINKS, getFooterSections } from "@/lib/constants";
+import { SOCIAL_LINKS, getFooterSections, type FooterLink } from "@/lib/constants";
 import { Logo } from "./logo";
+import { NavLink } from "./header/NavLink";
+import { useLocale } from "next-intl";
+import { useSiteNavigation } from "@/hooks/useSiteNavigation";
+import { toFooterColumns } from "@/lib/navigation/site";
+import type { Locale } from "@/lib/page-builder/types";
 
 // Custom inline SVG icons because trademarked social icons are excluded in this lucide-react build
 const FacebookIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -113,9 +118,20 @@ const SOCIAL_ICONS = [
   { name: "linkedin", Icon: LinkedinIcon, href: SOCIAL_LINKS.linkedin },
 ];
 
+/** A footer link; menus published in the CMS add the web-link flags. */
+type FooterItem = FooterLink & { external?: boolean; newTab?: boolean };
+
 export const Footer: React.FC = () => {
   const t = useTranslations("footer");
-  const footerSections = getFooterSections(t);
+  const locale = useLocale() as Locale;
+  const published = useSiteNavigation("footer").data;
+  // A footer menu published in the CMS replaces the built-in link columns; until then the built-in ones stay.
+  const footerSections: Array<{ title: string; items: FooterItem[] }> = published?.configured
+    ? toFooterColumns(published.items, locale).map((column) => ({
+        title: column.title,
+        items: column.items.map((i) => ({ label: i.label, href: i.href ?? undefined, external: i.external, newTab: i.newTab })),
+      }))
+    : getFooterSections(t);
 
   return (
     <footer
@@ -150,12 +166,14 @@ export const Footer: React.FC = () => {
                   {section.items.map((item, itemIdx) => (
                     <li key={itemIdx} className="flex flex-col gap-2">
                       {item.href ? (
-                        <Link
+                        <NavLink
                           href={item.href}
+                          external={item.external}
+                          newTab={item.newTab}
                           className="text-zinc-400 text-xs hover:text-white transition-colors block"
                         >
                           {item.label}
-                        </Link>
+                        </NavLink>
                       ) : (
                         <span className="text-zinc-300 text-xs font-semibold block">
                           {item.label}

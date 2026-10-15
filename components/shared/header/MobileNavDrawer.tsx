@@ -6,17 +6,14 @@ import { Link } from '@/lib/i18n/navigation';
 import { Search, ChevronDown, ChevronRight, PhoneCall, MapPin, Wrench } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { productMenuService } from '@/services/product-menu-service';
+import type { SiteNavItem } from '@/lib/navigation/site';
+import { NavLink } from './NavLink';
 import { DEFAULT_PRODUCT_MENU_GROUPS, groupLabel, type ProductMenuGroup } from '@/lib/product-menu/groups';
 
-interface NavItem {
-  label: string;
-  href: string;
-  hasDropdown?: boolean;
-}
 
 interface MobileNavDrawerProps {
   isOpen: boolean;
-  navItems: NavItem[];
+  navItems: SiteNavItem[];
   pathname: string;
   searchQuery: string;
   setSearchQuery: (q: string) => void;
@@ -77,10 +74,10 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
 
           <nav className="flex flex-col gap-4">
             {navItems.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive = item.href !== null && pathname === item.href;
               if (item.hasDropdown) {
                 return (
-                  <div key={item.href} className="flex flex-col border-b border-[#046e3e]">
+                  <div key={item.id} className="flex flex-col border-b border-[#046e3e]">
                     <button
                       type="button"
                       onClick={() => setIsMobileProductsOpen(!isMobileProductsOpen)}
@@ -128,19 +125,7 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
                 );
               }
 
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={onClose}
-                  className={cn(
-                    'text-lg font-bold py-2 border-b border-[#046e3e] transition-colors',
-                    isActive ? 'text-[#FFD700]' : 'text-[#E0E0E0] hover:text-[#FFD700]'
-                  )}
-                >
-                  {item.label}
-                </Link>
-              );
+              return <MobileNavEntry key={item.id} item={item} isActive={isActive} onClose={onClose} />;
             })}
           </nav>
 
@@ -204,3 +189,46 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
     </AnimatePresence>
   );
 };
+
+/** A top-level entry: a plain link, or an expandable group when it has items under it. */
+function MobileNavEntry({ item, isActive, onClose }: { item: SiteNavItem; isActive: boolean; onClose: () => void }) {
+  const [open, setOpen] = useState(false);
+  const rowClass = cn('text-lg font-bold py-2 transition-colors', isActive ? 'text-[#FFD700]' : 'text-[#E0E0E0] hover:text-[#FFD700]');
+
+  if (item.children.length === 0) {
+    return item.href !== null ? (
+      <NavLink href={item.href} external={item.external} newTab={item.newTab} onClick={onClose} className={cn(rowClass, 'border-b border-[#046e3e]')}>{item.label}</NavLink>
+    ) : null;
+  }
+  return (
+    <div className="flex flex-col border-b border-[#046e3e]">
+      <button type="button" aria-expanded={open} onClick={() => setOpen((o) => !o)} className={cn(rowClass, 'flex w-full cursor-pointer items-center justify-between text-left')}>
+        <span>{item.label}</span>
+        <ChevronDown className={cn('w-5 h-5 transition-transform duration-200 text-white/70', open && 'rotate-180')} aria-hidden />
+      </button>
+      {open && (
+        <ul className="flex flex-col gap-1 pl-4 pb-4 pt-1">
+          {item.href !== null && (
+            <li><NavLink href={item.href} external={item.external} newTab={item.newTab} onClick={onClose} className="block py-1.5 text-sm font-medium text-white hover:text-[#FFD700]">{item.label}</NavLink></li>
+          )}
+          {item.children.map((child) => (
+            <li key={child.id}>
+              {child.href !== null ? (
+                <NavLink href={child.href} external={child.external} newTab={child.newTab} onClick={onClose} className="block py-1.5 text-sm text-[#E0E0E0] hover:text-[#FFD700]">{child.label}</NavLink>
+              ) : (
+                <span className="block pt-2 text-[11px] font-extrabold uppercase tracking-wider text-white/60">{child.label}</span>
+              )}
+              {child.children.length > 0 && (
+                <ul className="pl-4">
+                  {child.children.map((grand) => grand.href !== null && (
+                    <li key={grand.id}><NavLink href={grand.href} external={grand.external} newTab={grand.newTab} onClick={onClose} className="block py-1 text-sm text-[#E0E0E0]/80 hover:text-[#FFD700]">{grand.label}</NavLink></li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}

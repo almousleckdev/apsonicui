@@ -33,6 +33,7 @@ export function PreviewFrame({ pageId, locale, device, document, selectedId, lab
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [readyFor, setReadyFor] = useState<string | null>(null);
 
+  // English is the unprefixed address; the editor has already saved the language cookie, so no redirect is involved.
   const src = `${locale === defaultLocale ? '' : `/${locale}`}/preview/pages/${pageId}?embed=1`;
   const ready = readyFor === src;
 

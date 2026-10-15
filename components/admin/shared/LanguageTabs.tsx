@@ -28,7 +28,7 @@ export function LanguageTabs({ value, onChange }: Props) {
           role="tab"
           aria-selected={value === l.code}
           onClick={() => onChange(l.code)}
-          className={`px-3 py-1 text-[11px] font-bold rounded-lg transition-colors cursor-pointer ${value === l.code ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500 hover:text-zinc-800'}`}
+          className={`px-3 py-1 text-[11px] font-bold whitespace-nowrap rounded-lg transition-colors cursor-pointer ${value === l.code ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500 hover:text-zinc-800'}`}
         >
           {l.label}
         </button>
