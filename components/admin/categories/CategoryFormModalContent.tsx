@@ -22,17 +22,21 @@ export const CategoryFormModalContent: React.FC<CategoryFormModalContentProps> =
   onCancel,
 }) => {
   const [lang, setLang] = useState<AdminLang>('en');
+  const [attempted, setAttempted] = useState(false);
+  const missingImage = attempted && !formData.imageUrl?.trim();
   const nameKey = ({ en: 'nameEn', fr: 'nameFr', zh: 'nameZh' } as const)[lang];
   const NAME_PLACEHOLDER: Record<AdminLang, string> = { en: 'Street / Knight / Off-Road', fr: 'Urbaine', zh: '街车 / 骑士车 / 越野车' };
 
   return (
     <form
       onSubmit={(e) => {
+        e.preventDefault();
+        setAttempted(true);
         if (!formData.nameEn.trim()) {
-          e.preventDefault();
           setLang('en'); // the English name is the required fallback
           return;
         }
+        if (!formData.imageUrl?.trim()) return;
         onSubmit(e);
       }} className="space-y-4 text-xs font-medium font-sans">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -102,11 +106,12 @@ export const CategoryFormModalContent: React.FC<CategoryFormModalContentProps> =
       </div>
 
       <div>
-        <label className="block text-zinc-700 font-bold mb-1">Cover picture</label>
+        <label className="block text-zinc-700 font-bold mb-1">Cover picture *</label>
         <CompactMediaField
           value={formData.imageUrl}
           onChange={(url) => setFormData((prev) => ({ ...prev, imageUrl: url }))}
         />
+        {missingImage && <p role="alert" className="mt-1 text-[11px] font-medium text-red-600">A cover picture is required.</p>}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

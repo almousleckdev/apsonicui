@@ -48,8 +48,8 @@ export default function AdminHomePage() {
       setShowTestimonialErrors(false);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
-    } catch (error) {
-      alert("Failed to save configuration");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to save the home page');
     }
   };
 
@@ -64,8 +64,8 @@ export default function AdminHomePage() {
       const def = await homepageService.resetToDefault();
       setConfig(def);
       setShowResetModal(false);
-    } catch (error) {
-      alert("Failed to reset configuration");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to reset the home page');
     }
   };
 

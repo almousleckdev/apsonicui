@@ -26,6 +26,16 @@ export const productMenuService = {
     return DEFAULT_PRODUCT_MENU_GROUPS;
   },
 
+  /**
+   * Admin: applies a change to the freshly loaded list and saves the result. Reading right before writing keeps
+   * two admins (or two tabs) from overwriting each other's groups with a stale copy.
+   */
+  async updateGroups(change: (current: ProductMenuGroup[]) => ProductMenuGroup[]): Promise<ProductMenuGroup[]> {
+    const next = change(await this.getGroups());
+    await this.saveGroups(next);
+    return next;
+  },
+
   async saveGroups(groups: ProductMenuGroup[]): Promise<void> {
     await apiClient(`/admin/cms/config/${CONFIG_KEY}`, {
       method: 'PUT',

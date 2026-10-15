@@ -15,6 +15,7 @@ import {
   type ProductMenuGroup,
 } from "@/lib/product-menu/groups";
 import { cn } from "@/lib/utils";
+import { isSafeImagePath } from "@/lib/media/safe-path";
 
 interface ProductsDropdownProps {
   onMouseEnter?: () => void;
@@ -176,7 +177,14 @@ export const ProductsDropdown: React.FC<ProductsDropdownProps> = ({
                         : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-950 font-medium"
                     )}
                   >
-                    <span>{displayLabel}</span>
+                    <span className="flex items-center gap-2 min-w-0">
+                      {category.image && isSafeImagePath(category.image) && (
+                        <span className="relative h-5 w-8 shrink-0">
+                          <Image src={category.image} alt="" fill sizes="32px" unoptimized className="object-contain" />
+                        </span>
+                      )}
+                      <span className="truncate">{displayLabel}</span>
+                    </span>
                     {isActive && <span className="text-brand-green font-bold ml-2">→</span>}
                   </button>
                 );

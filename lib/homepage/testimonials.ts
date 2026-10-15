@@ -1,4 +1,7 @@
+import { isSafeImagePath } from '@/lib/media/safe-path';
 import type { HomeTestimonialItem } from '@/lib/types/homepage';
+
+export { isSafeImagePath };
 
 export type TestimonialLocale = 'en' | 'fr' | 'zh';
 
@@ -19,12 +22,6 @@ export interface ResolvedTestimonial {
 }
 
 const clean = (value?: string) => (value ?? '').trim();
-
-/** Only site-relative paths are rendered as photos: an arbitrary external host would make next/image throw. */
-export function isSafeImagePath(src?: string): boolean {
-  const value = clean(src);
-  return value.startsWith('/') && !value.startsWith('//') && !value.includes('..') && !/[<>"]/.test(value);
-}
 
 /** Text for the visitor's language, falling back to English and then to any other language that has text. */
 function pick(item: HomeTestimonialItem, field: 'role' | 'quote', locale: string): string {

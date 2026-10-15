@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocale } from "next-intl";
-import { homepageService } from "@/services/homepage-service";
 import { HomeHeroConfig, DEFAULT_HOMEPAGE_CONFIG } from "@/lib/types/homepage";
 
 interface VideoHeroProps {

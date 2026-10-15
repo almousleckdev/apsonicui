@@ -1,3 +1,5 @@
+import { isSafeImagePath } from '@/lib/media/safe-path';
+
 export type MenuLocale = 'en' | 'fr' | 'zh';
 
 /** A top-level entry of the Products menu ("Two-wheeler", ...). Categories point at it through their `parentType`. */
@@ -7,15 +9,19 @@ export interface ProductMenuGroup {
   labelEn: string;
   labelFr: string;
   labelZh: string;
+  /** Picture of the group, a site-relative path such as /uploads/x.png. Required when a group is created or edited. */
+  image: string;
 }
 
 export const PRODUCT_MENU_LIMITS = { maxGroups: 8, label: 40 } as const;
 
 export const DEFAULT_PRODUCT_MENU_GROUPS: ProductMenuGroup[] = [
-  { id: 'two-wheeler', labelEn: 'Two-wheeler', labelFr: 'Deux-roues', labelZh: '两轮车' },
-  { id: 'three-wheeler', labelEn: 'Three-wheeler', labelFr: 'Trois-roues', labelZh: '三轮车' },
-  { id: 'atv', labelEn: 'All-Terrain (ATV)', labelFr: 'Tout-terrain (ATV)', labelZh: '全地形' },
+  { id: 'two-wheeler', labelEn: 'Two-wheeler', labelFr: 'Deux-roues', labelZh: '两轮车', image: '/categories/街车/AP125-27 (2.2).png' },
+  { id: 'three-wheeler', labelEn: 'Three-wheeler', labelFr: 'Trois-roues', labelZh: '三轮车', image: '/categories/三轮车/AP150ZH-175 更新/AP150ZH-175 MAX (1).png' },
+  { id: 'atv', labelEn: 'All-Terrain (ATV)', labelFr: 'Tout-terrain (ATV)', labelZh: '全地形', image: '/categories/ATV/AP150ST-250 正右侧 投影.png' },
 ];
+
+const defaultImageFor = (id: string) => DEFAULT_PRODUCT_MENU_GROUPS.find((g) => g.id === id)?.image ?? '';
 
 const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const clean = (value?: string) => (value ?? '').trim();
@@ -54,6 +60,8 @@ export function sanitizeGroups(raw: unknown): ProductMenuGroup[] {
       labelEn: typeof e.labelEn === 'string' ? e.labelEn : '',
       labelFr: typeof e.labelFr === 'string' ? e.labelFr : '',
       labelZh: typeof e.labelZh === 'string' ? e.labelZh : '',
+      // Older saved menus have no picture: fall back to the built-in one for the same group, else none.
+      image: typeof e.image === 'string' && isSafeImagePath(e.image) ? e.image.trim() : defaultImageFor(id),
     };
     if (!ID_PATTERN.test(id) || seen.has(id)) continue;
     if (!clean(group.labelEn) && !clean(group.labelFr) && !clean(group.labelZh)) continue;
@@ -63,26 +71,42 @@ export function sanitizeGroups(raw: unknown): ProductMenuGroup[] {
   return result.slice(0, PRODUCT_MENU_LIMITS.maxGroups);
 }
 
-/** Error messages that block saving; empty when the list is valid. */
+/** Problems with one group as the admin edits it, including the required picture. Empty when it can be saved. */
+export function validateGroup(group: ProductMenuGroup): string[] {
+  const errors: string[] = [];
+  if (!clean(group.labelEn)) errors.push('The English name is required.');
+  for (const label of [group.labelEn, group.labelFr, group.labelZh]) {
+    if (clean(label).length > PRODUCT_MENU_LIMITS.label) {
+      errors.push(`Names are limited to ${PRODUCT_MENU_LIMITS.label} characters.`);
+      break;
+    }
+  }
+  if (!clean(group.image)) errors.push('A picture is required.');
+  else if (!isSafeImagePath(group.image)) errors.push('The picture must be an uploaded image.');
+  return errors;
+}
+
+/** Problems with the list as a whole (the per-group rules are in {@link validateGroup}). Empty when it is valid. */
 export function validateGroups(groups: ProductMenuGroup[]): string[] {
   const errors: string[] = [];
   if (groups.length === 0) errors.push('Keep at least one group, otherwise the Products menu would be empty.');
   if (groups.length > PRODUCT_MENU_LIMITS.maxGroups) errors.push(`At most ${PRODUCT_MENU_LIMITS.maxGroups} groups.`);
   const seen = new Set<string>();
-  groups.forEach((g, i) => {
-    const row = `Group ${i + 1}`;
-    if (!clean(g.labelEn)) errors.push(`${row}: the English name is required.`);
-    if (!ID_PATTERN.test(g.id)) errors.push(`${row}: the identifier must use lowercase letters, digits and dashes.`);
-    if (seen.has(g.id)) errors.push(`${row}: the identifier "${g.id}" is used twice.`);
+  for (const g of groups) {
+    if (!ID_PATTERN.test(g.id)) errors.push(`"${g.id}" is not a valid identifier.`);
+    if (seen.has(g.id)) errors.push(`The identifier "${g.id}" is used twice.`);
     seen.add(g.id);
-    for (const label of [g.labelEn, g.labelFr, g.labelZh]) {
-      if (clean(label).length > PRODUCT_MENU_LIMITS.label) {
-        errors.push(`${row}: names are limited to ${PRODUCT_MENU_LIMITS.label} characters.`);
-        break;
-      }
-    }
-  });
+  }
   return errors;
+}
+
+/** Replaces the group with the same id, or appends it when new. Never mutates the input. */
+export function upsertGroup(groups: ProductMenuGroup[], group: ProductMenuGroup): ProductMenuGroup[] {
+  return groups.some((g) => g.id === group.id) ? groups.map((g) => (g.id === group.id ? group : g)) : [...groups, group];
+}
+
+export function removeGroup(groups: ProductMenuGroup[], id: string): ProductMenuGroup[] {
+  return groups.filter((g) => g.id !== id);
 }
 
 /** An identifier not yet used, derived from the English name. */
@@ -104,16 +128,6 @@ export function moveGroup(groups: ProductMenuGroup[], id: string, direction: -1 
   return next;
 }
 
-/** Number of categories attached to each group id (used to block deleting a group that is still in use). */
-export function countByGroup(categories: Array<{ parentType?: string }>): Record<string, number> {
-  const counts: Record<string, number> = {};
-  for (const c of categories) {
-    const key = (c.parentType || 'two-wheeler').toLowerCase();
-    counts[key] = (counts[key] ?? 0) + 1;
-  }
-  return counts;
-}
-
 /**
  * Group the menu files a category under. A category whose group was removed (or never existed) goes to the first
  * group instead of silently disappearing from the site.
@@ -121,4 +135,22 @@ export function countByGroup(categories: Array<{ parentType?: string }>): Record
 export function groupIdForCategory(parentType: string | undefined, groups: ProductMenuGroup[]): string | undefined {
   const wanted = (parentType || 'two-wheeler').toLowerCase();
   return groups.find((g) => g.id === wanted)?.id ?? groups[0]?.id;
+}
+
+export interface Grouped<T> {
+  /** Categories per group id, in the order they were given. */
+  byGroup: Record<string, T[]>;
+  /** Categories whose group no longer exists. The public menu files these under the first group. */
+  orphans: T[];
+}
+
+/** Splits categories into the groups of the menu; used by the admin board and to count what a group holds. */
+export function partitionByGroup<T extends { parentType?: string }>(items: T[], groups: ProductMenuGroup[]): Grouped<T> {
+  const byGroup: Record<string, T[]> = Object.fromEntries(groups.map((g) => [g.id, [] as T[]]));
+  const orphans: T[] = [];
+  for (const item of items) {
+    const key = (item.parentType || 'two-wheeler').toLowerCase();
+    (byGroup[key] ?? orphans).push(item);
+  }
+  return { byGroup, orphans };
 }

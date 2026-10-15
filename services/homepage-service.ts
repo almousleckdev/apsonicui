@@ -26,8 +26,8 @@ export const homepageService = {
           visibility: { ...DEFAULT_HOMEPAGE_CONFIG.visibility, ...(stored.visibility || {}) },
         };
       }
-    } catch (e) {
-      // Silently fall back to defaults if not found
+    } catch {
+      // Not saved yet (404) or unreachable: fall back to the defaults.
     }
     return DEFAULT_HOMEPAGE_CONFIG;
   },
