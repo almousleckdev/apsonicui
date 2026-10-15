@@ -85,7 +85,7 @@ export function usePageEditor(initial: PageDetail) {
         }
       } else {
         setStatus('offline');
-        setMessage('You appear to be offline. Changes will be saved when the connection returns.');
+        setMessage(null); // the editor explains it in the display language
       }
       throw error;
     } finally {

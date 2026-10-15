@@ -66,8 +66,8 @@ export function CompactMediaField({ label, value, onChange, accept = 'image/*', 
           )}
         </div>
         <div className="min-w-0 flex-1">
-          {label && <p className="text-[11px] font-bold text-zinc-700">{label}</p>}
-          <p className="text-[11px] text-zinc-400 truncate" title={value}>{name}</p>
+          {label && <p className="text-2xs font-bold text-zinc-700">{label}</p>}
+          <p className="text-2xs text-zinc-400 truncate" title={value}>{name}</p>
         </div>
         {value && (
           <button type="button" onClick={() => onChange('')} aria-label="Remove file" title="Remove"
@@ -81,7 +81,7 @@ export function CompactMediaField({ label, value, onChange, accept = 'image/*', 
           type="button"
           disabled={uploading}
           onClick={() => input.current?.click()}
-          className="inline-flex items-center gap-1.5 shrink-0 px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-[11px] font-bold text-zinc-700 disabled:opacity-60 cursor-pointer"
+          className="inline-flex items-center gap-1.5 shrink-0 px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-2xs font-bold text-zinc-700 disabled:opacity-60 cursor-pointer"
         >
           {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
           {value ? 'Replace' : 'Upload'}

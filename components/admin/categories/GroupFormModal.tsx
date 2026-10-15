@@ -77,7 +77,7 @@ function GroupForm({ group, onCancel, onSave }: { group: ProductMenuGroup | null
           placeholder={PLACEHOLDER[lang]}
           className="w-full px-3 py-2 border border-zinc-200 rounded-xl bg-zinc-50 focus:bg-white focus:outline-none"
         />
-        <p className="mt-1 text-[11px] text-zinc-400">
+        <p className="mt-1 text-2xs text-zinc-400">
           {lang === 'en' ? 'Shown in the Products menu.' : 'If empty, visitors using this language see the English name.'}
         </p>
       </div>
@@ -88,11 +88,11 @@ function GroupForm({ group, onCancel, onSave }: { group: ProductMenuGroup | null
       </div>
 
       {attempted && errors.length > 0 && (
-        <ul role="alert" className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-[11px] text-red-700 space-y-0.5">
+        <ul role="alert" className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-2xs text-red-700 space-y-0.5">
           {errors.map((m) => <li key={m}>{m}</li>)}
         </ul>
       )}
-      {serverError && <p role="alert" className="text-[11px] font-medium text-red-600">{serverError}</p>}
+      {serverError && <p role="alert" className="text-2xs font-medium text-red-600">{serverError}</p>}
 
       <div className="flex justify-end gap-3 pt-3 border-t border-zinc-100">
         <button type="button" onClick={onCancel} className="px-4 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-bold text-xs rounded-xl cursor-pointer">Cancel</button>

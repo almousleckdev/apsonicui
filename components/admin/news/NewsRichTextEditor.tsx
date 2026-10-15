@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { EditorContent } from '@tiptap/react';
+import { useAdminText } from '@/context/AdminTextContext';
 import { uploadMediaFile } from '@/services/media';
 import { EditorFloatingPlusMenu } from './editor/EditorFloatingPlusMenu';
 import { EditorSelectionBubbleMenu } from './editor/EditorSelectionBubbleMenu';
@@ -17,8 +18,9 @@ interface NewsRichTextEditorProps {
 export const NewsRichTextEditor: React.FC<NewsRichTextEditorProps> = ({
   contentHtml,
   onChange,
-  placeholder = 'Tell your story...',
+  placeholder,
 }) => {
+  const { t } = useAdminText();
   const [plusMenuOpen, setPlusMenuOpen] = useState(false);
   const [videoModalOpen, setVideoModalOpen] = useState(false);
   const [videoUrlInput, setVideoUrlInput] = useState('');
@@ -28,7 +30,7 @@ export const NewsRichTextEditor: React.FC<NewsRichTextEditorProps> = ({
   const editor = useRichTextEditor({
     contentHtml,
     onChange,
-    placeholder,
+    placeholder: placeholder ?? t('news.rte.storyPlaceholder'),
     onPlusMenuClose: () => setPlusMenuOpen(false),
   });
 

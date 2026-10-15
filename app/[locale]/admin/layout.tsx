@@ -1,14 +1,9 @@
-'use client';
-
 import React from 'react';
-import { NextIntlClientProvider } from 'next-intl';
-import zhMessages from '@/messages/zh.json';
+import { cookies } from 'next/headers';
+import { AdminProviders } from '@/components/admin/AdminProviders';
+import { ADMIN_TEXT_COOKIE, normalizeAdminTextMode } from '@/lib/i18n/admin/text';
 
-// The admin portal is always Chinese regardless of the public site locale.
-export default function AdminRootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <NextIntlClientProvider locale="zh" messages={zhMessages}>
-      {children}
-    </NextIntlClientProvider>
-  );
+export default async function AdminRootLayout({ children }: { children: React.ReactNode }) {
+  const mode = normalizeAdminTextMode((await cookies()).get(ADMIN_TEXT_COOKIE)?.value);
+  return <AdminProviders initialMode={mode}>{children}</AdminProviders>;
 }

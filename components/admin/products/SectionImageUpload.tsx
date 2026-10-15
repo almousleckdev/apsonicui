@@ -48,13 +48,13 @@ export const SectionImageUpload: React.FC<SectionImageUploadProps> = ({
       <div className="flex items-center justify-between gap-3">
         <div>
           <label className="block text-zinc-900 font-bold text-xs">{label}</label>
-          {description && <p className="text-[11px] text-zinc-500">{description}</p>}
+          {description && <p className="text-2xs text-zinc-500">{description}</p>}
         </div>
         <button 
           type="button" 
           disabled={uploading}
           onClick={() => fileInputRef.current?.click()}
-          className="cursor-pointer bg-brand-green hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 text-[11px] font-bold shadow-sm transition-all shrink-0"
+          className="cursor-pointer bg-brand-green hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 text-2xs font-bold shadow-sm transition-all shrink-0"
         >
           {uploading ? (
             <Loader2 className="w-3.5 h-3.5 animate-spin" />

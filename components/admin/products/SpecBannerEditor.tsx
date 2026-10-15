@@ -44,7 +44,7 @@ export const SpecBannerEditor: React.FC<SpecBannerEditorProps> = ({
           <label className="block text-zinc-900 font-bold text-xs">
             Specification Section Banners (Section 3, 4, 5...)
           </label>
-          <p className="text-[11px] text-zinc-500">
+          <p className="text-2xs text-zinc-500">
             Upload full-bleed pictures for Frame, Carrier, Engine, and other technical highlight sections.
           </p>
         </div>

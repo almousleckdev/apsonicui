@@ -28,7 +28,7 @@ export function CollapsibleCard({ title, summary, defaultOpen = true, actions, i
         >
           <ChevronDown className={`w-4 h-4 shrink-0 text-zinc-400 transition-transform ${open ? '' : '-rotate-90'}`} />
           <h2 className="text-sm font-black text-zinc-900 truncate">{title}</h2>
-          {summary && <span className="text-[11px] font-medium text-zinc-400 truncate">{summary}</span>}
+          {summary && <span className="text-2xs font-medium text-zinc-400 truncate">{summary}</span>}
         </button>
         {open && actions && <div className="flex items-center gap-2">{actions}</div>}
       </div>

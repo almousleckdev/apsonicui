@@ -43,7 +43,7 @@ export const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
           ) : (
             <>
               <Camera className="w-6 h-6 mb-1" />
-              <span className="text-[10px] font-bold">Change</span>
+              <span className="text-3xs font-bold">Change</span>
             </>
           )}
         </div>

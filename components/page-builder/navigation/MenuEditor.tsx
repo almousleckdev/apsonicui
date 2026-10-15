@@ -8,6 +8,9 @@ import { AlertTriangle, ChevronDown, FileText, Heading, Home, Link2, Loader2, Pl
 import { ActionModal } from '@/components/admin/ActionModal';
 import { LanguageTabs, type AdminLang } from '@/components/admin/shared/LanguageTabs';
 import { useToast } from '@/components/ui/Toast';
+import { T } from '@/components/admin/T';
+import { useAdminText } from '@/context/AdminTextContext';
+import type { AdminKey } from '@/lib/i18n/admin/catalog';
 import { ApiError } from '@/services/api-client';
 import { navigationService } from '@/services/navigation';
 import { cn } from '@/lib/utils';
@@ -19,18 +22,19 @@ import { ItemForm } from './ItemForm';
 import { MenuItemRow } from './MenuItemRow';
 import { MenuPreview } from './MenuPreview';
 
-const MENU_NAME: Record<MenuKey, string> = { header: 'header menu', footer: 'footer menu' };
-const ADD_OPTIONS: Array<{ kind: ItemKind; label: string; hint: string; Icon: typeof FileText }> = [
-  { kind: 'PAGE', label: 'A page', hint: 'One of your pages', Icon: FileText },
-  { kind: 'ROUTE', label: 'A built-in page', hint: 'Products, Services, Contact…', Icon: Home },
-  { kind: 'EXTERNAL', label: 'A web link', hint: 'Another website', Icon: Link2 },
-  { kind: 'GROUP', label: 'A heading', hint: 'Groups items into a dropdown or column', Icon: Heading },
+const MENU_NAME: Record<MenuKey, AdminKey> = { header: 'navigation.menuName.header', footer: 'navigation.menuName.footer' };
+const ADD_OPTIONS: Array<{ kind: ItemKind; label: AdminKey; hint: AdminKey; Icon: typeof FileText }> = [
+  { kind: 'PAGE', label: 'navigation.add.page', hint: 'navigation.add.pageHint', Icon: FileText },
+  { kind: 'ROUTE', label: 'navigation.add.route', hint: 'navigation.add.routeHint', Icon: Home },
+  { kind: 'EXTERNAL', label: 'navigation.add.external', hint: 'navigation.add.externalHint', Icon: Link2 },
+  { kind: 'GROUP', label: 'navigation.add.group', hint: 'navigation.add.groupHint', Icon: Heading },
 ];
 
 interface Problem { path: string; message: string }
 
 /** Loads one menu, then hands it to the editor. */
 export function MenuEditor({ menu }: { menu: MenuKey }) {
+  const { t } = useAdminText();
   const [view, setView] = useState<MenuView | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,17 +42,18 @@ export function MenuEditor({ menu }: { menu: MenuKey }) {
     let cancelled = false;
     navigationService.get(menu)
       .then((v) => { if (!cancelled) setView(v); })
-      .catch((e) => { if (!cancelled) setError(getErrorMessage(e, 'The menu could not be loaded.')); });
+      .catch((e) => { if (!cancelled) setError(getErrorMessage(e, t('navigation.loadFailed'))); });
     return () => { cancelled = true; };
-  }, [menu]);
+  }, [menu, t]);
 
   if (error) return <p role="alert" className="rounded-xl bg-red-50 p-6 text-sm font-semibold text-red-700">{error}</p>;
-  if (!view) return <div className="flex items-center justify-center gap-2 py-24 text-sm font-medium text-zinc-500" role="status"><Loader2 className="h-5 w-5 animate-spin" /> Loading the {MENU_NAME[menu]}…</div>;
+  if (!view) return <div className="flex items-center justify-center gap-2 py-24 text-sm font-medium text-zinc-500" role="status"><Loader2 className="h-5 w-5 animate-spin" /> {t('navigation.loading', { menu: t(MENU_NAME[menu]) })}</div>;
   return <MenuEditorBody menu={menu} initial={view} />;
 }
 
 function MenuEditorBody({ menu, initial }: { menu: MenuKey; initial: MenuView }) {
   const { toast } = useToast();
+  const { t } = useAdminText();
   const maxDepth = MENU_MAX_DEPTH[menu];
   const [server, setServer] = useState(initial);
   const [items, setItems] = useState<MenuItem[]>(initial.draft);
@@ -78,12 +83,12 @@ function MenuEditorBody({ menu, initial }: { menu: MenuKey; initial: MenuView })
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }), useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }));
   const onDragEnd = (e: DragEndEvent) => { if (e.over) setItems((current) => moveTo(current, String(e.active.id), String(e.over!.id), maxDepth)); };
 
-  const labelFor = useCallback((item: MenuItem) => localized(item.labels, locale) || (item.kind === 'GROUP' ? 'Untitled heading' : 'No label yet'), [locale]);
+  const labelFor = useCallback((item: MenuItem) => localized(item.labels, locale) || t(item.kind === 'GROUP' ? 'navigation.labelFallback.group' : 'navigation.labelFallback.item'), [locale, t]);
   const subtitleFor = (item: MenuItem) => {
-    if (item.kind === 'PAGE') { const p = item.pageId ? pagesById.get(item.pageId) : undefined; return p ? `/${p.slug}${p.status !== 'PUBLISHED' ? ` · ${p.status.toLowerCase()}` : ''}` : 'No page chosen'; }
-    if (item.kind === 'ROUTE') return item.route ? (BUILT_IN_ROUTES.find((r) => r.route === item.route)?.label ?? item.route) : 'No page chosen';
-    if (item.kind === 'EXTERNAL') return item.url || 'No address yet';
-    return item.children.length > 0 ? `Heading · ${item.children.length} item${item.children.length === 1 ? '' : 's'}` : 'Heading · empty';
+    if (item.kind === 'PAGE') { const p = item.pageId ? pagesById.get(item.pageId) : undefined; return p ? `/${p.slug}${p.status !== 'PUBLISHED' ? ` · ${t(p.status === 'DRAFT' ? 'common.draft' : 'common.archived')}` : ''}` : t('navigation.itemSubtitle.noPage'); }
+    if (item.kind === 'ROUTE') { const route = BUILT_IN_ROUTES.find((r) => r.route === item.route); return item.route ? (route ? t(route.label) : item.route) : t('navigation.itemSubtitle.noPage'); }
+    if (item.kind === 'EXTERNAL') return item.url || t('navigation.itemSubtitle.noAddress');
+    return item.children.length > 0 ? t('navigation.itemSubtitle.headingItems', { count: item.children.length }) : t('navigation.itemSubtitle.headingEmpty');
   };
 
   /** Turns a server path like items[1].children[0].labels.en into the name of the item it refers to. */
@@ -92,7 +97,7 @@ function MenuEditorBody({ menu, initial }: { menu: MenuKey; initial: MenuView })
     let list = items;
     let target: MenuItem | undefined;
     for (const index of steps) { target = list[index]; if (!target) break; list = target.children; }
-    return target ? { who: localized(target.labels, 'en') || 'Untitled item', id: target.id } : { who: 'Menu' };
+    return target ? { who: localized(target.labels, 'en') || t('navigation.untitledItem'), id: target.id } : { who: t('navigation.menuWord') };
   };
 
   const adopt = (view: MenuView) => { setServer(view); setItems(view.draft); setProblems([]); setConflict(false); };
@@ -106,14 +111,14 @@ function MenuEditorBody({ menu, initial }: { menu: MenuKey; initial: MenuView })
     } catch (e) {
       if (e instanceof ApiError && e.status === 409) setConflict(true);
       else if (e instanceof ApiError && e.details?.errors?.length) setProblems(e.details.errors.map((x) => ({ path: x.field, message: x.message })));
-      else toast.error(getErrorMessage(e, 'That did not work.'));
+      else toast.error(getErrorMessage(e, t('navigation.done.failed')));
       return false;
     } finally {
       setBusy(null);
     }
   };
 
-  const save = () => run('save', () => navigationService.saveDraft(menu, server.version, items), 'Draft saved. Visitors still see the published menu.');
+  const save = () => run('save', () => navigationService.saveDraft(menu, server.version, items), t('navigation.done.draftSaved'));
   const publish = async () => {
     setConfirm(null);
     if (dirty) {
@@ -122,19 +127,19 @@ function MenuEditorBody({ menu, initial }: { menu: MenuKey; initial: MenuView })
         const saved = await navigationService.saveDraft(menu, server.version, items);
         setServer(saved);
         setBusy(null);
-        await run('publish', () => navigationService.publish(menu, saved.version), `The ${MENU_NAME[menu]} is live.`);
+        await run('publish', () => navigationService.publish(menu, saved.version), t('navigation.done.live', { menu: t(MENU_NAME[menu]) }));
       } catch (e) {
         setBusy(null);
         if (e instanceof ApiError && e.status === 409) setConflict(true);
         else if (e instanceof ApiError && e.details?.errors?.length) setProblems(e.details.errors.map((x) => ({ path: x.field, message: x.message })));
-        else toast.error(getErrorMessage(e, 'That did not work.'));
+        else toast.error(getErrorMessage(e, t('navigation.done.failed')));
       }
       return;
     }
-    await run('publish', () => navigationService.publish(menu, server.version), `The ${MENU_NAME[menu]} is live.`);
+    await run('publish', () => navigationService.publish(menu, server.version), t('navigation.done.live', { menu: t(MENU_NAME[menu]) }));
   };
-  const discard = async () => { setConfirm(null); await run('discard', () => navigationService.discard(menu, server.version), 'Back to the published menu.'); };
-  const reload = async () => { try { adopt(await navigationService.get(menu)); toast.success('Loaded the latest version.'); } catch (e) { toast.error(getErrorMessage(e, 'Could not reload.')); } };
+  const discard = async () => { setConfirm(null); await run('discard', () => navigationService.discard(menu, server.version), t('navigation.done.backToPublished')); };
+  const reload = async () => { try { adopt(await navigationService.get(menu)); toast.success(t('navigation.done.loadedLatest')); } catch (e) { toast.error(getErrorMessage(e, t('navigation.done.reloadFailed'))); } };
 
   const add = (kind: ItemKind) => {
     const item = newMenuItem(kind);
@@ -151,35 +156,35 @@ function MenuEditorBody({ menu, initial }: { menu: MenuKey; initial: MenuView })
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-zinc-200 bg-white px-4 py-3">
         <div className="flex items-center gap-3">
           <StatusChip server={server} dirty={dirty} />
-          <p className="text-xs text-zinc-500">{total} {total === 1 ? 'item' : 'items'}{!server.configured && menu === 'footer' ? ' · publishing replaces the built-in footer links' : ''}</p>
+          <p className="text-xs text-zinc-500">{t('navigation.count', { count: total })}{!server.configured && menu === 'footer' ? ` · ${t('navigation.replacesFooter')}` : ''}</p>
         </div>
         <div className="flex items-center gap-2">
           {(dirty || server.hasUnpublishedChanges) && server.configured && (
             <button type="button" onClick={() => (dirty ? setItems(server.draft) : setConfirm('discard'))} disabled={busy !== null}
               className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold text-zinc-600 hover:bg-zinc-100 disabled:opacity-50">
-              <RotateCcw className="h-3.5 w-3.5" aria-hidden /> {dirty ? 'Undo my changes' : 'Back to published'}
+              <RotateCcw className="h-3.5 w-3.5" aria-hidden /> <T id={dirty ? 'navigation.undoChanges' : 'navigation.backToPublished'} />
             </button>
           )}
           <button type="button" onClick={save} disabled={!dirty || busy !== null}
             className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 px-4 py-2 text-xs font-bold text-zinc-700 hover:bg-zinc-50 disabled:opacity-40">
-            {busy === 'save' && <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />} Save draft
+            {busy === 'save' && <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />} <T id="navigation.saveDraft" />
           </button>
           <button type="button" onClick={() => setConfirm('publish')} disabled={publishDisabled}
             className="inline-flex items-center gap-2 rounded-lg bg-brand-green px-5 py-2 text-xs font-extrabold uppercase tracking-wide text-white hover:bg-brand-green-hover disabled:cursor-not-allowed disabled:opacity-50">
-            {(busy === 'publish') && <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />} Publish
+            {(busy === 'publish') && <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />} <T id="navigation.publish" />
           </button>
         </div>
       </div>
 
       {conflict && (
         <div role="alert" className="flex flex-wrap items-center gap-3 rounded-xl bg-red-600 px-4 py-2.5 text-xs font-semibold text-white">
-          <AlertTriangle className="h-4 w-4" aria-hidden /> Someone else changed this menu. Your changes were not saved.
-          <button type="button" onClick={reload} className="rounded-md bg-white px-2.5 py-1 font-bold text-red-700">Load the latest version (discards my changes)</button>
+          <AlertTriangle className="h-4 w-4" aria-hidden /> <T id="navigation.conflict" />
+          <button type="button" onClick={reload} className="rounded-md bg-white px-2.5 py-1 font-bold text-red-700"><T id="navigation.loadLatest" /></button>
         </div>
       )}
       {problems.length > 0 && (
         <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
-          <p className="flex items-center gap-2 text-sm font-extrabold text-red-700"><AlertTriangle className="h-4 w-4" aria-hidden /> Please fix these first</p>
+          <p className="flex items-center gap-2 text-sm font-extrabold text-red-700"><AlertTriangle className="h-4 w-4" aria-hidden /> <T id="navigation.fixFirst" /></p>
           <ul className="mt-1.5 space-y-1">
             {problems.map((p, i) => { const d = describeProblem(p.path); return (
               <li key={i} className="text-xs text-red-800">
@@ -192,30 +197,30 @@ function MenuEditorBody({ menu, initial }: { menu: MenuKey; initial: MenuView })
 
       <section aria-labelledby="preview-heading" className="space-y-2">
         <div className="flex items-center justify-between">
-          <h2 id="preview-heading" className="text-[11px] font-extrabold uppercase tracking-[0.15em] text-zinc-400">Preview of your draft</h2>
+          <h2 id="preview-heading" className="text-2xs font-extrabold uppercase tracking-[0.15em] text-zinc-400"><T id="navigation.previewTitle" /></h2>
           <LanguageTabs value={locale} onChange={setLocale} />
         </div>
         <MenuPreview menu={menu} items={items} locale={locale} pages={pagesById} />
       </section>
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
-        <section aria-label="Menu items" className="rounded-2xl border border-zinc-200 bg-white">
+        <section aria-label={t('navigation.itemsTitle')} className="rounded-2xl border border-zinc-200 bg-white">
           <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-3">
             <div>
-              <h2 className="text-sm font-extrabold text-zinc-900">Menu items</h2>
-              <p className="text-[11px] text-zinc-500">Drag to reorder. Use → to put an item under the one above it.</p>
+              <h2 className="text-sm font-extrabold text-zinc-900"><T id="navigation.itemsTitle" /></h2>
+              <p className="text-2xs text-zinc-500"><T id="navigation.itemsHint" /></p>
             </div>
             <div className="relative">
               <button type="button" onClick={() => setAddOpen((o) => !o)} aria-haspopup="menu" aria-expanded={addOpen}
                 className="inline-flex items-center gap-1.5 rounded-lg bg-brand-green px-3.5 py-2 text-xs font-extrabold text-white hover:bg-brand-green-hover">
-                <Plus className="h-4 w-4" aria-hidden /> Add item <ChevronDown className="h-3.5 w-3.5 opacity-80" aria-hidden />
+                <Plus className="h-4 w-4" aria-hidden /> <T id="navigation.addItem" /> <ChevronDown className="h-3.5 w-3.5 opacity-80" aria-hidden />
               </button>
               {addOpen && (
                 <div role="menu" className="absolute right-0 top-full z-20 mt-1 w-64 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-xl">
                   {ADD_OPTIONS.map(({ kind, label, hint, Icon }) => (
                     <button key={kind} type="button" role="menuitem" onClick={() => add(kind)} className="flex w-full items-start gap-3 px-3 py-2 text-left hover:bg-zinc-50">
                       <Icon className="mt-0.5 h-4 w-4 text-brand-green" aria-hidden />
-                      <span><span className="block text-xs font-bold text-zinc-800">{label}</span><span className="block text-[11px] text-zinc-500">{hint}</span></span>
+                      <span><span className="block text-xs font-bold text-zinc-800"><T id={label} /></span><span className="block text-2xs text-zinc-500"><T id={hint} /></span></span>
                     </button>
                   ))}
                 </div>
@@ -224,7 +229,7 @@ function MenuEditorBody({ menu, initial }: { menu: MenuKey; initial: MenuView })
           </div>
           <div className="p-3">
             {flat.length === 0 ? (
-              <p className="rounded-lg border border-dashed border-zinc-300 px-4 py-10 text-center text-sm text-zinc-500">This menu is empty. Use <strong>Add item</strong> to start.</p>
+              <p className="rounded-lg border border-dashed border-zinc-300 px-4 py-10 text-center text-sm text-zinc-500"><T id="navigation.empty" /></p>
             ) : (
               <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
                 <SortableContext items={flat.map((f) => f.item.id)} strategy={verticalListSortingStrategy}>
@@ -247,9 +252,9 @@ function MenuEditorBody({ menu, initial }: { menu: MenuKey; initial: MenuView })
           </div>
         </section>
 
-        <aside aria-label="Item settings" className="self-start rounded-2xl border border-zinc-200 bg-white lg:sticky lg:top-4">
+        <aside aria-label={t('navigation.settingsTitle')} className="self-start rounded-2xl border border-zinc-200 bg-white lg:sticky lg:top-4">
           <div className="border-b border-zinc-100 px-4 py-3">
-            <h2 className="text-sm font-extrabold text-zinc-900">{selected ? 'Item settings' : 'No item selected'}</h2>
+            <h2 className="text-sm font-extrabold text-zinc-900"><T id={selected ? 'navigation.settingsTitle' : 'navigation.noSelection'} /></h2>
           </div>
           <div className="p-4">
             {selected ? (
@@ -258,7 +263,7 @@ function MenuEditorBody({ menu, initial }: { menu: MenuKey; initial: MenuView })
                 onChange={(change) => setItems((c) => update(c, selected.id, change))}
                 onRemove={() => { setItems((c) => remove(c, selected.id)); setSelectedId(null); }} />
             ) : (
-              <p className="text-xs text-zinc-500">Select an item to change its label, target or visibility.</p>
+              <p className="text-xs text-zinc-500"><T id="navigation.selectHint" /></p>
             )}
           </div>
         </aside>
@@ -266,18 +271,18 @@ function MenuEditorBody({ menu, initial }: { menu: MenuKey; initial: MenuView })
 
       <ActionModal
         isOpen={confirm === 'publish'} onClose={() => setConfirm(null)} onConfirm={publish} variant="brand"
-        title={`Publish the ${MENU_NAME[menu]}?`}
-        description={`The new menu replaces the current one on every page of the website straight away.${menu === 'footer' ? ' It also replaces the built-in footer links.' : ''}`}
-        confirmLabel="Publish" />
+        title={t('navigation.confirmPublish', { menu: t(MENU_NAME[menu]) })}
+        description={`${t('navigation.confirmPublishText')}${menu === 'footer' ? ` ${t('navigation.confirmPublishFooter')}` : ''}`}
+        confirmLabel={<T id="navigation.publish" />} />
       <ActionModal
         isOpen={confirm === 'discard'} onClose={() => setConfirm(null)} onConfirm={discard} variant="warning"
-        title="Go back to the published menu?" description="Your saved draft changes will be thrown away. The live menu is not affected." confirmLabel="Discard draft" />
+        title={t('navigation.confirmDiscard')} description={t('navigation.confirmDiscardText')} confirmLabel={<T id="navigation.discardDraft" />} />
     </div>
   );
 }
 
 function StatusChip({ server, dirty }: { server: MenuView; dirty: boolean }) {
-  const text = dirty ? 'Unsaved changes' : server.hasUnpublishedChanges ? 'Draft not published' : server.configured ? 'Published' : 'Not published yet';
+  const text: AdminKey = dirty ? 'navigation.status.unsaved' : server.hasUnpublishedChanges ? 'navigation.status.draftNotPublished' : server.configured ? 'navigation.status.published' : 'navigation.status.notPublishedYet';
   const tone = dirty ? 'bg-amber-100 text-amber-800' : server.hasUnpublishedChanges || !server.configured ? 'bg-zinc-100 text-zinc-600' : 'bg-brand-green/10 text-brand-green';
-  return <span className={cn('rounded-full px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider', tone)}>{text}</span>;
+  return <span className={cn('rounded-full px-3 py-1 text-2xs font-extrabold uppercase tracking-wider', tone)}><T id={text} /></span>;
 }

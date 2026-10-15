@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Video, X } from 'lucide-react';
+import { T } from '@/components/admin/T';
 
 interface EditorVideoModalProps {
   isOpen: boolean;
@@ -26,7 +27,7 @@ export const EditorVideoModal: React.FC<EditorVideoModalProps> = ({
         <div className="flex items-center justify-between">
           <h4 className="text-sm font-extrabold text-zinc-900 flex items-center gap-2">
             <Video className="w-4 h-4 text-brand-green" />
-            <span>Embed Video URL</span>
+            <span><T id="news.rte.embedVideo" /></span>
           </h4>
           <button
             type="button"
@@ -37,7 +38,7 @@ export const EditorVideoModal: React.FC<EditorVideoModalProps> = ({
           </button>
         </div>
         <p className="text-xs text-zinc-500 font-medium">
-          Paste YouTube URL or direct MP4/WebM video file link:
+          <T id="news.rte.embedHint" />
         </p>
         <input
           type="url"
@@ -52,14 +53,14 @@ export const EditorVideoModal: React.FC<EditorVideoModalProps> = ({
             onClick={onClose}
             className="px-4 py-2 rounded-xl text-xs font-bold text-zinc-600 hover:bg-zinc-100"
           >
-            Cancel
+            <T id="common.cancel" />
           </button>
           <button
             type="button"
             onClick={onInsert}
             className="px-4 py-2 rounded-xl bg-brand-green text-white text-xs font-bold hover:bg-green-700 shadow-md shadow-brand-green/20"
           >
-            Embed Video
+            <T id="news.rte.embedButton" />
           </button>
         </div>
       </div>

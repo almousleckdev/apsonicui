@@ -3,11 +3,12 @@
 import React from 'react';
 import Link from 'next/link';
 import { Plus, RefreshCw, LucideIcon } from 'lucide-react';
+import { T } from './T';
 
 export interface AdminPageHeaderProps {
-  title: string;
-  subtitle: string;
-  actionLabel?: string;
+  title: React.ReactNode;
+  subtitle: React.ReactNode;
+  actionLabel?: React.ReactNode;
   actionHref?: string;
   onActionClick?: () => void;
   actionIcon?: LucideIcon;
@@ -50,7 +51,7 @@ export const AdminPageHeader: React.FC<AdminPageHeaderProps> = ({
             className="inline-flex items-center gap-2 px-4 py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
-            <span>Refresh</span>
+            <span><T id="common.refresh" /></span>
           </button>
         )}
 

@@ -1,3 +1,4 @@
+import type { AdminKey } from '@/lib/i18n/admin/catalog';
 import type { ItemKind, MenuItem } from './types';
 
 /**
@@ -144,12 +145,12 @@ function insertBefore(items: MenuItem[], beforeId: string, item: MenuItem): Menu
 export interface ItemWarning { message: string }
 
 /** Quick hints shown on a row before the backend has the last word. */
-export function warningsFor(item: MenuItem): string[] {
-  const warnings: string[] = [];
-  if (!item.labels.en?.trim()) warnings.push('Add an English label');
-  if (item.kind === 'PAGE' && !item.pageId) warnings.push('Choose a page');
-  if (item.kind === 'ROUTE' && !item.route) warnings.push('Choose a page');
-  if (item.kind === 'EXTERNAL' && !/^(https?:\/\/|mailto:|tel:)/i.test(item.url ?? '')) warnings.push('Enter a full web address (https://…)');
+export function warningsFor(item: MenuItem): AdminKey[] {
+  const warnings: AdminKey[] = [];
+  if (!item.labels.en?.trim()) warnings.push('navigation.warn.label');
+  if (item.kind === 'PAGE' && !item.pageId) warnings.push('navigation.warn.page');
+  if (item.kind === 'ROUTE' && !item.route) warnings.push('navigation.warn.page');
+  if (item.kind === 'EXTERNAL' && !/^(https?:\/\/|mailto:|tel:)/i.test(item.url ?? '')) warnings.push('navigation.warn.address');
   return warnings;
 }
 

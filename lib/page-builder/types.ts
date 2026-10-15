@@ -71,7 +71,18 @@ export interface SectionStyle {
   paddingBottom?: SectionSize;
   width?: 'narrow' | 'normal' | 'wide';
   showOn?: 'all' | 'desktop' | 'mobile';
+  eyebrowSize?: number;
+  eyebrowColor?: string;
+  eyebrowFont?: TextFont;
+  headingSize?: number;
+  headingColor?: string;
+  headingFont?: TextFont;
+  subheadingSize?: number;
+  subheadingColor?: string;
+  subheadingFont?: TextFont;
 }
+
+export type TextFont = 'default' | 'serif' | 'condensed' | 'mono';
 
 export type SectionContent = Record<string, unknown>;
 

@@ -1,6 +1,10 @@
 @import "tailwindcss";
 
 @theme {
+  /* Sizes below Tailwind's smallest, as tokens so the Chinese admin can enlarge them (see [data-admin-lang="zh"]). */
+  --text-2xs: 0.6875rem;
+  --text-3xs: 0.625rem;
+  --text-4xs: 0.5625rem;
   --color-brand-green: #00A651;
   --color-brand-green-hover: #008D44;
   --color-border: hsl(var(--border));
@@ -378,8 +382,27 @@ figcaption {
 .pb-text {
   color: var(--pb-text);
 }
-.pb-text :is(h1, h2, h3, h4, h5, p, span, li, dt, dd, summary, blockquote, figcaption, label, small, strong, em, a, div):not(.pb-btn, .pb-btn *, .pb-own, .pb-own *) {
+.pb-text :is(h1, h2, h3, h4, h5, p, span, li, dt, dd, summary, blockquote, figcaption, label, small, strong, em, a, div):not(.pb-btn, .pb-btn *, .pb-own, .pb-own *, .pb-t) {
   color: var(--pb-text) !important;
+}
+/* Styled text (small label, heading, subheading): its own color is set inline; the size scales a base that depends on
+   where the text sits, so the default look is unchanged until an editor picks a size. */
+.pb-scaled {
+  font-size: calc(var(--pb-base) * var(--pb-scale, 1));
+}
+.pb-base-h1 { --pb-base: 2.25rem; }
+.pb-base-h2 { --pb-base: 1.875rem; }
+.pb-base-eyebrow { --pb-base: 0.75rem; }
+.pb-base-sub { --pb-base: 1rem; }
+.pb-base-sub-lg { --pb-base: 1.125rem; }
+@media (min-width: 640px) {
+  .pb-base-h1 { --pb-base: 3rem; }
+  .pb-base-h2 { --pb-base: 2.25rem; }
+  .pb-base-sub { --pb-base: 1.125rem; }
+  .pb-base-sub-lg { --pb-base: 1.25rem; }
+}
+@media (min-width: 768px) {
+  .pb-base-h1 { --pb-base: 3.75rem; }
 }
 .pb-accent {
   color: var(--pb-accent, #00a651);
@@ -389,4 +412,34 @@ figcaption {
 }
 .pb-own {
   color: var(--pb-own);
+}
+
+/* Admin text: every label carries Chinese and English (see components/admin/T.tsx). Chinese is drawn larger because its
+   characters look smaller than Latin letters of the same size. The display mode on <html data-admin-text> hides one
+   of the two for people who prefer a single language. */
+.admin-bi .admin-zh {
+  font-size: 1.14em;
+}
+.admin-bi .admin-en {
+  font-size: 0.82em;
+  opacity: 0.72;
+  margin-left: 0.4em;
+}
+.admin-bi.admin-stack {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.admin-bi.admin-stack .admin-en {
+  margin-left: 0;
+}
+html[data-admin-text="en"] .admin-bi .admin-zh,
+html[data-admin-text="zh"] .admin-bi .admin-en {
+  display: none;
+}
+html[data-admin-text="en"] .admin-bi .admin-en,
+html[data-admin-text="zh"] .admin-bi .admin-en {
+  font-size: 1em;
+  opacity: 1;
+  margin-left: 0;
 }

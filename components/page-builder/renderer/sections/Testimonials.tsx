@@ -52,7 +52,7 @@ export function Testimonials({ section, ctx }: SectionProps) {
 
   return (
     <SectionShell section={section} className="max-w-[1360px]">
-      <SectionHeading title={text(c, 'heading', ctx.locale)} intro={text(c, 'intro', ctx.locale)} dark={r.dark} />
+      <SectionHeading section={section} ctx={ctx} />
       <div className={cn('grid grid-cols-1 gap-6 lg:gap-8', COLUMNS[columns])}>
         {entries.map((t) => (
           // Not <figure>: the site has a global rule for bare figure/figcaption (news articles) that would override these classes.

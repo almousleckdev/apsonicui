@@ -3,17 +3,12 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { safeColor } from '@/lib/page-builder/colors';
-import { clamp, cssPosition, cssSize, resolveStyle } from '@/lib/page-builder/style';
+import { clamp, cssPosition, cssSize, resolveStyle, textStyle } from '@/lib/page-builder/style';
 import { Buttons, CoverImage, EmptyHint, Overlay, isVideoUrl, list, num, pick, str, styleProps, text, type SectionProps } from '../shared';
 
 const HEIGHTS = { md: 'min-h-[420px]', lg: 'min-h-[560px]', full: 'min-h-[100svh]', custom: '' } as const;
 const ALIGN = { left: 'items-start text-left', center: 'items-center text-center', right: 'items-end text-right' } as const;
 const VERTICAL = { top: 'justify-start', center: 'justify-center', bottom: 'justify-end' } as const;
-const HEADING = {
-  md: 'text-3xl sm:text-4xl md:text-5xl',
-  lg: 'text-4xl sm:text-5xl md:text-6xl',
-  xl: 'text-5xl sm:text-6xl md:text-7xl',
-} as const;
 
 export function Hero({ section, ctx }: SectionProps) {
   const c = section.content;
@@ -34,6 +29,9 @@ export function Hero({ section, ctx }: SectionProps) {
   const overlayStyle = pick(c.overlayStyle, ['solid', 'bottom', 'top'] as const, 'solid');
   const bg = safeColor(c.backgroundColor) ?? '#09090b';
   const own = styleProps({ ...r, backgroundClass: '', backgroundColor: undefined, dark: true });
+  const eyebrowStyle = textStyle(r, 'eyebrow', 'eyebrow', r.accentColor ?? '#ffd700');
+  const headingStyle = textStyle(r, 'heading', 'h1');
+  const subStyle = textStyle(r, 'subheading', 'sub-lg');
   const hasMedia = !!(desktop || mobile || video);
 
   if (!heading && !sub && !eyebrow && !hasMedia && ctas.length === 0) {
@@ -59,9 +57,9 @@ export function Hero({ section, ctx }: SectionProps) {
       <div className="absolute inset-0 -z-10" aria-hidden><Overlay color={str(c, 'overlayColor') || '#000000'} strength={tint} mode={overlayStyle} /></div>
 
       <div className={cn('mx-auto flex w-full max-w-[1360px] flex-col px-4 py-24 sm:px-6 lg:px-8', ALIGN[align], VERTICAL[vertical])}>
-        {eyebrow && <span className="mb-3 text-xs font-extrabold uppercase tracking-[0.25em]" style={{ color: r.accentColor ?? '#ffd700' }}>{eyebrow}</span>}
-        {heading && <h1 className={cn('max-w-3xl font-black uppercase tracking-tight drop-shadow-md text-balance', HEADING[pick(c.headingSize, ['md', 'lg', 'xl'] as const, 'lg')])}>{heading}</h1>}
-        {sub && <p className="mt-5 max-w-2xl text-lg font-medium opacity-90 sm:text-xl">{sub}</p>}
+        {eyebrow && <span className={cn('mb-3 text-xs font-extrabold uppercase tracking-[0.25em]', eyebrowStyle.className)} style={eyebrowStyle.style}>{eyebrow}</span>}
+        {heading && <h1 className={cn('max-w-3xl text-4xl font-black uppercase tracking-tight drop-shadow-md text-balance sm:text-5xl md:text-6xl', headingStyle.className)} style={headingStyle.style}>{heading}</h1>}
+        {sub && <p className={cn('mt-5 max-w-2xl text-lg font-medium opacity-90 sm:text-xl', subStyle.className)} style={subStyle.style}>{sub}</p>}
         <Buttons items={ctas} section={section} ctx={ctx} onImage className={cn('mt-8', align === 'center' && 'justify-center', align === 'right' && 'justify-end')} />
       </div>
     </section>

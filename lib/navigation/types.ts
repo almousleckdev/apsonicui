@@ -1,3 +1,4 @@
+import type { AdminKey } from '@/lib/i18n/admin/catalog';
 import type { LocalizedText, PageStatus } from '@/lib/page-builder/types';
 
 export type MenuKey = 'header' | 'footer';
@@ -53,12 +54,12 @@ export interface ResolvedMenu {
 }
 
 /** Built-in pages a menu may point at (the backend accepts exactly these). */
-export const BUILT_IN_ROUTES: Array<{ route: string; label: string }> = [
-  { route: '/', label: 'Home' },
-  { route: '/products', label: 'Products (with the product menu)' },
-  { route: '/services', label: 'Services' },
-  { route: '/news', label: 'News' },
-  { route: '/contact', label: 'Contact us' },
+export const BUILT_IN_ROUTES: Array<{ route: string; label: AdminKey }> = [
+  { route: '/', label: 'navigation.routes.home' },
+  { route: '/products', label: 'navigation.routes.products' },
+  { route: '/services', label: 'navigation.routes.services' },
+  { route: '/news', label: 'navigation.routes.news' },
+  { route: '/contact', label: 'navigation.routes.contact' },
 ];
 
 /** Levels allowed per menu (mirrors the backend). */

@@ -7,6 +7,31 @@ import { Header } from './Header';
 import { ActionModal } from './ActionModal';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
+import { T } from './T';
+import { useAdminText } from '@/context/AdminTextContext';
+import type { AdminKey } from '@/lib/i18n/admin/catalog';
+
+/** The heading shown in the top bar for the page being viewed, by the last part of its address. */
+const PAGE_TITLES: Record<string, AdminKey> = {
+  dashboard: 'nav.dashboard',
+  pages: 'nav.pages',
+  navigation: 'nav.navigation',
+  'home-page': 'nav.homePage',
+  products: 'nav.products',
+  categories: 'nav.categories',
+  news: 'nav.news',
+  users: 'nav.users',
+  trash: 'nav.trash',
+  notifications: 'nav.notifications',
+  profile: 'nav.profile',
+  new: 'titles.new',
+  edit: 'titles.edit',
+};
+
+function pageTitleKey(path: string): AdminKey {
+  const last = path.split('/').filter(Boolean).pop() ?? '';
+  return PAGE_TITLES[last] ?? 'nav.dashboard';
+}
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -20,6 +45,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const pathname = usePathname();
   const router = useRouter();
   const { isAuthenticated, isLoading, logout } = useAuth();
+  const { t } = useAdminText();
 
   // Protect administrative routes
   useEffect(() => {
@@ -28,36 +54,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     }
   }, [isLoading, isAuthenticated, router]);
 
-  const getPageTitles = (path: string) => {
-    const parts = path.split('/').filter(Boolean);
-    const lastPart = parts[parts.length - 1];
+  const titleKey = pageTitleKey(pathname);
 
-    if (!lastPart || lastPart === 'dashboard') {
-      return { zh: '仪表板概览', en: 'Dashboard' };
-    }
-
-    const titles: Record<string, { zh: string; en: string }> = {
-      pages: { zh: '页面管理', en: 'Pages' },
-      navigation: { zh: '导航管理', en: 'Navigation' },
-      'home-page': { zh: '主页内容管理', en: 'Home Page' },
-      products: { zh: '产品管理', en: 'Products' },
-      categories: { zh: '产品分类', en: 'Categories' },
-      news: { zh: '新闻管理', en: 'News & Media' },
-      users: { zh: '用户管理', en: 'Users' },
-      notifications: { zh: '通知中心', en: 'Notifications' },
-      new: { zh: '新建', en: 'New Item' },
-      edit: { zh: '编辑', en: 'Edit Item' },
-    };
-
-    return (
-      titles[lastPart] || {
-        zh: lastPart.charAt(0).toUpperCase() + lastPart.slice(1),
-        en: lastPart.charAt(0).toUpperCase() + lastPart.slice(1),
-      }
-    );
-  };
-
-  const { zh: titleZh, en: titleEn } = getPageTitles(pathname);
   // The page editor is a full-screen workspace with its own top bar; it still sits behind the sign-in check.
   const isImmersive = /\/admin\/pages\/\d+\/?$/.test(pathname);
 
@@ -78,7 +76,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       <div className="min-h-screen bg-zinc-50 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="w-10 h-10 text-brand-green animate-spin" />
-          <p className="text-xs font-semibold text-zinc-500">正在验证权限... Verifying Permissions...</p>
+          <p className="text-xs font-semibold text-zinc-500"><T id="session.verifying" /></p>
         </div>
       </div>
     );
@@ -97,7 +95,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       />
 
       <div className="lg:ml-56 flex flex-col min-h-screen">
-        <Header onMenuClick={() => setIsSidebarOpen(true)} title={titleZh} titleEn={titleEn} />
+        <Header onMenuClick={() => setIsSidebarOpen(true)} titleKey={titleKey} />
         <main className="flex-grow p-4 md:p-8">{children}</main>
       </div>
 
@@ -106,10 +104,10 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         onClose={() => setIsLogoutDialogOpen(false)}
         onConfirm={handleLogout}
         variant="danger"
-        title="Confirm Sign Out / 确认登出系统"
-        description="Are you sure you want to end your current admin session? You will need to sign in again to access the portal."
-        confirmLabel="Sign Out"
-        cancelLabel="Cancel"
+        title={t('session.signOutTitle')}
+        description={t('session.signOutText')}
+        confirmLabel={t('session.signOut')}
+        cancelLabel={t('common.cancel')}
         isLoading={isLoggingOut}
       />
     </div>

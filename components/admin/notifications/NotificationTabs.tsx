@@ -38,7 +38,7 @@ export const NotificationTabs: React.FC<NotificationTabsProps> = ({
           >
             <span>{t.label}</span>
             {Boolean(t.badge && t.badge > 0) && (
-              <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${t.color}`}>
+              <span className={`px-2 py-0.5 rounded-full text-3xs font-black ${t.color}`}>
                 {t.badge}
               </span>
             )}

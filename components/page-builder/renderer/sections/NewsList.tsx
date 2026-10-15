@@ -21,7 +21,7 @@ export function NewsList({ section, ctx }: SectionProps) {
   if (!isLoading && shown.length === 0) return <EmptyHint editing={ctx.editing}>News: no published articles yet.</EmptyHint>;
   return (
     <SectionShell section={section}>
-      <SectionHeading title={text(c, 'heading', ctx.locale)} dark={dark} />
+      <SectionHeading section={section} ctx={ctx} />
       <ul className={cn('grid grid-cols-1 gap-8', COLUMNS[pick(c.columns, ['2', '3'] as const, '3')])}>
         {shown.map((item) => (
           <li key={item.id}>

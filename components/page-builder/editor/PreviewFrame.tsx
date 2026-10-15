@@ -3,6 +3,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { T } from '@/components/admin/T';
+import { useAdminText } from '@/context/AdminTextContext';
 import { defaultLocale } from '@/lib/i18n/locales';
 import { BUILDER_TO_PREVIEW, PREVIEW_TO_BUILDER, type PreviewMessage } from '@/lib/page-builder/messages';
 import type { Locale, PageDocument } from '@/lib/page-builder/types';
@@ -28,6 +30,7 @@ interface Props {
  * The unsaved document is pushed into the frame with postMessage, so edits show instantly.
  */
 export function PreviewFrame({ pageId, locale, device, document, selectedId, labels, onSelect, onInsert, onAction }: Props) {
+  const { t } = useAdminText();
   const frame = useRef<HTMLIFrameElement>(null);
   const area = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
@@ -85,7 +88,7 @@ export function PreviewFrame({ pageId, locale, device, document, selectedId, lab
             key={src}
             ref={frame}
             src={src}
-            title={`Page preview (${device})`}
+            title={t('editor.canvas.frameTitle', { device: t(`editor.topBar.${device}`) })}
             className="h-full w-full border-0"
           />
         </div>
@@ -93,7 +96,7 @@ export function PreviewFrame({ pageId, locale, device, document, selectedId, lab
       {!ready && (
         <div className="absolute inset-0 flex items-center justify-center bg-zinc-100/70" role="status">
           <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-bold text-zinc-600 shadow">
-            <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> Loading preview…
+            <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> <T id="editor.canvas.loading" />
           </span>
         </div>
       )}

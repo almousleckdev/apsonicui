@@ -29,14 +29,14 @@ export function CategoryRow({ category: c, canDelete, onToggleActive, onEdit, on
 
       <div className="min-w-0">
         <p className={`truncate text-sm font-bold ${active ? 'text-zinc-900' : 'text-zinc-400'}`}>{c.nameEn || c.name}</p>
-        <p className="truncate font-mono text-[10px] text-zinc-400">{c.slug}</p>
+        <p className="truncate font-mono text-3xs text-zinc-400">{c.slug}</p>
       </div>
 
-      <p className="hidden md:block min-w-0 truncate text-[11px] text-zinc-500">
+      <p className="hidden md:block min-w-0 truncate text-2xs text-zinc-500">
         <span className="text-zinc-400">FR</span> {c.nameFr || '—'} <span className="ml-2 text-zinc-400">中</span> {c.nameZh || '—'}
       </p>
 
-      <span className={`hidden md:inline rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${c.brand === 'apsonic-pro' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}`}>
+      <span className={`hidden md:inline rounded-full px-2 py-0.5 text-3xs font-bold uppercase tracking-wider ${c.brand === 'apsonic-pro' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}`}>
         {c.brand}
       </span>
 

@@ -39,7 +39,7 @@ export const HeroSectionEditor: React.FC<HeroSectionEditorProps> = ({ hero, onCh
         {FIELDS.map((f) => {
           const key = `${f.key}${suffix}` as keyof HomeHeroConfig;
           return (
-            <label key={f.key} className="text-[11px] font-bold text-zinc-600">
+            <label key={f.key} className="text-2xs font-bold text-zinc-600">
               {f.label}
               <input
                 type="text"
@@ -52,7 +52,7 @@ export const HeroSectionEditor: React.FC<HeroSectionEditorProps> = ({ hero, onCh
           );
         })}
       </div>
-      {lang !== 'en' && <p className="mt-2 text-[11px] text-zinc-400">Empty fields show the English text to visitors.</p>}
+      {lang !== 'en' && <p className="mt-2 text-2xs text-zinc-400">Empty fields show the English text to visitors.</p>}
 
       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3 border-t border-zinc-50 pt-3">
         <CompactMediaField label="Background 1 (video or image)" value={hero.videos?.[0]} onChange={(u) => updateVideoUrl(0, u)} accept="video/*,image/*" />

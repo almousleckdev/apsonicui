@@ -25,7 +25,7 @@ export function ContactBlock({ section, ctx }: SectionProps) {
 
   return (
     <SectionShell section={section} className="max-w-3xl">
-      <SectionHeading title={text(c, 'heading', ctx.locale)} intro={text(c, 'intro', ctx.locale)} dark={dark} />
+      <SectionHeading section={section} ctx={ctx} />
       <ul className="space-y-4">
         {rows.map(({ Icon, value, href }, i) => (
           <li key={i} className={cn('flex items-start gap-4 rounded-2xl border p-5', dark ? 'border-white/15 bg-white/5' : 'border-zinc-100 bg-white text-zinc-900 shadow-sm')}>

@@ -6,6 +6,8 @@ import { DndContext, DragOverlay, KeyboardSensor, PointerSensor, closestCenter, 
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { AlertTriangle, Loader2, RefreshCw } from 'lucide-react';
 import { ActionModal } from '@/components/admin/ActionModal';
+import { T, TServer } from '@/components/admin/T';
+import { useAdminText } from '@/context/AdminTextContext';
 import { useToast } from '@/components/ui/Toast';
 import { useAuth } from '@/hooks/useAuth';
 import { usePageEditor } from '@/hooks/page-builder/usePageEditor';
@@ -19,7 +21,7 @@ import { SectionIcon } from '../renderer/registry';
 import { AddSectionPanel } from './AddSectionPanel';
 import { PageSettingsPanel } from './PageSettingsPanel';
 import { Device, PreviewFrame } from './PreviewFrame';
-import { describeIssue, PublishDialog } from './PublishDialog';
+import { describeIssue, PublishDialog, useIssueText } from './PublishDialog';
 import { PropertiesPanel } from './PropertiesPanel';
 import { RevisionsDrawer } from './RevisionsDrawer';
 import { STRUCTURE_END_ID, StructureList } from './StructureList';
@@ -33,6 +35,8 @@ export function EditorShell({ initial }: { initial: PageDetail }) {
   const { page, doc, edit } = editor;
   const { definitions, byType, styleFields, isLoading: loadingTypes, isError: typesFailed } = useSectionTypes();
   const { toast } = useToast();
+  const { t, tServer } = useAdminText();
+  const describe = useIssueText();
   const router = useRouter();
   const { user } = useAuth();
   const can = useCallback((permission: string) => !!user?.permissions?.includes(permission), [user]);
@@ -83,11 +87,11 @@ export function EditorShell({ initial }: { initial: PageDetail }) {
       case 'delete':
         edit((d) => removeSection(d, id));
         setSelectedId((current) => (current === id ? null : current));
-        toast.success('Section deleted. Press Ctrl/⌘ Z to undo.');
+        toast.success(t('editor.outline.deleted'));
         break;
       case 'toggle-hidden': edit((d) => setHidden(d, id, !doc.sections[index].hidden)); break;
     }
-  }, [doc.sections, edit, toast]);
+  }, [doc.sections, edit, toast, t]);
 
   // --- drag and drop ---------------------------------------------------------------------------------------------
   const sensors = useSensors(
@@ -144,7 +148,7 @@ export function EditorShell({ initial }: { initial: PageDetail }) {
       if (tab) tab.location.href = `${prefix}/preview/pages/${page.id}?token=${encodeURIComponent(token)}`;
     } catch (e) {
       tab?.close();
-      toast.error(getErrorMessage(e, 'Could not open the preview.'));
+      toast.error(getErrorMessage(e, t('editor.canvas.previewFailed')));
     }
   };
 
@@ -152,10 +156,10 @@ export function EditorShell({ initial }: { initial: PageDetail }) {
     try {
       if (editor.dirty) await editor.save();
       const copy = await pagesService.duplicate(page.id);
-      toast.success('Page duplicated. Opening the copy…');
+      toast.success(t('editor.actions.duplicated'));
       router.push(`/admin/pages/${copy.id}`);
     } catch (e) {
-      toast.error(getErrorMessage(e, 'Could not duplicate the page.'));
+      toast.error(getErrorMessage(e, t('editor.actions.duplicateFailed')));
     }
   };
 
@@ -167,27 +171,28 @@ export function EditorShell({ initial }: { initial: PageDetail }) {
         const restored = await pagesService.rollback(saved.id, confirm.restore, saved.version);
         editor.adopt(restored);
         setSelectedId(null);
-        toast.success(`Version #${confirm.restore} restored to your draft. It is not published.`);
+        toast.success(t('editor.actions.restored', { number: confirm.restore }));
         setHistoryOpen(false);
       } else if (confirm === 'unpublish') {
         editor.adopt(await pagesService.unpublish(saved.id, saved.version));
-        toast.success('Page unpublished. It is no longer visible to visitors.');
+        toast.success(t('editor.actions.unpublished'));
       } else if (confirm === 'archive') {
         await pagesService.archive(saved.id, saved.version);
-        toast.success('Page archived.');
+        toast.success(t('editor.actions.archived'));
         router.push('/admin/pages');
       }
       setConfirm(null);
     } catch (e) {
-      toast.error(getErrorMessage(e, 'That did not work.'));
+      toast.error(getErrorMessage(e, t('editor.actions.failed')));
     } finally {
       setBusy(false);
     }
   };
 
-  const publishLabel = page.status === 'PUBLISHED' ? (page.hasUnpublishedChanges || editor.dirty ? 'Publish changes' : 'Published') : 'Publish';
+  const publishState = page.status === 'PUBLISHED' ? (page.hasUnpublishedChanges || editor.dirty ? 'publishChanges' : 'published') : 'publish';
   const addPosition = addIndex ?? (selectedIndex >= 0 ? selectedIndex + 1 : sections.length);
-  const positionLabel = addPosition === 0 ? 'at the top' : addPosition >= sections.length ? 'at the end' : `after “${byType.get(sections[addPosition - 1].type)?.label ?? 'the previous section'}”`;
+  const previous = addPosition > 0 ? byType.get(sections[addPosition - 1].type)?.label : undefined;
+  const positionLabel = addPosition === 0 ? t('editor.library.atTop') : addPosition >= sections.length ? t('editor.library.atEnd') : previous ? t('editor.library.after', { name: tServer(previous) }) : t('editor.library.afterPrevious');
 
   return (
     <div className="fixed inset-0 z-40 flex flex-col bg-zinc-100 font-sans text-zinc-900">
@@ -195,7 +200,7 @@ export function EditorShell({ initial }: { initial: PageDetail }) {
         title={doc.meta.en?.title || page.title} slug={editor.slug} status={page.status} hasUnpublishedChanges={page.hasUnpublishedChanges}
         saveLabel={editor.label} device={device} locale={locale} canUndo={editor.canUndo} canRedo={editor.canRedo}
         canPublish={can('PUBLISH_PAGES')} canManage={can('PUBLISH_PAGES') || can('DELETE_PAGES')}
-        publishLabel={publishLabel} publishDisabled={publishLabel === 'Published' || page.status === 'ARCHIVED'}
+        publishLabel={<T id={`editor.publish.${publishState}`} />} publishDisabled={publishState === 'published' || page.status === 'ARCHIVED'}
         onDevice={setDevice} onLocale={setLocale} onUndo={editor.undo} onRedo={editor.redo}
         onSettings={() => setSelectedId(null)} onPreview={openPreview}
         onPublish={() => setPublishOpen(true)} onSaveNow={() => { void editor.save().catch(() => undefined); }}
@@ -204,34 +209,35 @@ export function EditorShell({ initial }: { initial: PageDetail }) {
 
       {editor.label === 'conflict' && (
         <Banner tone="error" icon={<AlertTriangle className="h-4 w-4" />}>
-          <span>Someone else saved this page while you were editing. Your latest changes were <strong>not</strong> saved.</span>
+          <span><T id="editor.banner.conflict" /></span>
           <button type="button" className="ml-3 inline-flex items-center gap-1 rounded-md bg-white px-2.5 py-1 text-xs font-bold text-red-700 shadow-sm"
-            onClick={() => { editor.reload().then(() => toast.success('Loaded the latest version.')).catch((e) => toast.error(getErrorMessage(e, 'Could not reload.'))); }}>
-            <RefreshCw className="h-3.5 w-3.5" /> Load the latest version (discards my unsaved changes)
+            onClick={() => { editor.reload().then(() => toast.success(t('editor.banner.loadedLatest'))).catch((e) => toast.error(getErrorMessage(e, t('editor.banner.reloadFailed')))); }}>
+            <RefreshCw className="h-3.5 w-3.5" /> <T id="editor.banner.loadLatest" />
           </button>
         </Banner>
       )}
       {editor.label === 'error' && (
         <Banner tone="error" icon={<AlertTriangle className="h-4 w-4" />}>
-          <span>Autosave is paused because some content is not valid: {editor.message}</span>
+          <span><T id="editor.banner.invalid" /> {editor.message}</span>
           <span className="ml-2 inline-flex flex-wrap gap-2">
             {editor.problems.slice(0, 3).map((p, i) => {
-              const d = describeIssue({ path: p.path, code: '', message: p.message, severity: 'ERROR' }, doc, byType);
-              return d.sectionId
-                ? <button key={i} type="button" className="font-bold underline" onClick={() => setSelectedId(d.sectionId!)}>{d.where}</button>
-                : <span key={i} className="font-bold">{d.where}</span>;
+              const where = describeIssue({ path: p.path, code: '', message: p.message, severity: 'ERROR' }, doc, byType);
+              const sectionId = where.kind === 'section' ? where.sectionId : undefined;
+              return sectionId
+                ? <button key={i} type="button" className="font-bold underline" onClick={() => setSelectedId(sectionId)}>{describe(where)}</button>
+                : <span key={i} className="font-bold">{describe(where)}</span>;
             })}
           </span>
         </Banner>
       )}
-      {editor.label === 'offline' && <Banner tone="warn" icon={<AlertTriangle className="h-4 w-4" />}><span>{editor.message}</span></Banner>}
-      {page.status === 'ARCHIVED' && <Banner tone="warn" icon={<AlertTriangle className="h-4 w-4" />}><span>This page is archived and read-only. Restore it from the pages list to edit.</span></Banner>}
-      {typesFailed && <Banner tone="error" icon={<AlertTriangle className="h-4 w-4" />}><span>The section list could not be loaded. Reload the page.</span></Banner>}
+      {editor.label === 'offline' && <Banner tone="warn" icon={<AlertTriangle className="h-4 w-4" />}><span><T id="editor.banner.offline" /></span></Banner>}
+      {page.status === 'ARCHIVED' && <Banner tone="warn" icon={<AlertTriangle className="h-4 w-4" />}><span><T id="editor.banner.archived" /></span></Banner>}
+      {typesFailed && <Banner tone="error" icon={<AlertTriangle className="h-4 w-4" />}><span><T id="editor.banner.typesFailed" /></span></Banner>}
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd}
         onDragCancel={() => { setDragType(null); setDropTargetId(null); }}>
         <div className="relative flex min-h-0 flex-1">
-          <aside className="w-[280px] shrink-0 border-r border-zinc-200 bg-white" aria-label="Page outline">
+          <aside className="w-[280px] shrink-0 border-r border-zinc-200 bg-white" aria-label={t('editor.outline.label')}>
             <StructureList
               sections={sections} definitions={byType} selectedId={selectedId} dropTargetId={dropTargetId} dragging={dragType !== null}
               onSelect={setSelectedId} onToggleHidden={(id) => applyAction(id, 'toggle-hidden')}
@@ -240,14 +246,14 @@ export function EditorShell({ initial }: { initial: PageDetail }) {
             />
           </aside>
 
-          <main className="relative min-w-0 flex-1" aria-label="Page preview">
+          <main className="relative min-w-0 flex-1" aria-label={t('editor.canvas.label')}>
             <PreviewFrame
               pageId={page.id} locale={locale} device={device} document={doc} selectedId={selectedId} labels={labels}
               onSelect={setSelectedId} onInsert={(index) => setAddIndex(index)} onAction={applyAction}
             />
             {loadingTypes && (
               <div className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs font-bold text-zinc-500 shadow" role="status">
-                <Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading sections…
+                <Loader2 className="h-3.5 w-3.5 animate-spin" /> <T id="editor.canvas.loadingSections" />
               </div>
             )}
             {addIndex !== null && (
@@ -257,11 +263,11 @@ export function EditorShell({ initial }: { initial: PageDetail }) {
 
           {historyOpen && (
             <RevisionsDrawer pageId={page.id} definitions={byType} canRestore={can('RESTORE_PAGES') && page.status !== 'ARCHIVED'}
-              restoreBlockedReason={page.status === 'ARCHIVED' ? 'Restore the page from the pages list first.' : 'You do not have permission to restore versions.'}
+              restoreBlockedReason={t(page.status === 'ARCHIVED' ? 'editor.actions.restoreFromList' : 'editor.actions.noRestorePermission')}
               onRestore={async (n) => setConfirm({ restore: n })} onClose={() => setHistoryOpen(false)} />
           )}
 
-          <aside className="w-[340px] shrink-0 border-l border-zinc-200 bg-white" aria-label="Settings">
+          <aside className="w-[340px] shrink-0 border-l border-zinc-200 bg-white" aria-label={t('editor.properties.settings')}>
             {selected ? (
               <PropertiesPanel
                 key={selected.id} section={selected} sectionIndex={selectedIndex} definition={byType.get(selected.type)} styleFields={styleFields}
@@ -280,7 +286,7 @@ export function EditorShell({ initial }: { initial: PageDetail }) {
         <DragOverlay dropAnimation={null}>
           {dragType && (
             <div className="flex w-44 items-center gap-2 rounded-xl border border-brand-green bg-white p-3 text-xs font-extrabold shadow-xl">
-              <SectionIcon type={dragType} className="h-4 w-4 text-brand-green" /> {labels[dragType] ?? dragType}
+              <SectionIcon type={dragType} className="h-4 w-4 text-brand-green" /> <TServer text={labels[dragType] ?? dragType} />
             </div>
           )}
         </DragOverlay>
@@ -292,7 +298,7 @@ export function EditorShell({ initial }: { initial: PageDetail }) {
         publish={async (saved) => {
           const live = await pagesService.publish(saved.id, saved.version);
           editor.adopt(live);
-          toast.success(`Published. Live at /${live.slug}`);
+          toast.success(t('editor.actions.publishedAt', { slug: live.slug }));
         }}
         onSelectSection={setSelectedId}
       />
@@ -300,13 +306,9 @@ export function EditorShell({ initial }: { initial: PageDetail }) {
       <ActionModal
         isOpen={confirm !== null} onClose={() => setConfirm(null)} onConfirm={runConfirmed} isLoading={busy}
         variant={confirm === 'archive' ? 'danger' : 'warning'}
-        title={isRestore(confirm) ? `Restore version #${confirm.restore}?` : confirm === 'archive' ? 'Archive this page?' : 'Unpublish this page?'}
-        description={isRestore(confirm)
-          ? 'Your current draft is replaced by this version. It is not published, and the version you are replacing stays in the history.'
-          : confirm === 'archive'
-            ? 'The page is taken offline and becomes read-only. You can restore it later from the pages list.'
-            : 'Visitors will no longer be able to see this page. Your draft stays as it is and you can publish it again.'}
-        confirmLabel={isRestore(confirm) ? 'Restore to draft' : confirm === 'archive' ? 'Archive' : 'Unpublish'}
+        title={t(isRestore(confirm) ? 'editor.actions.restoreTitle' : confirm === 'archive' ? 'editor.actions.archiveTitle' : 'editor.actions.unpublishTitle', { number: isRestore(confirm) ? confirm.restore : 0 })}
+        description={t(isRestore(confirm) ? 'editor.actions.restoreText' : confirm === 'archive' ? 'editor.actions.archiveText' : 'editor.actions.unpublishText')}
+        confirmLabel={<T id={isRestore(confirm) ? 'editor.actions.restoreConfirm' : confirm === 'archive' ? 'editor.topBar.archive' : 'editor.topBar.unpublish'} />}
       />
     </div>
   );

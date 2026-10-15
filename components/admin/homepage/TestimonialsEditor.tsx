@@ -38,7 +38,7 @@ const fieldClass =
   'w-full px-3 py-2 border rounded-xl bg-white text-sm text-zinc-900 focus:outline-none focus:ring-2 focus:ring-brand-green/25 focus:border-brand-green/50';
 
 const Counter: React.FC<{ value: string; max: number }> = ({ value, max }) => (
-  <span className={`text-[11px] tabular-nums ${value.length > max ? 'font-bold text-red-600' : 'text-zinc-400'}`}>
+  <span className={`text-2xs tabular-nums ${value.length > max ? 'font-bold text-red-600' : 'text-zinc-400'}`}>
     {value.length}/{max}
   </span>
 );
@@ -69,7 +69,7 @@ export const TestimonialsEditor: React.FC<TestimonialsEditorProps> = ({
           <ChevronDown className={`h-4 w-4 shrink-0 text-zinc-400 transition-transform ${open ? '' : '-rotate-90'}`} />
           <MessageSquareQuote className="h-4 w-4 shrink-0 text-brand-green" />
           <h2 className="text-sm font-black text-zinc-900">Testimonials</h2>
-          <span className="text-[11px] font-medium text-zinc-400 truncate">
+          <span className="text-2xs font-medium text-zinc-400 truncate">
             {testimonials.length} item{testimonials.length === 1 ? '' : 's'} &middot; &ldquo;Voices of the Continent&rdquo;
           </span>
         </button>
@@ -95,7 +95,7 @@ export const TestimonialsEditor: React.FC<TestimonialsEditorProps> = ({
             }}
             disabled={atLimit}
             title={atLimit ? `Maximum ${TESTIMONIAL_LIMITS.maxItems} testimonials` : undefined}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-green text-white font-bold text-[11px] rounded-lg hover:bg-green-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-green text-white font-bold text-2xs rounded-lg hover:bg-green-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Plus className="w-3.5 h-3.5" /> Add
           </button>
@@ -127,7 +127,7 @@ export const TestimonialsEditor: React.FC<TestimonialsEditorProps> = ({
             </button>
           ))}
         </div>
-        <span className="text-[11px] text-zinc-500">Name and photo are the same in every language. If a translation is empty, visitors see the English text.</span>
+        <span className="text-2xs text-zinc-500">Name and photo are the same in every language. If a translation is empty, visitors see the English text.</span>
       </div>
 
       {/* List */}
@@ -152,7 +152,7 @@ export const TestimonialsEditor: React.FC<TestimonialsEditorProps> = ({
                 {/* Form */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-extrabold uppercase tracking-widest text-zinc-400">Testimonial {index + 1}</span>
+                    <span className="text-2xs font-extrabold uppercase tracking-widest text-zinc-400">Testimonial {index + 1}</span>
                     <div className="flex items-center gap-1">
                       <button type="button" onClick={() => onChange((current) => moveTestimonial(current, item.id, -1))} disabled={index === 0} aria-label="Move up" className="rounded-lg p-1.5 text-zinc-500 hover:bg-zinc-200/70 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer">
                         <ArrowUp className="h-4 w-4" />
@@ -172,7 +172,7 @@ export const TestimonialsEditor: React.FC<TestimonialsEditorProps> = ({
                   </div>
 
                   <TestimonialPhotoUpload value={item.image} name={item.name} onChange={(url) => update(item.id, { image: url })} />
-                  {itemErrors?.image && <p className="text-[11px] font-medium text-red-600">{itemErrors.image}</p>}
+                  {itemErrors?.image && <p className="text-2xs font-medium text-red-600">{itemErrors.image}</p>}
 
                   <div>
                     <div className="mb-1 flex items-center justify-between">
@@ -188,7 +188,7 @@ export const TestimonialsEditor: React.FC<TestimonialsEditorProps> = ({
                       aria-invalid={!!itemErrors?.name}
                       className={`${fieldClass} ${itemErrors?.name ? 'border-red-400' : 'border-zinc-200'}`}
                     />
-                    {itemErrors?.name && <p className="mt-1 text-[11px] font-medium text-red-600">{itemErrors.name}</p>}
+                    {itemErrors?.name && <p className="mt-1 text-2xs font-medium text-red-600">{itemErrors.name}</p>}
                   </div>
 
                   <div>
@@ -205,7 +205,7 @@ export const TestimonialsEditor: React.FC<TestimonialsEditorProps> = ({
                       aria-invalid={!!itemErrors?.[roleKey]}
                       className={`${fieldClass} ${itemErrors?.[roleKey] ? 'border-red-400' : 'border-zinc-200'}`}
                     />
-                    {itemErrors?.[roleKey] && <p className="mt-1 text-[11px] font-medium text-red-600">{itemErrors[roleKey]}</p>}
+                    {itemErrors?.[roleKey] && <p className="mt-1 text-2xs font-medium text-red-600">{itemErrors[roleKey]}</p>}
                   </div>
 
                   <div>
@@ -224,19 +224,19 @@ export const TestimonialsEditor: React.FC<TestimonialsEditorProps> = ({
                       aria-invalid={!!itemErrors?.[quoteKey]}
                       className={`${fieldClass} resize-y leading-relaxed ${itemErrors?.[quoteKey] ? 'border-red-400' : 'border-zinc-200'}`}
                     />
-                    {itemErrors?.[quoteKey] && <p className="mt-1 text-[11px] font-medium text-red-600">{itemErrors[quoteKey]}</p>}
+                    {itemErrors?.[quoteKey] && <p className="mt-1 text-2xs font-medium text-red-600">{itemErrors[quoteKey]}</p>}
                     {usingEnglishFallback && (
-                      <p className="mt-1 text-[11px] font-medium text-amber-700">No {langLabel} text yet: visitors using {langLabel} will see the English quote.</p>
+                      <p className="mt-1 text-2xs font-medium text-amber-700">No {langLabel} text yet: visitors using {langLabel} will see the English quote.</p>
                     )}
                   </div>
                   {showErrors && itemErrors?.quoteEn && lang !== 'en' && (
-                    <p className="text-[11px] font-medium text-red-600">{itemErrors.quoteEn} Switch to English to fill it in.</p>
+                    <p className="text-2xs font-medium text-red-600">{itemErrors.quoteEn} Switch to English to fill it in.</p>
                   )}
                 </div>
 
                 {/* Live preview: the same card the homepage renders */}
                 <div className="flex flex-col">
-                  <span className="mb-2 text-[11px] font-extrabold uppercase tracking-widest text-zinc-400">Preview &middot; {langLabel}</span>
+                  <span className="mb-2 text-2xs font-extrabold uppercase tracking-widest text-zinc-400">Preview &middot; {langLabel}</span>
                   <div className="flex-1 rounded-2xl bg-white p-4 border border-zinc-100">
                     {preview ? (
                       <div className="mx-auto max-w-md">

@@ -24,7 +24,7 @@ export function ProductShowcase({ section, ctx }: SectionProps) {
   if (!isLoading && shown.length === 0) return <EmptyHint editing={ctx.editing}>Product showcase: no products found for this category.</EmptyHint>;
   return (
     <SectionShell section={section}>
-      <SectionHeading title={text(c, 'heading', ctx.locale)} intro={text(c, 'intro', ctx.locale)} dark={dark} />
+      <SectionHeading section={section} ctx={ctx} />
       <ul className={cn('grid grid-cols-1 gap-6', COLUMNS[pick(c.columns, ['2', '3', '4'] as const, '4')])}>
         {shown.map((p) => (
           <li key={p.id}>

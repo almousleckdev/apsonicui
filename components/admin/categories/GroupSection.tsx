@@ -43,7 +43,7 @@ export function GroupSection({ group, categories, totalCount, canMoveUp, canMove
         </div>
         <div className="min-w-0 flex-1">
           <h2 className="truncate text-sm font-black text-zinc-900">{group.labelEn || group.id}</h2>
-          <p className="truncate text-[11px] text-zinc-400">
+          <p className="truncate text-2xs text-zinc-400">
             {names.length > 0 && <>{names.join(' · ')} · </>}
             {totalCount} categor{totalCount === 1 ? 'y' : 'ies'}
           </p>
@@ -60,7 +60,7 @@ export function GroupSection({ group, categories, totalCount, canMoveUp, canMove
             onClick={onDelete}
             className={`${iconButton} text-red-500 hover:bg-red-50`}
           ><Trash2 className="h-3.5 w-3.5" /></button>
-          <button type="button" onClick={onAddCategory} className="ml-2 inline-flex items-center gap-1 rounded-lg bg-brand-green px-2.5 py-1.5 text-[11px] font-bold text-white hover:bg-green-700 cursor-pointer">
+          <button type="button" onClick={onAddCategory} className="ml-2 inline-flex items-center gap-1 rounded-lg bg-brand-green px-2.5 py-1.5 text-2xs font-bold text-white hover:bg-green-700 cursor-pointer">
             <Plus className="h-3.5 w-3.5" /> Category
           </button>
         </div>

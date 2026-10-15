@@ -104,8 +104,8 @@ describe('nesting', () => {
 
 describe('row hints and equality', () => {
   it('flags what is missing', () => {
-    expect(warningsFor(newMenuItem('PAGE'))).toEqual(['Add an English label', 'Choose a page']);
-    expect(warningsFor(newMenuItem('EXTERNAL', { labels: { en: 'x' }, url: 'javascript:alert(1)' }))).toEqual(['Enter a full web address (https://…)']);
+    expect(warningsFor(newMenuItem('PAGE'))).toEqual(['navigation.warn.label', 'navigation.warn.page']);
+    expect(warningsFor(newMenuItem('EXTERNAL', { labels: { en: 'x' }, url: 'javascript:alert(1)' }))).toEqual(['navigation.warn.address']);
     expect(warningsFor(newMenuItem('ROUTE', { labels: { en: 'x' }, route: '/news' }))).toEqual([]);
   });
 

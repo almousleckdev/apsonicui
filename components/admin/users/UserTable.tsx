@@ -54,7 +54,7 @@ export const UserTable: React.FC<UserTableProps> = ({
                   </span>
                 )}
               </div>
-              <div className="text-[11px] text-zinc-400 font-mono">@{user.username}</div>
+              <div className="text-2xs text-zinc-400 font-mono">@{user.username}</div>
             </div>
           </div>
         );
@@ -75,7 +75,7 @@ export const UserTable: React.FC<UserTableProps> = ({
             {roles.map((role) => (
               <span
                 key={role}
-                className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                className={`px-2 py-0.5 rounded-full text-3xs font-bold uppercase tracking-wider ${
                   role === 'ROLE_SUPER_ADMIN'
                     ? 'bg-purple-100 text-purple-800'
                     : role === 'ROLE_ADMIN'

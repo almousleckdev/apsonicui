@@ -99,7 +99,7 @@ export const ContactMessageModal: React.FC<ContactMessageModalProps> = ({
           <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-zinc-50 border border-zinc-100">
             <User className="w-4 h-4 text-brand-green shrink-0" />
             <div>
-              <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Visitor Name</p>
+              <p className="text-3xs font-bold text-zinc-400 uppercase tracking-wider">Visitor Name</p>
               <p className="text-xs font-extrabold text-zinc-900">{message.firstName} {message.lastName}</p>
             </div>
           </div>
@@ -107,7 +107,7 @@ export const ContactMessageModal: React.FC<ContactMessageModalProps> = ({
           <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-zinc-50 border border-zinc-100">
             <Globe className="w-4 h-4 text-brand-green shrink-0" />
             <div>
-              <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Country / 国家</p>
+              <p className="text-3xs font-bold text-zinc-400 uppercase tracking-wider">Country / 国家</p>
               <p className="text-xs font-extrabold text-zinc-900">{message.country || 'N/A'}</p>
             </div>
           </div>
@@ -115,7 +115,7 @@ export const ContactMessageModal: React.FC<ContactMessageModalProps> = ({
           <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-zinc-50 border border-zinc-100">
             <Mail className="w-4 h-4 text-brand-green shrink-0" />
             <div>
-              <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Email Address</p>
+              <p className="text-3xs font-bold text-zinc-400 uppercase tracking-wider">Email Address</p>
               <a href={`mailto:${message.email}`} className="text-xs font-extrabold text-brand-green hover:underline">
                 {message.email}
               </a>
@@ -125,7 +125,7 @@ export const ContactMessageModal: React.FC<ContactMessageModalProps> = ({
           <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-zinc-50 border border-zinc-100">
             <Phone className="w-4 h-4 text-brand-green shrink-0" />
             <div>
-              <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Phone Number</p>
+              <p className="text-3xs font-bold text-zinc-400 uppercase tracking-wider">Phone Number</p>
               <p className="text-xs font-extrabold text-zinc-900">{message.phone || 'N/A'}</p>
             </div>
           </div>
@@ -135,7 +135,7 @@ export const ContactMessageModal: React.FC<ContactMessageModalProps> = ({
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Subject / 主题</p>
-            <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-600">
+            <span className="text-3xs font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-600">
               {message.department}
             </span>
           </div>

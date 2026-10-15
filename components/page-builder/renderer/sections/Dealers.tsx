@@ -16,7 +16,7 @@ export function Dealers({ section, ctx }: SectionProps) {
   if (items.length === 0) return <EmptyHint editing={ctx.editing}>Dealers: add locations in the panel.</EmptyHint>;
   return (
     <SectionShell section={section}>
-      <SectionHeading title={text(c, 'heading', ctx.locale)} intro={text(c, 'intro', ctx.locale)} dark={dark} />
+      <SectionHeading section={section} ctx={ctx} />
       <ul className={cn('grid grid-cols-1 gap-6', COLUMNS[pick(c.columns, ['2', '3'] as const, '3')])}>
         {items.map((d, i) => {
           const place = [str(d, 'city'), str(d, 'country')].filter(Boolean).join(', ');

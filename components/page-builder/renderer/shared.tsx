@@ -6,7 +6,7 @@ import { Link } from '@/lib/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { localized } from '@/lib/page-builder/document';
 import { colorWithAlpha, readableText, safeColor } from '@/lib/page-builder/colors';
-import { resolveButton, resolveStyle, type ResolvedStyle } from '@/lib/page-builder/style';
+import { resolveButton, resolveStyle, textStyle, type ResolvedStyle } from '@/lib/page-builder/style';
 import type { Locale, PageSection } from '@/lib/page-builder/types';
 
 /** Everything a section renderer needs besides its own content. */
@@ -103,16 +103,24 @@ export function SectionShell({ section, children, className }: { section: PageSe
   );
 }
 
-/** Eyebrow, heading and introduction used by most sections. */
-export function SectionHeading({
-  eyebrow, title, intro, dark, align = 'center', className,
-}: { eyebrow?: string; title?: string; intro?: string; dark?: boolean; align?: 'left' | 'center'; className?: string }) {
+/**
+ * The small label, heading and subheading most sections open with. They are read from the section itself so every
+ * section styles them the same way (size, color and font from the section style).
+ */
+export function SectionHeading({ section, ctx, align = 'center', className }: { section: PageSection; ctx: RenderContext; align?: 'left' | 'center'; className?: string }) {
+  const r = resolveStyle(section.style);
+  const eyebrow = text(section.content, 'eyebrow', ctx.locale);
+  const title = text(section.content, 'heading', ctx.locale);
+  const intro = text(section.content, 'intro', ctx.locale);
   if (!eyebrow && !title && !intro) return null;
+  const e = textStyle(r, 'eyebrow', 'eyebrow');
+  const h = textStyle(r, 'heading', 'h2');
+  const s = textStyle(r, 'subheading', 'sub');
   return (
     <div className={cn('mb-10 sm:mb-14', align === 'center' ? 'text-center mx-auto max-w-3xl' : 'text-left', className)}>
-      {eyebrow && <span className="pb-accent text-xs font-extrabold uppercase tracking-[0.25em]">{eyebrow}</span>}
-      {title && <h2 className="text-3xl sm:text-4xl font-extrabold mt-2 tracking-tight text-balance">{title}</h2>}
-      {intro && <p className={cn('mt-4 text-base sm:text-lg leading-relaxed', dark ? 'text-white/80' : 'text-zinc-600')}>{intro}</p>}
+      {eyebrow && <span className={cn('pb-accent block text-xs font-extrabold uppercase tracking-[0.25em]', e.className)} style={e.style}>{eyebrow}</span>}
+      {title && <h2 className={cn('text-3xl sm:text-4xl font-extrabold mt-2 tracking-tight text-balance', h.className)} style={h.style}>{title}</h2>}
+      {intro && <p className={cn('mt-4 text-base sm:text-lg leading-relaxed', r.dark ? 'text-white/80' : 'text-zinc-600', s.className)} style={s.style}>{intro}</p>}
     </div>
   );
 }

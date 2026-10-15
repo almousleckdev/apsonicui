@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { T } from './T';
+import { useAdminText } from '@/context/AdminTextContext';
 
 export type ActionModalVariant = 'danger' | 'warning' | 'primary' | 'brand';
 
@@ -11,10 +13,10 @@ export interface ActionModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void | Promise<void>;
-  title: string;
-  description: string;
-  confirmLabel?: string;
-  cancelLabel?: string;
+  title: React.ReactNode;
+  description: React.ReactNode;
+  confirmLabel?: React.ReactNode;
+  cancelLabel?: React.ReactNode;
   variant?: ActionModalVariant;
   isLoading?: boolean;
   maxWidth?: 'sm' | 'md' | 'lg';
@@ -27,13 +29,14 @@ export const ActionModal: React.FC<ActionModalProps> = ({
   onConfirm,
   title,
   description,
-  confirmLabel = 'Confirm',
-  cancelLabel = 'Cancel',
+  confirmLabel = <T id="common.confirm" />,
+  cancelLabel = <T id="common.cancel" />,
   variant = 'brand',
   isLoading = false,
   maxWidth = 'md',
   expectedConfirmationName,
 }) => {
+  const { t } = useAdminText();
   const [typedName, setTypedName] = useState('');
 
   // Clear the typed confirmation each time the dialog opens. Adjusting state while rendering (instead of in an
@@ -102,7 +105,7 @@ export const ActionModal: React.FC<ActionModalProps> = ({
                 onClick={onClose}
                 disabled={isLoading}
                 className="p-1 text-zinc-400 hover:text-zinc-600 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
-                aria-label="Close"
+                aria-label={t('common.close')}
               >
                 <X className="w-5 h-5" />
               </button>
@@ -116,14 +119,14 @@ export const ActionModal: React.FC<ActionModalProps> = ({
             {/* Name Verification Box if deletion/critical action requires confirmation */}
             {expectedConfirmationName && (
               <div className="space-y-2 pt-1">
-                <label className="block text-[11px] font-bold text-zinc-700">
-                  Please type <span className="font-mono text-red-600 bg-red-50 px-1.5 py-0.5 rounded border border-red-200 select-all">{expectedConfirmationName}</span> to confirm:
+                <label className="block text-2xs font-bold text-zinc-700">
+                  <T id="confirm.typeToConfirm" /> <span className="font-mono text-red-600 bg-red-50 px-1.5 py-0.5 rounded border border-red-200 select-all">{expectedConfirmationName}</span>
                 </label>
                 <input
                   type="text"
                   value={typedName}
                   onChange={(e) => setTypedName(e.target.value)}
-                  placeholder={`Type "${expectedConfirmationName}" to confirm`}
+                  placeholder={t('confirm.typePlaceholder', { name: expectedConfirmationName })}
                   className="w-full px-3 py-2 text-xs border border-zinc-300 rounded-xl bg-zinc-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500/20 font-medium"
                 />
               </div>

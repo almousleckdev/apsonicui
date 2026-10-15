@@ -78,12 +78,12 @@ export const NotificationList: React.FC<NotificationListProps> = ({
                   <h4 className="font-extrabold text-sm text-zinc-900 group-hover:text-brand-green transition-colors truncate">
                     {msg.firstName} {msg.lastName}
                   </h4>
-                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-zinc-500 bg-zinc-100 px-2.5 py-0.5 rounded-full">
+                  <span className="inline-flex items-center gap-1 text-2xs font-bold text-zinc-500 bg-zinc-100 px-2.5 py-0.5 rounded-full">
                     <Globe className="w-3 h-3 text-zinc-400" />
                     {msg.country || 'Global'}
                   </span>
                 </div>
-                <span className="text-[11px] font-semibold text-zinc-400 shrink-0">{formattedDate}</span>
+                <span className="text-2xs font-semibold text-zinc-400 shrink-0">{formattedDate}</span>
               </div>
 
               <p className="text-xs font-bold text-zinc-800 truncate mt-1">{msg.subject}</p>
@@ -93,17 +93,17 @@ export const NotificationList: React.FC<NotificationListProps> = ({
             {/* Status Badge Tag */}
             <div className="hidden sm:flex items-center gap-2 shrink-0">
               {!msg.isRead && (
-                <span className="px-3 py-1 rounded-full text-[11px] font-extrabold bg-red-100 text-red-700">
+                <span className="px-3 py-1 rounded-full text-2xs font-extrabold bg-red-100 text-red-700">
                   Unread
                 </span>
               )}
               {msg.isRead && !msg.isReplied && (
-                <span className="px-3 py-1 rounded-full text-[11px] font-extrabold bg-blue-100 text-blue-700">
+                <span className="px-3 py-1 rounded-full text-2xs font-extrabold bg-blue-100 text-blue-700">
                   Read
                 </span>
               )}
               {msg.isReplied && (
-                <span className="px-3 py-1 rounded-full text-[11px] font-extrabold bg-emerald-100 text-emerald-800">
+                <span className="px-3 py-1 rounded-full text-2xs font-extrabold bg-emerald-100 text-emerald-800">
                   Replied
                 </span>
               )}

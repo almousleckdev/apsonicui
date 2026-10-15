@@ -203,7 +203,7 @@ export default function AdminCategoriesPage() {
               type="button"
               aria-pressed={brand === b}
               onClick={() => setBrand(b)}
-              className={`px-3 py-1 rounded-lg text-[11px] font-bold capitalize transition-colors cursor-pointer ${brand === b ? 'bg-brand-green text-white shadow-sm' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}
+              className={`px-3 py-1 rounded-lg text-2xs font-bold capitalize transition-colors cursor-pointer ${brand === b ? 'bg-brand-green text-white shadow-sm' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}
             >
               {b === 'all' ? 'All brands' : b}
             </button>
@@ -212,7 +212,7 @@ export default function AdminCategoriesPage() {
             type="button"
             onClick={() => setGroupForm({ group: null })}
             disabled={groups.length >= PRODUCT_MENU_LIMITS.maxGroups}
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[11px] font-bold bg-zinc-900 text-white hover:bg-zinc-700 disabled:opacity-50 cursor-pointer sm:ml-2"
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-2xs font-bold bg-zinc-900 text-white hover:bg-zinc-700 disabled:opacity-50 cursor-pointer sm:ml-2"
           >
             <Plus className="w-3.5 h-3.5" /> Add group
           </button>
@@ -244,7 +244,7 @@ export default function AdminCategoriesPage() {
             <Layers className="h-4 w-4 text-amber-700" />
             <div>
               <h2 className="text-sm font-black text-amber-900">Group removed</h2>
-              <p className="text-[11px] text-amber-800">
+              <p className="text-2xs text-amber-800">
                 These categories point to a group that no longer exists. The site lists them under the first group; edit each one to choose a group.
               </p>
             </div>

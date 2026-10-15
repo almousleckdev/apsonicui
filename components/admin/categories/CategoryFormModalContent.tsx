@@ -99,9 +99,9 @@ export const CategoryFormModalContent: React.FC<CategoryFormModalContentProps> =
           className="w-full px-3 py-2 border border-zinc-200 rounded-xl bg-zinc-50 focus:bg-white focus:outline-none"
         />
         {lang !== 'en' ? (
-          <p className="mt-1 text-[11px] text-zinc-400">If empty, visitors using this language see the English name.</p>
+          <p className="mt-1 text-2xs text-zinc-400">If empty, visitors using this language see the English name.</p>
         ) : !formData.nameEn.trim() ? (
-          <p className="mt-1 text-[11px] text-zinc-400">The English name is required.</p>
+          <p className="mt-1 text-2xs text-zinc-400">The English name is required.</p>
         ) : null}
       </div>
 
@@ -111,7 +111,7 @@ export const CategoryFormModalContent: React.FC<CategoryFormModalContentProps> =
           value={formData.imageUrl}
           onChange={(url) => setFormData((prev) => ({ ...prev, imageUrl: url }))}
         />
-        {missingImage && <p role="alert" className="mt-1 text-[11px] font-medium text-red-600">A cover picture is required.</p>}
+        {missingImage && <p role="alert" className="mt-1 text-2xs font-medium text-red-600">A cover picture is required.</p>}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

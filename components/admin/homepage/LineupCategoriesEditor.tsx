@@ -46,13 +46,13 @@ export const LineupCategoriesEditor: React.FC<LineupCategoriesEditorProps> = ({ 
       actions={
         <>
           <LanguageTabs value={lang} onChange={setLang} />
-          <button type="button" onClick={addCategory} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-green text-white font-bold text-[11px] rounded-lg hover:bg-green-700 cursor-pointer">
+          <button type="button" onClick={addCategory} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-green text-white font-bold text-2xs rounded-lg hover:bg-green-700 cursor-pointer">
             <Plus className="w-3.5 h-3.5" /> Add
           </button>
         </>
       }
     >
-      {lang !== 'en' && <p className="mb-2 text-[11px] text-zinc-400">Empty names show the English text to visitors.</p>}
+      {lang !== 'en' && <p className="mb-2 text-2xs text-zinc-400">Empty names show the English text to visitors.</p>}
       <ul className="divide-y divide-zinc-100">
         {categories.map((c) => (
           <li key={c.id} className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_auto] gap-2 items-center py-2.5">

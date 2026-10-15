@@ -1,5 +1,6 @@
 'use client';
 
+import { useAdminText } from '@/context/AdminTextContext';
 import React, { useEffect } from 'react';
 import { FloatingMenu } from '@tiptap/react/menus';
 import type { Editor } from '@tiptap/react';
@@ -22,6 +23,7 @@ export const EditorFloatingPlusMenu: React.FC<FloatingPlusMenuProps> = ({
   onOpenImageUpload,
   onOpenVideoModal,
 }) => {
+  const { t } = useAdminText();
   useEffect(() => {
     if (!editor) return;
     const handleSelectionUpdate = () => {
@@ -39,6 +41,7 @@ export const EditorFloatingPlusMenu: React.FC<FloatingPlusMenuProps> = ({
     <FloatingMenu
       editor={editor}
       shouldShow={({ state }) => {
+  const { t } = useAdminText();
         const { $from } = state.selection;
         const currentLineText = $from.parent.textContent;
         return $from.parent.type.name === 'paragraph' && currentLineText === '';
@@ -55,7 +58,7 @@ export const EditorFloatingPlusMenu: React.FC<FloatingPlusMenuProps> = ({
               ? 'border-zinc-800 bg-zinc-900 text-white rotate-45'
               : 'border-zinc-300 bg-white text-zinc-700 hover:text-brand-green hover:border-brand-green hover:bg-zinc-50'
           }`}
-          title="Add content"
+          title={t('news.rte.addContent')}
         >
           <Plus className="w-5 h-5 transition-transform" />
         </Button>
@@ -66,7 +69,7 @@ export const EditorFloatingPlusMenu: React.FC<FloatingPlusMenuProps> = ({
               type="button"
               onClick={onOpenImageUpload}
               className="p-2 text-zinc-600 hover:text-brand-green hover:bg-zinc-100 rounded-full transition-all cursor-pointer"
-              title="Add Image from Computer"
+              title={t('news.rte.addImage')}
             >
               <ImageIcon className="w-4 h-4" />
             </button>
@@ -74,7 +77,7 @@ export const EditorFloatingPlusMenu: React.FC<FloatingPlusMenuProps> = ({
               type="button"
               onClick={onOpenVideoModal}
               className="p-2 text-zinc-600 hover:text-brand-green hover:bg-zinc-100 rounded-full transition-all cursor-pointer"
-              title="Add Video Link"
+              title={t('news.rte.addVideo')}
             >
               <Video className="w-4 h-4" />
             </button>

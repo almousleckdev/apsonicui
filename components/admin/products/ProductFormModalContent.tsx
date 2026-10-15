@@ -254,7 +254,7 @@ export const ProductFormContent: React.FC<ProductFormContentProps> = ({
                 <span>Structured Technical Specs Table</span>
               </button>
             </div>
-            <p className="text-[11px] text-zinc-500">
+            <p className="text-2xs text-zinc-500">
               Select one format: upload a graphical spec banner OR configure a structured specification table.
             </p>
           </div>

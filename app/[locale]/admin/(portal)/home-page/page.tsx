@@ -80,7 +80,7 @@ export default function AdminHomePage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white px-4 py-3 rounded-2xl border border-zinc-100 shadow-sm">
           <div>
             <h1 className="text-base font-extrabold text-zinc-900 tracking-tight">Home page</h1>
-            <p className="text-[11px] text-zinc-500 font-medium">Hero, models, lineup and testimonials, in English, French and Chinese.</p>
+            <p className="text-2xs text-zinc-500 font-medium">Hero, models, lineup and testimonials, in English, French and Chinese.</p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -92,13 +92,13 @@ export default function AdminHomePage() {
             <button
               type="button"
               onClick={handleReset}
-              className="inline-flex items-center gap-2 px-3 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-bold text-[11px] uppercase tracking-wider rounded-lg transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-3 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-bold text-2xs uppercase tracking-wider rounded-lg transition-all cursor-pointer"
             >
               <RefreshCw className="w-3.5 h-3.5" /> Reset
             </button>
             <button
               type="submit"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-brand-green text-white font-bold text-[11px] uppercase tracking-wider rounded-lg hover:bg-green-700 transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-brand-green text-white font-bold text-2xs uppercase tracking-wider rounded-lg hover:bg-green-700 transition-all cursor-pointer"
             >
               <Save className="w-3.5 h-3.5" /> Save changes
             </button>

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { contrastRatio, isDarkColor, luminance, PALETTE, readableText, safeColor } from '@/lib/page-builder/colors';
-import { clamp, cssPosition, cssSize, resolveButton, resolveStyle } from '@/lib/page-builder/style';
+import { clamp, cssPosition, cssSize, resolveButton, resolveStyle, textStyle } from '@/lib/page-builder/style';
 
 describe('safeColor', () => {
   it('accepts #rrggbb and normalises to lower case', () => {
@@ -115,5 +115,38 @@ describe('resolveButton', () => {
     expect(resolveButton(plain, { variant: 'secondary' }).style).toMatchObject({ border: '2px solid #27272a' });
     expect(resolveButton(plain, { variant: 'secondary' }, true).style).toMatchObject({ border: '2px solid #ffffff' });
     expect(resolveButton(plain, { variant: 'secondary', color: '#00a651' }).style).toMatchObject({ border: '2px solid #00a651', color: '#00a651' });
+  });
+});
+
+describe('text styles', () => {
+  it('adds nothing at the default size, so existing sections look the same', () => {
+    const t = textStyle(resolveStyle({}), 'heading', 'h2');
+    expect(t.className).toBe('pb-t');
+    expect(t.style).toEqual({});
+  });
+
+  it('scales from the base size of where the text sits and clamps absurd values', () => {
+    const big = textStyle(resolveStyle({ headingSize: 150 }), 'heading', 'h1');
+    expect(big.className).toContain('pb-base-h1');
+    expect((big.style as Record<string, unknown>)['--pb-scale']).toBe(1.5);
+    const huge = textStyle(resolveStyle({ headingSize: 9000 }), 'heading', 'h2');
+    expect((huge.style as Record<string, unknown>)['--pb-scale']).toBe(3);
+  });
+
+  it('uses the text own color before the section text color, and ignores anything that is not a hex color', () => {
+    const r = resolveStyle({ textColor: '#111111', headingColor: '#ff0000', subheadingColor: 'red; background:url(x)' });
+    expect(textStyle(r, 'heading', 'h2').style.color).toBe('#ff0000');
+    expect(textStyle(r, 'subheading', 'sub').style.color).toBe('#111111');
+  });
+
+  it('keeps the accent color for the small label unless it has its own', () => {
+    expect(textStyle(resolveStyle({ textColor: '#111111' }), 'eyebrow', 'eyebrow').style.color).toBeUndefined();
+    expect(textStyle(resolveStyle({ eyebrowColor: '#00a651' }), 'eyebrow', 'eyebrow').style.color).toBe('#00a651');
+  });
+
+  it('maps font names to bundled stacks and never passes unknown names through', () => {
+    expect(textStyle(resolveStyle({ headingFont: 'serif' }), 'heading', 'h2').style.fontFamily).toContain('--font-playfair');
+    expect(textStyle(resolveStyle({ headingFont: 'default' }), 'heading', 'h2').style.fontFamily).toBeUndefined();
+    expect(() => textStyle(resolveStyle({ headingFont: 'evil' as never }), 'heading', 'h2')).not.toThrow();
   });
 });

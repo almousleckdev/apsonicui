@@ -15,7 +15,7 @@ export function Video({ section, ctx }: SectionProps) {
   const autoplay = bool(c, 'autoplay', false);
   return (
     <SectionShell section={section}>
-      <SectionHeading title={text(c, 'heading', ctx.locale)} dark={resolveStyle(section.style).dark} />
+      <SectionHeading section={section} ctx={ctx} />
       <div className={cn('overflow-hidden bg-zinc-950 shadow-xl', bool(c, 'rounded', true) ? 'rounded-3xl' : 'rounded-none')}>
         <video src={src} poster={str(c, 'poster') || undefined} controls={bool(c, 'controls', true)} playsInline preload="metadata"
           // Browsers only allow a video to start by itself when it is muted.

@@ -14,7 +14,7 @@ export function Faq({ section, ctx }: SectionProps) {
   if (items.length === 0) return <EmptyHint editing={ctx.editing}>FAQ: add questions in the panel.</EmptyHint>;
   return (
     <SectionShell section={section} className="max-w-3xl">
-      <SectionHeading title={text(c, 'heading', ctx.locale)} dark={dark} />
+      <SectionHeading section={section} ctx={ctx} />
       <div className={cn(lines ? 'divide-y divide-current/15 border-y border-current/15' : 'space-y-3')}>
         {items.map((item, i) => (
           <details key={i} open={bool(c, 'openFirst', false) && i === 0 ? true : undefined}

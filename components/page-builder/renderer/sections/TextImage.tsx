@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { resolveStyle } from '@/lib/page-builder/style';
+import { resolveStyle, textStyle } from '@/lib/page-builder/style';
 import { Buttons, CoverImage, EmptyHint, SectionShell, buttonsOf, pick, str, text, type SectionProps } from '../shared';
 
 const RATIO = { '4-3': 'aspect-[4/3]', '1-1': 'aspect-square', '16-9': 'aspect-video', '3-4': 'aspect-[3/4]' } as const;
@@ -15,6 +15,8 @@ export function TextImage({ section, ctx }: SectionProps) {
   const eyebrow = text(c, 'eyebrow', ctx.locale);
   const heading = text(c, 'heading', ctx.locale);
   const body = text(c, 'body', ctx.locale);
+  const eyebrowStyle = textStyle(r, 'eyebrow', 'eyebrow');
+  const headingStyle = textStyle(r, 'heading', 'h2');
   const image = str(c, 'image');
   const imageRight = str(c, 'imagePosition') === 'right';
   const center = c.textAlign === 'center';
@@ -32,8 +34,8 @@ export function TextImage({ section, ctx }: SectionProps) {
           </div>
         )}
         <div className={cn(!image && 'lg:col-span-2 max-w-3xl', center && 'text-center')}>
-          {eyebrow && <span className="pb-accent text-xs font-extrabold uppercase tracking-[0.25em]">{eyebrow}</span>}
-          {heading && <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-balance sm:text-4xl">{heading}</h2>}
+          {eyebrow && <span className={cn('pb-accent block text-xs font-extrabold uppercase tracking-[0.25em]', eyebrowStyle.className)} style={eyebrowStyle.style}>{eyebrow}</span>}
+          {heading && <h2 className={cn('mt-2 text-3xl font-extrabold tracking-tight text-balance sm:text-4xl', headingStyle.className)} style={headingStyle.style}>{heading}</h2>}
           {body && <div className={cn('prose mt-5 max-w-none', r.dark && 'prose-invert [&_*]:!text-inherit')} dangerouslySetInnerHTML={{ __html: body }} />}
           <Buttons items={buttonsOf(c)} section={section} ctx={ctx} className={cn('mt-8', center && 'justify-center')} />
         </div>

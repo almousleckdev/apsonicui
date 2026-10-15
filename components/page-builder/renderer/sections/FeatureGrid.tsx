@@ -25,7 +25,7 @@ export function FeatureGrid({ section, ctx }: SectionProps) {
 
   return (
     <SectionShell section={section}>
-      <SectionHeading title={text(c, 'heading', ctx.locale)} intro={text(c, 'intro', ctx.locale)} dark={r.dark} />
+      <SectionHeading section={section} ctx={ctx} />
       <ul className={cn('grid grid-cols-1 gap-6', COLUMNS[pick(c.columns, ['2', '3', '4'] as const, '3')])}>
         {items.map((item, i) => {
           const Icon = ICONS[str(item, 'icon')] as LucideIcon | undefined;

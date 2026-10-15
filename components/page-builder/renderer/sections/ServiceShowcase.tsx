@@ -16,7 +16,7 @@ export function ServiceShowcase({ section, ctx }: SectionProps) {
   if (items.length === 0) return <EmptyHint editing={ctx.editing}>Service showcase: add services in the panel.</EmptyHint>;
   return (
     <SectionShell section={section}>
-      <SectionHeading title={text(c, 'heading', ctx.locale)} intro={text(c, 'intro', ctx.locale)} dark={dark} />
+      <SectionHeading section={section} ctx={ctx} />
       <ul className={cn('grid grid-cols-1 gap-6', COLUMNS[pick(c.columns, ['2', '3', '4'] as const, '3')])}>
         {items.map((item, i) => {
           const image = str(item, 'image');

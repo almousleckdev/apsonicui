@@ -73,7 +73,7 @@ export const TestimonialPhotoUpload: React.FC<TestimonialPhotoUploadProps> = ({ 
         )}
         <input ref={inputRef} type="file" accept={ACCEPTED_TYPES} onChange={handleFile} className="hidden" />
       </div>
-      <div className="text-[11px] leading-snug text-zinc-500">
+      <div className="text-2xs leading-snug text-zinc-500">
         <p className="font-bold text-zinc-700">Photo</p>
         <p>Click the circle to {value ? 'change' : 'upload'}. Square image, JPG/PNG/WebP, max 5 MB.</p>
       </div>

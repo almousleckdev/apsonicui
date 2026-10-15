@@ -62,7 +62,7 @@ export const UserRolePicker: React.FC<UserRolePickerProps> = ({
         <label className="text-xs font-bold text-zinc-800 uppercase tracking-wider block">
           Assign Role & Explicit Permissions
         </label>
-        <span className="text-[11px] text-zinc-400 font-medium">
+        <span className="text-2xs text-zinc-400 font-medium">
           Select exact role level
         </span>
       </div>
@@ -95,7 +95,7 @@ export const UserRolePicker: React.FC<UserRolePickerProps> = ({
                     <span className={cn("text-xs font-extrabold tracking-tight", isSelected ? "text-brand-green" : "text-zinc-900")}>
                       {r.title}
                     </span>
-                    <span className="ml-2 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-zinc-100 text-zinc-600">
+                    <span className="ml-2 px-2 py-0.5 rounded-full text-4xs font-bold uppercase tracking-wider bg-zinc-100 text-zinc-600">
                       {r.badge}
                     </span>
                   </div>
@@ -105,7 +105,7 @@ export const UserRolePicker: React.FC<UserRolePickerProps> = ({
                 )}
               </div>
 
-              <p className="text-[11px] text-zinc-500 leading-relaxed font-medium">
+              <p className="text-2xs text-zinc-500 leading-relaxed font-medium">
                 {r.desc}
               </p>
 
@@ -114,7 +114,7 @@ export const UserRolePicker: React.FC<UserRolePickerProps> = ({
                   <span
                     key={perm}
                     className={cn(
-                      "px-1.5 py-0.5 rounded text-[9px] font-mono font-bold",
+                      "px-1.5 py-0.5 rounded text-4xs font-mono font-bold",
                       isSelected ? "bg-brand-green/10 text-brand-green" : "bg-zinc-100 text-zinc-500"
                     )}
                   >

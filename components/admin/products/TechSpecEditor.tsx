@@ -73,7 +73,7 @@ export const TechSpecEditor: React.FC<TechSpecEditorProps> = ({
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
           <label className="block text-zinc-900 font-bold text-xs">Technical Specifications Table</label>
-          <p className="text-[11px] text-zinc-500">Type key metrics and detailed engineering spec rows.</p>
+          <p className="text-2xs text-zinc-500">Type key metrics and detailed engineering spec rows.</p>
         </div>
         <div className="flex items-center gap-2">
           {specs.length === 0 && (
@@ -126,7 +126,7 @@ export const TechSpecEditor: React.FC<TechSpecEditorProps> = ({
               placeholder="Unit (KM/H, MM)"
               className="w-24 px-2.5 py-1.5 border border-zinc-200 rounded-lg bg-white text-xs focus:outline-none"
             />
-            <label className="flex items-center gap-1.5 text-[11px] font-bold text-zinc-700 px-2 cursor-pointer bg-white py-1.5 border border-zinc-200 rounded-lg">
+            <label className="flex items-center gap-1.5 text-2xs font-bold text-zinc-700 px-2 cursor-pointer bg-white py-1.5 border border-zinc-200 rounded-lg">
               <input
                 type="checkbox"
                 checked={s.isKeyMetric || false}

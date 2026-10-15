@@ -1,8 +1,11 @@
 'use client';
 
-import React, { useId } from 'react';
+import React, { useId, useState } from 'react';
 import { ArrowDown, ArrowUp, ChevronDown, Plus, Trash2 } from 'lucide-react';
 import { CompactMediaField } from '@/components/admin/shared/CompactMediaField';
+import { CopyFromLanguage } from '@/components/admin/shared/CopyFromLanguage';
+import { T, TServer } from '@/components/admin/T';
+import { useAdminText } from '@/context/AdminTextContext';
 import { NewsRichTextEditor } from '@/components/admin/news/NewsRichTextEditor';
 import { cn } from '@/lib/utils';
 import { issuePath } from '@/lib/page-builder/document';
@@ -41,6 +44,9 @@ interface Props {
 /** Renders the editor for one field from its definition. Lists recurse into their item fields. */
 export function FieldControl({ field, value, path, ctx }: Props) {
   const id = useId();
+  const { t, tServer } = useAdminText();
+  // Bumped when text is copied in, so the rich text editor (which only reads its content once) starts again from it.
+  const [copies, setCopies] = useState(0);
   const localePath = field.localized ? [...path, ctx.locale] : path;
   const current = field.localized
     ? ((value as Record<string, string> | undefined)?.[ctx.locale] ?? '')
@@ -57,8 +63,8 @@ export function FieldControl({ field, value, path, ctx }: Props) {
   const label = (
     <label htmlFor={id} className="mb-1 flex items-baseline justify-between gap-2 text-xs font-bold text-zinc-700">
       <span>
-        {field.label}
-        {field.required && <span className="ml-0.5 text-red-500" aria-label="required">*</span>}
+        <TServer text={field.label} />
+        {field.required && <span className="ml-0.5 text-red-500" aria-label={t('editor.field.required')}>*</span>}
       </span>
       {typeof current === 'string' && field.maxLength && current.length > field.maxLength * 0.8 && (
         <span className={cn('font-medium', current.length > field.maxLength ? 'text-red-500' : 'text-zinc-400')}>{current.length}/{field.maxLength}</span>
@@ -83,8 +89,8 @@ export function FieldControl({ field, value, path, ctx }: Props) {
     case 'RICHTEXT':
       control = (
         <div className="min-h-[140px] rounded-lg border border-zinc-200 bg-white p-2 text-sm focus-within:border-brand-green focus-within:ring-2 focus-within:ring-brand-green/20">
-          <NewsRichTextEditor key={`${ctx.sectionIndex}-${path.join('.')}-${ctx.locale}`} contentHtml={(current as string) ?? ''}
-            onChange={(html) => set(html)} placeholder={english ? 'Falls back to English until you write here…' : 'Write your content…'} />
+          <NewsRichTextEditor key={`${ctx.sectionIndex}-${path.join('.')}-${ctx.locale}-${copies}`} contentHtml={(current as string) ?? ''}
+            onChange={(html) => set(html)} placeholder={t(english ? 'editor.field.richFallback' : 'editor.field.richPlaceholder')} />
         </div>
       );
       break;
@@ -92,10 +98,10 @@ export function FieldControl({ field, value, path, ctx }: Props) {
       const text = (current as string) ?? '';
       control = (
         <>
-          <input id={id} type="text" inputMode="url" value={text} placeholder="/contact or https://…" onChange={(e) => set(e.target.value.trim())}
+          <input id={id} type="text" inputMode="url" value={text} placeholder={t('editor.field.linkPlaceholder')} onChange={(e) => set(e.target.value.trim())}
             className={INPUT_CLASS} aria-invalid={!!error} />
           {text && !looksLikeLink(text) && !error && (
-            <p className="mt-1 text-[11px] font-medium text-amber-600">Start with / for a page on this site, or https:// for another site.</p>
+            <p className="mt-1 text-2xs font-medium text-amber-600"><T id="editor.field.linkHint" /></p>
           )}
         </>
       );
@@ -110,26 +116,26 @@ export function FieldControl({ field, value, path, ctx }: Props) {
     case 'COLOR':
       return (
         <div>
-          <ColorField label={field.label} value={typeof current === 'string' ? current : undefined} onChange={(hex) => set(hex)} help={field.help} />
-          {error && <p role="alert" className="mt-1 text-[11px] font-semibold text-red-600">{error}</p>}
+          <ColorField label={<TServer text={field.label} />} labelText={tServer(field.label)} value={typeof current === 'string' ? current : undefined} onChange={(hex) => set(hex)} help={field.help ? <TServer text={field.help} /> : undefined} />
+          {error && <p role="alert" className="mt-1 text-2xs font-semibold text-red-600">{error}</p>}
         </div>
       );
     case 'ENUM': {
       const options = field.options ?? [];
       const selected = (current as string) ?? field.defaultValue ?? '';
       control = options.length <= 4 ? (
-        <div role="radiogroup" aria-label={field.label} className="inline-flex w-full rounded-lg bg-zinc-100 p-0.5">
+        <div role="radiogroup" aria-label={tServer(field.label)} className="inline-flex w-full rounded-lg bg-zinc-100 p-0.5">
           {options.map((option) => (
             <button key={option} type="button" role="radio" aria-checked={selected === option} onClick={() => set(option)}
               className={cn('flex-1 rounded-md px-2 py-1.5 text-xs font-bold transition-colors', selected === option ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500 hover:text-zinc-800')}>
-              {optionLabel(field, option, options.indexOf(option))}
+              <TServer text={optionLabel(field, option, options.indexOf(option))} />
             </button>
           ))}
         </div>
       ) : (
         <div className="relative">
           <select id={id} value={selected as string} onChange={(e) => set(e.target.value)} className={cn(INPUT_CLASS, 'appearance-none pr-8')}>
-            {options.map((option, i) => <option key={option} value={option}>{optionLabel(field, option, i)}</option>)}
+            {options.map((option, i) => <option key={option} value={option}>{tServer(optionLabel(field, option, i))}</option>)}
           </select>
           <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" aria-hidden />
         </div>
@@ -152,7 +158,7 @@ export function FieldControl({ field, value, path, ctx }: Props) {
       const on = current === undefined ? field.defaultValue === true : current === true;
       return (
         <div className="flex items-center justify-between gap-3 py-1">
-          <span id={id} className="text-xs font-bold text-zinc-700">{field.label}</span>
+          <span id={id} className="text-xs font-bold text-zinc-700"><TServer text={field.label} /></span>
           <button type="button" role="switch" aria-checked={on} aria-labelledby={id} onClick={() => set(!on)}
             className={cn('relative h-5 w-9 shrink-0 rounded-full transition-colors', on ? 'bg-brand-green' : 'bg-zinc-300')}>
             <span className={cn('absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform', on && 'translate-x-4')} />
@@ -166,15 +172,20 @@ export function FieldControl({ field, value, path, ctx }: Props) {
 
   return (
     <div>
-      {field.kind === 'MEDIA' || field.kind === 'ENUM' ? <p className="mb-1 text-xs font-bold text-zinc-700">{field.label}{field.required && <span className="ml-0.5 text-red-500">*</span>}</p> : label}
+      {field.kind === 'MEDIA' || field.kind === 'ENUM' ? <p className="mb-1 text-xs font-bold text-zinc-700"><TServer text={field.label} />{field.required && <span className="ml-0.5 text-red-500">*</span>}</p> : label}
       {control}
-      {field.help && !error && <p className="mt-1 text-[11px] text-zinc-400">{field.help}</p>}
-      {error && <p role="alert" className="mt-1 text-[11px] font-semibold text-red-600">{error}</p>}
+      {field.localized && (field.kind === 'TEXT' || field.kind === 'TEXTAREA' || field.kind === 'RICHTEXT') && (
+        <CopyFromLanguage current={ctx.locale} values={(value as Record<string, string> | undefined) ?? {}}
+          onCopy={(text) => { set(text); setCopies((n) => n + 1); }} />
+      )}
+      {field.help && !error && <p className="mt-1 text-2xs text-zinc-400"><TServer text={field.help} /></p>}
+      {error && <p role="alert" className="mt-1 text-2xs font-semibold text-red-600">{error}</p>}
     </div>
   );
 }
 
 function ListField({ field, items, path, ctx, error }: { field: FieldDef; items: unknown[]; path: Path; ctx: FieldContext; error?: string }) {
+  const { t } = useAdminText();
   const max = field.maxItems ?? 50;
   const itemFields = field.itemFields ?? [];
   const firstText = itemFields.find((f) => f.kind === 'TEXT');
@@ -182,19 +193,19 @@ function ListField({ field, items, path, ctx, error }: { field: FieldDef; items:
   const summary = (item: Record<string, unknown>, index: number) => {
     const raw = firstText ? item[firstText.name] : undefined;
     const text = typeof raw === 'string' ? raw : ((raw as Record<string, string> | undefined)?.en ?? '');
-    return text ? text : `Item ${index + 1}`;
+    return text ? text : t('editor.field.itemFallback', { number: index + 1 });
   };
 
   return (
     <div>
       <div className="mb-1.5 flex items-center justify-between">
-        <p className="text-xs font-bold text-zinc-700">{field.label} <span className="font-medium text-zinc-400">({items.length}/{max})</span></p>
+        <p className="text-xs font-bold text-zinc-700"><TServer text={field.label} /> <span className="font-medium text-zinc-400">({items.length}/{max})</span></p>
         <button type="button" disabled={items.length >= max} onClick={() => ctx.onAddItem(path, field)}
-          className="inline-flex items-center gap-1 rounded-md bg-zinc-100 px-2 py-1 text-[11px] font-bold text-zinc-700 hover:bg-zinc-200 disabled:opacity-40">
-          <Plus className="h-3.5 w-3.5" aria-hidden /> Add
+          className="inline-flex items-center gap-1 rounded-md bg-zinc-100 px-2 py-1 text-2xs font-bold text-zinc-700 hover:bg-zinc-200 disabled:opacity-40">
+          <Plus className="h-3.5 w-3.5" aria-hidden /> <T id="editor.field.listAdd" />
         </button>
       </div>
-      {items.length === 0 && <p className="rounded-lg border border-dashed border-zinc-200 px-3 py-4 text-center text-xs text-zinc-400">None yet</p>}
+      {items.length === 0 && <p className="rounded-lg border border-dashed border-zinc-200 px-3 py-4 text-center text-xs text-zinc-400"><T id="editor.field.listNone" /></p>}
       <ul className="space-y-2">
         {items.map((raw, index) => {
           const item = (raw ?? {}) as Record<string, unknown>;
@@ -206,9 +217,9 @@ function ListField({ field, items, path, ctx, error }: { field: FieldDef; items:
                   <ChevronDown className="h-3.5 w-3.5 shrink-0 text-zinc-400 transition-transform group-open:rotate-180" aria-hidden />
                   <span className="min-w-0 flex-1 truncate text-xs font-bold text-zinc-700">{summary(item, index)}</span>
                   <span className="flex shrink-0 items-center" onClick={(e) => e.preventDefault()}>
-                    <MiniButton label="Move up" disabled={index === 0} onClick={() => ctx.onMoveItem(path, index, index - 1)}><ArrowUp className="h-3.5 w-3.5" /></MiniButton>
-                    <MiniButton label="Move down" disabled={index === items.length - 1} onClick={() => ctx.onMoveItem(path, index, index + 1)}><ArrowDown className="h-3.5 w-3.5" /></MiniButton>
-                    <MiniButton label="Remove" danger onClick={() => ctx.onRemoveItem(path, index)}><Trash2 className="h-3.5 w-3.5" /></MiniButton>
+                    <MiniButton label={t('editor.field.moveUp')} disabled={index === 0} onClick={() => ctx.onMoveItem(path, index, index - 1)}><ArrowUp className="h-3.5 w-3.5" /></MiniButton>
+                    <MiniButton label={t('editor.field.moveDown')} disabled={index === items.length - 1} onClick={() => ctx.onMoveItem(path, index, index + 1)}><ArrowDown className="h-3.5 w-3.5" /></MiniButton>
+                    <MiniButton label={t('editor.field.remove')} danger onClick={() => ctx.onRemoveItem(path, index)}><Trash2 className="h-3.5 w-3.5" /></MiniButton>
                   </span>
                 </summary>
                 <div className="space-y-3 border-t border-zinc-200 p-3">
@@ -221,7 +232,7 @@ function ListField({ field, items, path, ctx, error }: { field: FieldDef; items:
           );
         })}
       </ul>
-      {error && <p role="alert" className="mt-1 text-[11px] font-semibold text-red-600">{error}</p>}
+      {error && <p role="alert" className="mt-1 text-2xs font-semibold text-red-600">{error}</p>}
     </div>
   );
 }

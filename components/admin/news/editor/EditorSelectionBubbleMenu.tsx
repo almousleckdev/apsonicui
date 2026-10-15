@@ -1,5 +1,6 @@
 'use client';
 
+import { useAdminText } from '@/context/AdminTextContext';
 import React, { useState } from 'react';
 import { BubbleMenu } from '@tiptap/react/menus';
 import type { Editor } from '@tiptap/react';
@@ -12,6 +13,7 @@ interface EditorSelectionBubbleMenuProps {
 }
 
 export const EditorSelectionBubbleMenu: React.FC<EditorSelectionBubbleMenuProps> = ({ editor }) => {
+  const { t } = useAdminText();
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [linkUrl, setLinkUrl] = useState('');
 
@@ -54,7 +56,7 @@ export const EditorSelectionBubbleMenu: React.FC<EditorSelectionBubbleMenuProps>
       <div className="flex items-center gap-1 bg-zinc-900/95 backdrop-blur-md p-1.5 rounded-2xl shadow-2xl border border-zinc-800 text-white z-50 font-sans">
         {isImageSelected ? (
           <div className="flex items-center gap-2 px-2 py-1">
-            <span className="text-xs font-semibold text-zinc-400">Image Selected</span>
+            <span className="text-xs font-semibold text-zinc-400">{t('news.rte.imageSelected')}</span>
             <Button
               type="button"
               variant="ghost"
@@ -63,14 +65,14 @@ export const EditorSelectionBubbleMenu: React.FC<EditorSelectionBubbleMenuProps>
               className="rounded-xl text-xs gap-1 font-bold text-red-400 hover:bg-red-500/20"
             >
               <Trash2 className="w-3.5 h-3.5" />
-              <span>Delete Image</span>
+              <span>{t('news.rte.deleteImage')}</span>
             </Button>
           </div>
         ) : showLinkInput ? (
           <div className="flex items-center gap-1.5 px-2 py-1">
             <input
               type="url"
-              placeholder="Paste or type link URL..."
+              placeholder={t('news.rte.linkPlaceholder')}
               value={linkUrl}
               onChange={(e) => setLinkUrl(e.target.value)}
               onKeyDown={(e) => {
@@ -86,7 +88,7 @@ export const EditorSelectionBubbleMenu: React.FC<EditorSelectionBubbleMenuProps>
               type="button"
               onClick={handleApplyLink}
               className="p-1.5 bg-brand-green text-white rounded-xl hover:bg-green-600 transition-all cursor-pointer"
-              title="Apply Link"
+              title={t('news.rte.applyLink')}
             >
               <Check className="w-3.5 h-3.5" />
             </button>
@@ -94,7 +96,7 @@ export const EditorSelectionBubbleMenu: React.FC<EditorSelectionBubbleMenuProps>
               type="button"
               onClick={() => setShowLinkInput(false)}
               className="p-1.5 bg-zinc-800 text-zinc-400 rounded-xl hover:text-white transition-all cursor-pointer"
-              title="Cancel"
+              title={t('common.cancel')}
             >
               <X className="w-3.5 h-3.5" />
             </button>

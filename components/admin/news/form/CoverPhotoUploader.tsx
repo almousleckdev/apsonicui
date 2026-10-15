@@ -4,6 +4,8 @@ import React, { useRef } from 'react';
 import Image from 'next/image';
 import { Upload, Trash2, ImageIcon, Loader2 } from 'lucide-react';
 import { uploadMediaFile } from '@/services/media';
+import { T } from '@/components/admin/T';
+import { useAdminText } from '@/context/AdminTextContext';
 
 interface CoverPhotoUploaderProps {
   coverImageUrl: string;
@@ -20,6 +22,7 @@ export const CoverPhotoUploader: React.FC<CoverPhotoUploaderProps> = ({
   setUploadingCover,
   setErrorMsg,
 }) => {
+  const { t } = useAdminText();
   const coverFileInputRef = useRef<HTMLInputElement>(null);
 
   const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,7 +35,7 @@ export const CoverPhotoUploader: React.FC<CoverPhotoUploaderProps> = ({
       if (url) setCoverImageUrl(url);
     } catch (err) {
       console.error(err);
-      setErrorMsg('Failed to upload cover image from computer.');
+      setErrorMsg(t('news.cover.failed'));
     } finally {
       setUploadingCover(false);
       if (coverFileInputRef.current) coverFileInputRef.current.value = '';
@@ -53,7 +56,7 @@ export const CoverPhotoUploader: React.FC<CoverPhotoUploaderProps> = ({
         <div className="relative w-full aspect-video sm:aspect-[21/9] rounded-3xl overflow-hidden border border-zinc-200 shadow-sm group">
           <Image
             src={coverImageUrl}
-            alt="Cover Banner"
+            alt={t('news.cover.alt')}
             fill
             unoptimized
             className="object-cover"
@@ -66,7 +69,7 @@ export const CoverPhotoUploader: React.FC<CoverPhotoUploaderProps> = ({
               className="px-4 py-2 bg-white text-zinc-900 font-bold text-xs rounded-xl shadow-lg hover:bg-zinc-100 transition-all flex items-center gap-1.5 cursor-pointer"
             >
               {uploadingCover ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-              <span>Change Cover Image</span>
+              <span><T id="news.cover.change" /></span>
             </button>
             <button
               type="button"
@@ -74,7 +77,7 @@ export const CoverPhotoUploader: React.FC<CoverPhotoUploaderProps> = ({
               className="px-4 py-2 bg-red-600 text-white font-bold text-xs rounded-xl shadow-lg hover:bg-red-700 transition-all flex items-center gap-1.5 cursor-pointer"
             >
               <Trash2 className="w-4 h-4" />
-              <span>Remove</span>
+              <span><T id="news.cover.remove" /></span>
             </button>
           </div>
         </div>
@@ -91,10 +94,10 @@ export const CoverPhotoUploader: React.FC<CoverPhotoUploaderProps> = ({
             </div>
           )}
           <span className="text-xs font-extrabold text-zinc-800">
-            {uploadingCover ? 'Uploading Banner...' : 'Add Cover Image (Optional Header Banner)'}
+            <T id={uploadingCover ? 'news.cover.uploading' : 'news.cover.add'} />
           </span>
-          <span className="text-[10px] text-zinc-400 font-medium">
-            Upload article hero image directly from your computer
+          <span className="text-3xs text-zinc-400 font-medium">
+            <T id="news.cover.hint" />
           </span>
         </div>
       )}

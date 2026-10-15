@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import { isDarkColor, readableText, safeColor } from './colors';
-import type { SectionSize, SectionStyle } from './types';
+import type { SectionSize, SectionStyle, TextFont } from './types';
 
 /**
  * Turns a section's style object into what the renderer needs. Every value is mapped through a closed list or a
@@ -20,6 +20,24 @@ const POSITIONS: Record<string, string> = {
 export const cssPosition = (value: unknown): string => POSITIONS[String(value)] ?? 'center';
 export const cssSize = (value: unknown): 'cover' | 'contain' | 'auto' => (value === 'contain' || value === 'auto' ? value : 'cover');
 
+/** The typefaces an editor can pick, as font stacks. The name is validated by the server; unknown names fall back to the default. */
+const FONT_STACKS: Record<Exclude<TextFont, 'default'>, string> = {
+  serif: 'var(--font-playfair), Georgia, "Times New Roman", serif',
+  condensed: 'var(--font-oswald), "Arial Narrow", sans-serif',
+  mono: 'var(--font-geist-mono), ui-monospace, Menlo, monospace',
+};
+
+export type TextRole = 'eyebrow' | 'heading' | 'subheading';
+/** Where a piece of text sits, which decides the size that "100%" means (see .pb-base-* in globals.css). */
+export type TextBase = 'h1' | 'h2' | 'eyebrow' | 'sub' | 'sub-lg';
+
+export interface ResolvedText {
+  /** Percentage of the normal size, 50 to 300. */
+  size: number;
+  color?: string;
+  font?: string;
+}
+
 export interface ResolvedStyle {
   /** Preset background class (empty for a custom color). */
   backgroundClass: string;
@@ -37,6 +55,7 @@ export interface ResolvedStyle {
   padBottom: string;
   width: string;
   showOn: string;
+  text: Record<TextRole, ResolvedText>;
   /** CSS custom properties read by the .pb-* utility classes in globals.css. */
   vars: CSSProperties;
 }
@@ -76,7 +95,39 @@ export function resolveStyle(style: SectionStyle | undefined): ResolvedStyle {
     padBottom: PAD_BOTTOM[(s.paddingBottom as SectionSize) in PAD_BOTTOM ? (s.paddingBottom as SectionSize) : 'md'],
     width: WIDTHS[(s.width as keyof typeof WIDTHS) in WIDTHS ? (s.width as keyof typeof WIDTHS) : 'normal'],
     showOn: SHOW_ON[(s.showOn as keyof typeof SHOW_ON) in SHOW_ON ? (s.showOn as keyof typeof SHOW_ON) : 'all'],
+    text: {
+      eyebrow: resolveText(s, 'eyebrow'),
+      heading: resolveText(s, 'heading'),
+      subheading: resolveText(s, 'subheading'),
+    },
     vars: vars as CSSProperties,
+  };
+}
+
+function resolveText(s: SectionStyle, role: TextRole): ResolvedText {
+  const font = s[`${role}Font`];
+  return {
+    size: clamp(Number(s[`${role}Size`] ?? 100), 50, 300),
+    color: safeColor(s[`${role}Color`]),
+    font: font && font !== 'default' ? FONT_STACKS[font as keyof typeof FONT_STACKS] : undefined,
+  };
+}
+
+/**
+ * Classes and inline style for one piece of text. A size of 100% adds nothing, so sections look as designed until an
+ * editor changes them; a color of the text's own wins over the section's text color.
+ */
+export function textStyle(resolved: Pick<ResolvedStyle, 'text' | 'textColor'>, role: TextRole, base: TextBase, fallbackColor?: string): { className: string; style: CSSProperties } {
+  const t = resolved.text[role];
+  const color = t.color ?? (role === 'eyebrow' ? undefined : resolved.textColor) ?? fallbackColor;
+  const scaled = t.size !== 100;
+  return {
+    className: scaled ? `pb-t pb-scaled pb-base-${base}` : 'pb-t',
+    style: {
+      ...(scaled ? { ['--pb-scale' as string]: t.size / 100 } : {}),
+      ...(color ? { color } : {}),
+      ...(t.font ? { fontFamily: t.font } : {}),
+    } as CSSProperties,
   };
 }
 

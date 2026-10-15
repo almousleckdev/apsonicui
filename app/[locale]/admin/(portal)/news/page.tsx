@@ -9,13 +9,16 @@ import type { NewsItem } from '@/lib/types/news';
 import { AdminNewsFilterBar } from '@/components/admin/news/AdminNewsFilterBar';
 import { AdminNewsTable } from '@/components/admin/news/AdminNewsTable';
 import { useToast } from '@/components/ui/Toast';
+import { T } from '@/components/admin/T';
+import { useAdminText } from '@/context/AdminTextContext';
 
 export default function AdminNewsPage() {
   const { toast } = useToast();
+  const { t } = useAdminText();
   const { data: newsList, setData: setNewsList, loading, refetch: fetchNews } = useRemoteList<NewsItem>(
     ['admin', 'news'],
     () => newsService.getAdminNewsList(),
-    () => toast.error('Failed to load news articles')
+    () => toast.error(t('news.loadFailed'))
   );
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
@@ -32,10 +35,10 @@ export default function AdminNewsPage() {
       setNewsList((prev) =>
         prev.map((n) => (n.id === item.id ? { ...n, published: nextStatus } : n))
       );
-      toast.success(`Article "${item.title}" ${nextStatus ? 'published' : 'saved as draft'}.`);
+      toast.success(t(nextStatus ? 'news.publishedToast' : 'news.draftToast', { title: item.title }));
     } catch (err) {
       console.error(err);
-      toast.error('Failed to update publish status');
+      toast.error(t('news.statusFailed'));
     }
   };
 
@@ -44,12 +47,12 @@ export default function AdminNewsPage() {
     setIsDeleting(true);
     try {
       await newsService.deleteNews(deleteTarget.id);
-      toast.success(`Article "${deleteTarget.title}" deleted successfully.`);
+      toast.success(t('news.deletedToast', { title: deleteTarget.title }));
       setNewsList((prev) => prev.filter((n) => n.id !== deleteTarget.id));
       setDeleteTarget(null);
     } catch (err: unknown) {
       console.error(err);
-      toast.error(err instanceof Error ? err.message : 'Failed to delete news article');
+      toast.error(err instanceof Error ? err.message : t('news.deleteFailed'));
     } finally {
       setIsDeleting(false);
     }
@@ -73,9 +76,9 @@ export default function AdminNewsPage() {
         <div className="space-y-6 font-sans max-w-7xl mx-auto">
           {/* Unified Admin Page Header */}
           <AdminPageHeader
-            title="News & Articles Management"
-            subtitle="Publish and organize brand stories, product launches, and press releases."
-            actionLabel="Create Article"
+            title={<T id="news.title" layout="stack" />}
+            subtitle={<T id="news.subtitle" />}
+            actionLabel={<T id="news.create" />}
             actionHref="/admin/news/new"
             onRefresh={fetchNews}
             isRefreshing={loading}
@@ -103,10 +106,9 @@ export default function AdminNewsPage() {
             onClose={() => setDeleteTarget(null)}
             onConfirm={handleDeleteConfirm}
             variant="danger"
-            title="Confirm Delete Article"
-            description={`Are you sure you want to delete "${deleteTarget?.title}"? This action cannot be undone.`}
-            confirmLabel="Delete Article"
-            cancelLabel="Cancel"
+            title={t('news.confirmDelete')}
+            description={t('news.confirmDeleteText', { title: deleteTarget?.title ?? '' })}
+            confirmLabel={<T id="news.deleteConfirm" />}
             expectedConfirmationName={deleteTarget?.title}
             isLoading={isDeleting}
           />

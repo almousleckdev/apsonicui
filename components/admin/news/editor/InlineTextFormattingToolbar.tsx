@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useAdminText } from '@/context/AdminTextContext';
 import type { Editor } from '@tiptap/react';
 import {
   Bold,
@@ -28,6 +29,7 @@ export const InlineTextFormattingToolbar: React.FC<InlineTextFormattingToolbarPr
   editor,
   onOpenLinkEditor,
 }) => {
+  const { t } = useAdminText();
   return (
     <div className="flex items-center gap-1 font-sans">
       <button
@@ -41,7 +43,7 @@ export const InlineTextFormattingToolbar: React.FC<InlineTextFormattingToolbarPr
             ? 'bg-brand-green text-white font-black'
             : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
         }`}
-        title="Bold"
+        title={t('news.rte.bold')}
       >
         <Bold className="w-4 h-4" />
       </button>
@@ -57,7 +59,7 @@ export const InlineTextFormattingToolbar: React.FC<InlineTextFormattingToolbarPr
             ? 'bg-brand-green text-white font-black'
             : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
         }`}
-        title="Italic"
+        title={t('news.rte.italic')}
       >
         <Italic className="w-4 h-4" />
       </button>
@@ -73,7 +75,7 @@ export const InlineTextFormattingToolbar: React.FC<InlineTextFormattingToolbarPr
             ? 'bg-brand-green text-white font-black'
             : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
         }`}
-        title="Underline"
+        title={t('news.rte.underline')}
       >
         <UnderlineIcon className="w-4 h-4" />
       </button>
@@ -91,7 +93,7 @@ export const InlineTextFormattingToolbar: React.FC<InlineTextFormattingToolbarPr
             ? 'bg-brand-green text-white font-black'
             : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
         }`}
-        title="Header 1 (Large)"
+        title={t('news.rte.h1')}
       >
         <Heading1 className="w-4 h-4" />
       </button>
@@ -107,7 +109,7 @@ export const InlineTextFormattingToolbar: React.FC<InlineTextFormattingToolbarPr
             ? 'bg-brand-green text-white font-black'
             : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
         }`}
-        title="Header 2 (Medium)"
+        title={t('news.rte.h2')}
       >
         <Heading2 className="w-4 h-4" />
       </button>
@@ -123,7 +125,7 @@ export const InlineTextFormattingToolbar: React.FC<InlineTextFormattingToolbarPr
             ? 'bg-brand-green text-white font-black'
             : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
         }`}
-        title="Header 3 (Small)"
+        title={t('news.rte.h3')}
       >
         <Heading3 className="w-4 h-4" />
       </button>
@@ -141,7 +143,7 @@ export const InlineTextFormattingToolbar: React.FC<InlineTextFormattingToolbarPr
             ? 'bg-brand-green text-white'
             : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
         }`}
-        title="Align Left"
+        title={t('news.rte.alignLeft')}
       >
         <AlignLeft className="w-4 h-4" />
       </button>
@@ -157,7 +159,7 @@ export const InlineTextFormattingToolbar: React.FC<InlineTextFormattingToolbarPr
             ? 'bg-brand-green text-white'
             : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
         }`}
-        title="Align Center"
+        title={t('news.rte.alignCenter')}
       >
         <AlignCenter className="w-4 h-4" />
       </button>
@@ -173,7 +175,7 @@ export const InlineTextFormattingToolbar: React.FC<InlineTextFormattingToolbarPr
             ? 'bg-brand-green text-white'
             : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
         }`}
-        title="Align Right"
+        title={t('news.rte.alignRight')}
       >
         <AlignRight className="w-4 h-4" />
       </button>
@@ -191,7 +193,7 @@ export const InlineTextFormattingToolbar: React.FC<InlineTextFormattingToolbarPr
             ? 'bg-brand-green text-white'
             : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
         }`}
-        title="Bullet List"
+        title={t('news.rte.bullets')}
       >
         <List className="w-4 h-4" />
       </button>
@@ -207,7 +209,7 @@ export const InlineTextFormattingToolbar: React.FC<InlineTextFormattingToolbarPr
             ? 'bg-brand-green text-white'
             : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
         }`}
-        title="Numbered List"
+        title={t('news.rte.numbers')}
       >
         <ListOrdered className="w-4 h-4" />
       </button>
@@ -223,7 +225,7 @@ export const InlineTextFormattingToolbar: React.FC<InlineTextFormattingToolbarPr
             ? 'bg-brand-green text-white'
             : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
         }`}
-        title="Quote Block"
+        title={t('news.rte.quote')}
       >
         <Quote className="w-4 h-4" />
       </button>
@@ -239,7 +241,7 @@ export const InlineTextFormattingToolbar: React.FC<InlineTextFormattingToolbarPr
             ? 'bg-brand-green text-white'
             : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
         }`}
-        title="Insert Link"
+        title={t('news.rte.link')}
       >
         <LinkIcon className="w-4 h-4" />
       </button>

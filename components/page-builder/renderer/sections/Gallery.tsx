@@ -23,7 +23,7 @@ export function Gallery({ section, ctx }: SectionProps) {
 
   return (
     <SectionShell section={section}>
-      <SectionHeading title={text(c, 'heading', ctx.locale)} dark={resolveStyle(section.style).dark} />
+      <SectionHeading section={section} ctx={ctx} />
       <ul className={cn('grid grid-cols-1', COLUMNS[pick(c.columns, ['2', '3', '4', '5'] as const, '3')], GAP[pick(c.gap, ['sm', 'md', 'lg'] as const, 'md')])}>
         {items.map((item, i) => {
           const caption = text(item, 'caption', ctx.locale);

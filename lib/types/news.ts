@@ -60,6 +60,9 @@ export interface NewsItem {
   content?: NewsContentBlock[];
 }
 
+/** Which languages an article has been written in (title and body both present). */
+export type NewsLanguageStatus = Record<'en' | 'fr' | 'zh', boolean>;
+
 export interface CreateNewsPayload {
   slug?: string;
   titleEn: string;

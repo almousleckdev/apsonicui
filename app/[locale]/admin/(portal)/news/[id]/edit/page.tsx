@@ -8,6 +8,7 @@ import { authService } from '@/services/auth-service';
 import type { CreateNewsPayload, NewsItem } from '@/lib/types/news';
 import type { UserProfileResponse } from '@/lib/types/auth';
 import { Loader2 } from 'lucide-react';
+import { T } from '@/components/admin/T';
 
 interface EditNewsPageProps {
   params: Promise<{ locale: string; id: string }>;
@@ -58,7 +59,7 @@ export default function EditNewsPage({ params }: EditNewsPageProps) {
         {loading ? (
           <div className="flex items-center justify-center py-20 gap-3">
             <Loader2 className="w-6 h-6 text-brand-green animate-spin" />
-            <span className="text-xs font-bold text-zinc-500">Loading Article Data...</span>
+            <span className="text-xs font-bold text-zinc-500"><T id="news.form.loading" /></span>
           </div>
         ) : (
           <NewsStoryForm

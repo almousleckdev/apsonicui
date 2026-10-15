@@ -41,12 +41,12 @@ export const FeaturedModelsEditor: React.FC<FeaturedModelsEditorProps> = ({ mode
       summary={`${models.length} model${models.length === 1 ? '' : 's'}`}
       defaultOpen={false}
       actions={
-        <button type="button" onClick={addModel} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-green text-white font-bold text-[11px] rounded-lg hover:bg-green-700 cursor-pointer">
+        <button type="button" onClick={addModel} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-green text-white font-bold text-2xs rounded-lg hover:bg-green-700 cursor-pointer">
           <Plus className="w-3.5 h-3.5" /> Add model
         </button>
       }
     >
-      <p className="mb-3 text-[11px] text-zinc-400">Model names are product names, so they are the same in English, French and Chinese.</p>
+      <p className="mb-3 text-2xs text-zinc-400">Model names are product names, so they are the same in English, French and Chinese.</p>
       <ul className="divide-y divide-zinc-100">
         {models.map((m) => (
           <li key={m.id} className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.2fr)_repeat(3,minmax(0,1fr))_auto] gap-2 items-center py-2.5">

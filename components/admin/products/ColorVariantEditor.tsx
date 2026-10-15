@@ -34,7 +34,7 @@ export const ColorVariantEditor: React.FC<ColorVariantEditorProps> = ({
       <div className="flex items-center justify-between">
         <div>
           <label className="block text-zinc-900 font-bold text-xs">Color Variants</label>
-          <p className="text-[11px] text-zinc-500">Configure motorcycle paint colors and matching photos.</p>
+          <p className="text-2xs text-zinc-500">Configure motorcycle paint colors and matching photos.</p>
         </div>
         <button
           type="button"

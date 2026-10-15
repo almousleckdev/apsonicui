@@ -54,7 +54,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
               {prod.model}
               {prod.featured && <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />}
             </div>
-            <div className="text-[10px] text-zinc-400 font-mono">{prod.slug}</div>
+            <div className="text-3xs text-zinc-400 font-mono">{prod.slug}</div>
           </div>
         );
       },
@@ -77,7 +77,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
       accessorKey: 'brand',
       header: 'Brand',
       cell: ({ row }) => (
-        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${row.original.brand === 'apsonic-pro' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}`}>
+        <span className={`px-2.5 py-1 rounded-full text-3xs font-bold uppercase tracking-wider ${row.original.brand === 'apsonic-pro' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}`}>
           {row.original.brand}
         </span>
       ),

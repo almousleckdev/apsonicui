@@ -29,7 +29,7 @@ export function Stats({ section, ctx }: SectionProps) {
 
   return (
     <SectionShell section={section}>
-      <SectionHeading title={text(c, 'heading', ctx.locale)} intro={text(c, 'intro', ctx.locale)} dark={r.dark} />
+      <SectionHeading section={section} ctx={ctx} />
       <dl className={cn('grid grid-cols-2 gap-6 sm:gap-8', columns === 'auto' ? auto : COLUMNS[columns], left ? 'text-left' : 'text-center')}>
         {items.map((item, i) => {
           const Icon = ICONS[str(item, 'icon')] as LucideIcon | undefined;
