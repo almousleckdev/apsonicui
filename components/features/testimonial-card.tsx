@@ -18,8 +18,9 @@ export interface TestimonialCardProps {
 }
 
 // The one place that defines how a testimonial looks. The homepage section and the admin preview both render this.
-const CARD_CLASSES =
-  "relative flex flex-col h-full rounded-2xl bg-zinc-50 p-8 border border-zinc-100 transition-all duration-300 group select-none animate-fade-in-up";
+// The public card is moved by framer-motion alone: a CSS transition or keyframe animation on the same element
+// would fight its inline transform and make the hover stutter.
+const BASE_CLASSES = "relative flex flex-col h-full rounded-2xl bg-zinc-50 p-8 border border-zinc-100 group select-none";
 
 const initialsOf = (name: string) =>
   name
@@ -68,7 +69,7 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({ quote, name, r
   );
 
   if (!animated) {
-    return <div className={CARD_CLASSES}>{content}</div>;
+    return <div className={BASE_CLASSES}>{content}</div>;
   }
 
   return (
@@ -78,10 +79,11 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({ quote, name, r
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.6, delay: index * 0.1, ease: "easeOut" }}
       whileHover={{
-        y: -6,
-        boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02)",
+        y: -4,
+        boxShadow: "0 16px 32px -12px rgba(0, 0, 0, 0.12)",
+        transition: { type: "spring", stiffness: 300, damping: 26, delay: 0 },
       }}
-      className={CARD_CLASSES}
+      className={`${BASE_CLASSES} will-change-transform`}
     >
       {content}
     </motion.div>

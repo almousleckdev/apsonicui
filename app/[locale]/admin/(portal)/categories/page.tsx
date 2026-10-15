@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useRemoteList } from '@/hooks/queries/useRemoteList';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { Modal } from '@/components/ui/modal';
@@ -9,6 +9,9 @@ import { categoryService, CategoryItem, CreateCategoryPayload } from '@/services
 import { CategoryTable } from '@/components/admin/categories/CategoryTable';
 import { CategoryFormModalContent } from '@/components/admin/categories/CategoryFormModalContent';
 import { useToast } from '@/components/ui/Toast';
+import { ProductMenuGroupsEditor } from '@/components/admin/categories/ProductMenuGroupsEditor';
+import { productMenuService } from '@/services/product-menu-service';
+import { DEFAULT_PRODUCT_MENU_GROUPS, type ProductMenuGroup } from '@/lib/product-menu/groups';
 import { Search } from 'lucide-react';
 
 export default function AdminCategoriesPage() {
@@ -22,6 +25,10 @@ export default function AdminCategoriesPage() {
     () => categoryService.getAdminCategories(),
     (e) => toast.error(e.message || 'Failed to load categories')
   );
+  const [menuGroups, setMenuGroups] = useState<ProductMenuGroup[]>(DEFAULT_PRODUCT_MENU_GROUPS);
+  useEffect(() => {
+    productMenuService.getGroups().then(setMenuGroups).catch(() => {});
+  }, []);
   const [search, setSearch] = useState('');
   const [selectedBrand, setSelectedBrand] = useState<string>('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -51,7 +58,7 @@ export default function AdminCategoriesPage() {
       nameZh: '',
       imageUrl: '',
       brand: 'apsonic',
-      parentType: 'two-wheeler',
+      parentType: menuGroups[0]?.id ?? 'two-wheeler',
       displayOrder: categories.length + 1,
       active: true,
     });
@@ -142,6 +149,8 @@ export default function AdminCategoriesPage() {
           isRefreshing={loading}
         />
 
+        <ProductMenuGroupsEditor groups={menuGroups} categories={categories} onSaved={setMenuGroups} />
+
         {/* Filters */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-3xl border border-zinc-100 shadow-sm">
           <div className="relative w-full sm:w-80 flex items-center bg-zinc-50 border border-zinc-200/80 rounded-2xl px-3 py-2">
@@ -185,6 +194,7 @@ export default function AdminCategoriesPage() {
             formData={formData}
             setFormData={setFormData}
             isEditing={!!editingCategory}
+            groups={menuGroups}
             onSubmit={handleSave}
             onCancel={() => setIsModalOpen(false)}
           />

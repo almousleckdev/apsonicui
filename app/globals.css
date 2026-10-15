@@ -357,3 +357,17 @@ figcaption {
 .ProseMirror h3[style*="text-align: left"] {
   text-align: left !important;
 }
+
+/* Failsafe for the full-screen site loader: it is in the server HTML and normally removed by React after hydration.
+   If scripts are slow or blocked, this still uncovers the page so a visitor never has to reload. */
+@keyframes site-loader-failsafe {
+  to {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+.site-loader {
+  animation: site-loader-failsafe 0.3s ease 5s forwards;
+}

@@ -7,6 +7,13 @@ import { useLocale } from "next-intl";
 import { motion } from "framer-motion";
 import { ENTERPRISE_EASE } from "@/lib/constants/animations";
 import { categoryService, CategoryItem } from "@/services/category";
+import { productMenuService } from "@/services/product-menu-service";
+import {
+  DEFAULT_PRODUCT_MENU_GROUPS,
+  groupIdForCategory,
+  groupLabel,
+  type ProductMenuGroup,
+} from "@/lib/product-menu/groups";
 import { cn } from "@/lib/utils";
 
 interface ProductsDropdownProps {
@@ -21,21 +28,6 @@ const SIDEBAR_TITLES: Record<string, string> = {
   en: "VEHICLE CATEGORIES",
   fr: "CATÉGORIES DE VÉHICULES",
 };
-
-const CATEGORIES_NAV_GROUPS = [
-  {
-    id: "two-wheeler",
-    label: { zh: "两轮车", en: "Two-wheeler", fr: "Deux-roues" },
-  },
-  {
-    id: "three-wheeler",
-    label: { zh: "三轮车", en: "Three-wheeler", fr: "Trois-roues" },
-  },
-  {
-    id: "atv",
-    label: { zh: "全地形", en: "All-Terrain (ATV)", fr: "Tout-terrain (ATV)" },
-  },
-];
 
 const DEFAULT_SUBCATEGORIES_MAP: Record<
   string,
@@ -97,8 +89,9 @@ export const ProductsDropdown: React.FC<ProductsDropdownProps> = ({
   onClose,
 }) => {
   const locale = useLocale();
-  const [activeCategory, setActiveCategory] = useState<string>("two-wheeler");
+  const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
   const [dbCategories, setDbCategories] = useState<CategoryItem[]>([]);
+  const [groups, setGroups] = useState<ProductMenuGroup[]>(DEFAULT_PRODUCT_MENU_GROUPS);
 
   useEffect(() => {
     categoryService.getPublicCategories().then((data: CategoryItem[]) => {
@@ -106,6 +99,7 @@ export const ProductsDropdown: React.FC<ProductsDropdownProps> = ({
         setDbCategories(data);
       }
     }).catch(() => {});
+    productMenuService.getGroups().then(setGroups).catch(() => {});
   }, []);
 
   const subcategoriesMap = React.useMemo(() => {
@@ -113,16 +107,16 @@ export const ProductsDropdown: React.FC<ProductsDropdownProps> = ({
       return DEFAULT_SUBCATEGORIES_MAP;
     }
 
-    const map: Record<string, Array<{ id: string; label: Record<string, string>; image: string; href: string }>> = {
-      "two-wheeler": [],
-      "three-wheeler": [],
-      atv: [],
-    };
+    const map: Record<string, Array<{ id: string; label: Record<string, string>; image: string; href: string }>> = {};
+    groups.forEach((g) => {
+      map[g.id] = [];
+    });
 
     dbCategories.forEach((cat) => {
       const slug = (cat.slug || "").toLowerCase();
-      const parent = (cat.parentType || "").toLowerCase();
-      const item = {
+      const groupId = groupIdForCategory(cat.parentType, groups);
+      if (!groupId) return;
+      map[groupId].push({
         id: String(cat.id || slug),
         label: {
           zh: cat.nameZh || cat.name || cat.nameEn || slug,
@@ -131,25 +125,16 @@ export const ProductsDropdown: React.FC<ProductsDropdownProps> = ({
         },
         image: cat.imageUrl || "/categories/弯梁车/AP110 (2).png",
         href: `/products?category=${slug}`,
-      };
-
-      if (parent === "three-wheeler" || slug.includes("tri") || slug.includes("cargo") || slug.includes("passenger") || slug.includes("三轮")) {
-        map["three-wheeler"].push(item);
-      } else if (parent === "atv" || slug.includes("atv") || slug.includes("terrain") || slug.includes("全地形")) {
-        map["atv"].push(item);
-      } else {
-        map["two-wheeler"].push(item);
-      }
+      });
     });
 
-    if (map["two-wheeler"].length === 0) map["two-wheeler"] = DEFAULT_SUBCATEGORIES_MAP["two-wheeler"];
-    if (map["three-wheeler"].length === 0) map["three-wheeler"] = DEFAULT_SUBCATEGORIES_MAP["three-wheeler"];
-    if (map["atv"].length === 0) map["atv"] = DEFAULT_SUBCATEGORIES_MAP["atv"];
-
     return map;
-  }, [dbCategories]);
+  }, [dbCategories, groups]);
 
-  const currentSubcategories = subcategoriesMap[activeCategory] || [];
+  // A group with nothing to show would be an empty panel, so it is left out of the sidebar.
+  const visibleGroups = groups.filter((g) => (subcategoriesMap[g.id] ?? []).length > 0);
+  const activeCategory = visibleGroups.some((g) => g.id === selectedGroup) ? selectedGroup : visibleGroups[0]?.id;
+  const currentSubcategories = (activeCategory && subcategoriesMap[activeCategory]) || [];
 
   return (
     <motion.div
@@ -174,13 +159,13 @@ export const ProductsDropdown: React.FC<ProductsDropdownProps> = ({
               {SIDEBAR_TITLES[locale] || SIDEBAR_TITLES.en}
             </span>
             <div className="space-y-0.5">
-              {CATEGORIES_NAV_GROUPS.map((category) => {
+              {visibleGroups.map((category) => {
                 const isActive = activeCategory === category.id;
-                const displayLabel = category.label[locale as keyof typeof category.label] || category.label.en;
+                const displayLabel = groupLabel(category, locale);
                 return (
                   <button
                     key={category.id}
-                    onMouseEnter={() => setActiveCategory(category.id)}
+                    onMouseEnter={() => setSelectedGroup(category.id)}
                     onClick={() => {
                       if (onClose) onClose();
                     }}

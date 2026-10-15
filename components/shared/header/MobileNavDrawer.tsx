@@ -1,10 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from '@/lib/i18n/navigation';
 import { Search, ChevronDown, ChevronRight, PhoneCall, MapPin, Wrench } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { productMenuService } from '@/services/product-menu-service';
+import { DEFAULT_PRODUCT_MENU_GROUPS, groupLabel, type ProductMenuGroup } from '@/lib/product-menu/groups';
 
 interface NavItem {
   label: string;
@@ -47,6 +49,11 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
   onClose,
   t,
 }) => {
+  const [menuGroups, setMenuGroups] = useState<ProductMenuGroup[]>(DEFAULT_PRODUCT_MENU_GROUPS);
+  useEffect(() => {
+    productMenuService.getGroups().then(setMenuGroups).catch(() => {});
+  }, []);
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -103,22 +110,17 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
                             <span>{t('allProducts')}</span>
                             <ChevronRight className="w-4 h-4 opacity-50" />
                           </Link>
-                          <Link
-                            href="/products?category=two-wheeler"
-                            onClick={onClose}
-                            className="text-sm text-[#E0E0E0] flex items-center justify-between py-1 hover:text-[#FFD700]"
-                          >
-                            <span>{t('twoWheelers')}</span>
-                            <ChevronRight className="w-4 h-4 opacity-50" />
-                          </Link>
-                          <Link
-                            href="/products?category=tricycle"
-                            onClick={onClose}
-                            className="text-sm text-[#E0E0E0] flex items-center justify-between py-1 hover:text-[#FFD700]"
-                          >
-                            <span>{t('tricycles')}</span>
-                            <ChevronRight className="w-4 h-4 opacity-50" />
-                          </Link>
+                          {menuGroups.map((group) => (
+                            <Link
+                              key={group.id}
+                              href={`/products?category=${group.id}`}
+                              onClick={onClose}
+                              className="text-sm text-[#E0E0E0] flex items-center justify-between py-1 hover:text-[#FFD700]"
+                            >
+                              <span>{groupLabel(group, locale)}</span>
+                              <ChevronRight className="w-4 h-4 opacity-50" />
+                            </Link>
+                          ))}
                         </motion.div>
                       )}
                     </AnimatePresence>

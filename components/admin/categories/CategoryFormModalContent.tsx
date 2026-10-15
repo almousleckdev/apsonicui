@@ -1,11 +1,13 @@
 import React from 'react';
 import { CreateCategoryPayload } from '@/services/category';
+import { groupLabel, type ProductMenuGroup } from '@/lib/product-menu/groups';
 import { SectionImageUpload } from '@/components/admin/products/SectionImageUpload';
 
 interface CategoryFormModalContentProps {
   formData: CreateCategoryPayload;
   setFormData: React.Dispatch<React.SetStateAction<CreateCategoryPayload>>;
   isEditing: boolean;
+  groups: ProductMenuGroup[];
   onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
 }
@@ -14,6 +16,7 @@ export const CategoryFormModalContent: React.FC<CategoryFormModalContentProps> =
   formData,
   setFormData,
   isEditing,
+  groups,
   onSubmit,
   onCancel,
 }) => {
@@ -38,9 +41,15 @@ export const CategoryFormModalContent: React.FC<CategoryFormModalContentProps> =
             onChange={(e) => setFormData({ ...formData, parentType: e.target.value })}
             className="w-full px-3 py-2 border border-zinc-200 rounded-xl bg-zinc-50 focus:bg-white focus:outline-none font-bold text-zinc-800"
           >
-            <option value="two-wheeler">Two-wheeler / 两轮车</option>
-            <option value="three-wheeler">Three-wheeler / 三轮车</option>
-            <option value="atv">All-Terrain (ATV) / 全地形</option>
+            {groups.map((g) => (
+              <option key={g.id} value={g.id}>
+                {groupLabel(g, 'en')}
+                {g.labelZh ? ` / ${g.labelZh}` : ''}
+              </option>
+            ))}
+            {formData.parentType && !groups.some((g) => g.id === formData.parentType) && (
+              <option value={formData.parentType}>{formData.parentType} (group removed)</option>
+            )}
           </select>
         </div>
         <div>

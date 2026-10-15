@@ -5,6 +5,10 @@ import Image from "next/image";
 import { usePathname, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
+const MIN_VISIBLE_MS = 700;
+// A manually triggered loader (language switch) must never outlive a failed navigation.
+const MANUAL_MAX_MS = 4000;
+
 export const SiteLoader: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [progress, setProgress] = useState(10);
@@ -12,7 +16,8 @@ export const SiteLoader: React.FC = () => {
   const searchParams = useSearchParams();
   const isInitialMount = useRef(true);
 
-  // 1. Initial page load loading (kept for a bit longer: 1.5s)
+  // 1. Initial page load: the overlay is part of the server HTML, so it can only be removed once the page has hydrated.
+  // A short minimum keeps the logo from flashing; globals.css also hides it by itself if scripts never arrive.
   useEffect(() => {
     const interval = setInterval(() => {
       setProgress((prev) => {
@@ -30,7 +35,7 @@ export const SiteLoader: React.FC = () => {
         setIsLoading(false);
         isInitialMount.current = false;
       }, 250);
-    }, 1500);
+    }, MIN_VISIBLE_MS);
 
     return () => {
       clearInterval(interval);
@@ -54,19 +59,29 @@ export const SiteLoader: React.FC = () => {
 
   // 3. Custom Event Listeners for manual loader triggers (e.g. language selection click)
   useEffect(() => {
+    let interval: ReturnType<typeof setInterval> | undefined;
+    let giveUp: ReturnType<typeof setTimeout> | undefined;
+
     const handleShow = () => {
+      clearInterval(interval);
+      clearTimeout(giveUp);
       setIsLoading(true);
       setProgress(15);
-      const interval = setInterval(() => {
+      interval = setInterval(() => {
         setProgress((prev) => Math.min(prev + 12, 95));
       }, 60);
-      return () => clearInterval(interval);
+      giveUp = setTimeout(() => {
+        clearInterval(interval);
+        setIsLoading(false);
+      }, MANUAL_MAX_MS);
     };
 
     window.addEventListener("show-site-loader", handleShow);
 
     return () => {
       window.removeEventListener("show-site-loader", handleShow);
+      clearInterval(interval);
+      clearTimeout(giveUp);
     };
   }, []);
 
@@ -77,7 +92,7 @@ export const SiteLoader: React.FC = () => {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
-          className="fixed inset-0 z-[9999] bg-zinc-950 flex flex-col items-center justify-center pointer-events-auto select-none"
+          className="site-loader fixed inset-0 z-[9999] bg-zinc-950 flex flex-col items-center justify-center pointer-events-auto select-none"
         >
           {/* Top Progress bar */}
           <div className="absolute top-0 left-0 w-full h-[3px] bg-zinc-900">
