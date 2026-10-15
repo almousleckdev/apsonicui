@@ -46,6 +46,7 @@ export const inbox = {
     subtitle: ['View and restore deleted items (kept for 3 months)', '查看并恢复已删除的项目（保留 3 个月）'],
     clear: ['Clear {type} trash', '清空{type}回收站'],
     tabs: {
+      pages: ['Pages', '页面'],
       products: ['Products', '产品'],
       categories: ['Categories', '分类'],
       news: ['News', '新闻'],

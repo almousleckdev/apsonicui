@@ -61,7 +61,7 @@ const DEFAULT_SUBCATEGORIES_MAP: Record<
     {
       id: "scooter",
       label: { zh: "踏板车", en: "Scooter", fr: "Scooter" },
-      image: "/categories/踏板车/AP125T-4 (2).png",
+      image: "/categories/踏板车/AP125T/AP125T 右侧 精修 白（2）.png",
       href: "/products?category=scooter",
     },
   ],
@@ -69,7 +69,7 @@ const DEFAULT_SUBCATEGORIES_MAP: Record<
     {
       id: "tricycle",
       label: { zh: "货运三轮车", en: "Cargo Tricycle", fr: "Tricycle Cargo" },
-      image: "/categories/三轮车/AP200ZH-B (2.2).png",
+      image: "/categories/三轮车/其他更新/AP200ZH-3 (1).png",
       href: "/products?category=tricycle",
     },
   ],

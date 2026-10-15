@@ -21,6 +21,7 @@ import { useToast } from '@/components/ui/Toast';
 import type { AdminKey } from '@/lib/i18n/admin/catalog';
 
 const TABS: { id: TrashResourceType; label: AdminKey }[] = [
+  { id: 'pages', label: 'trash.tabs.pages' },
   { id: 'products', label: 'trash.tabs.products' },
   { id: 'categories', label: 'trash.tabs.categories' },
   { id: 'news', label: 'trash.tabs.news' },

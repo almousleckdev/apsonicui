@@ -15,15 +15,15 @@ export const getLocalizedTricycleData = (locale: string): Record<string, Categor
             ? '包含载重规范、后桥保养及货箱维保指南。'
             : 'Covers load capacities, rear axle servicing, and cargo box maintenance.',
           pdfUrl: '/pdf/simpple.pdf',
-          imageUrl: '/categories/三轮车/AP150ZH(1.2).png',
+          imageUrl: '/categories/三轮车/AP150ZH-175 更新/AP150ZH-175 MAX (1).png',
           size: '4.2 MB',
           updated: isZh ? '2025年1月' : 'Jan 2025',
         },
       ],
       videos: [],
       images: [
-        '/categories/三轮车/AP150ZH(1.2).png',
-        '/categories/三轮车/AP200ZH(1.2).png',
+        '/categories/三轮车/AP150ZH-175 更新/AP150ZH-175 MAX (1).png',
+        '/categories/三轮车/其他更新/AP200ZH-3 (1).png',
       ],
     },
   };

@@ -7,7 +7,7 @@ export interface TrashItem {
   deletedBy: string;
 }
 
-export type TrashResourceType = 'products' | 'categories' | 'news' | 'users' | 'notifications';
+export type TrashResourceType = 'products' | 'categories' | 'news' | 'users' | 'notifications' | 'pages';
 
 export const fetchTrashItems = async (type: TrashResourceType) => {
   return apiClient<TrashItem[]>(`/admin/trash/${type}`, {

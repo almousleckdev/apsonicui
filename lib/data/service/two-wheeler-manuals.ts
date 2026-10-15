@@ -26,7 +26,7 @@ export const getLocalizedTwoWheelerData = (locale: string): Record<string, Categ
             ? 'AP110-3型号详细手册，包含操作说明与日常维护。'
             : 'Detailed manual for AP110-3, outlining operation and regular maintenance.',
           pdfUrl: '/pdf/simpple.pdf',
-          imageUrl: '/categories/弯梁车/AP110-3 (1).png',
+          imageUrl: '/categories/弯梁车/AP110-3 (1.2).png',
           size: '2.1 MB',
           updated: isZh ? '2024年12月' : 'Dec 2024',
         },
