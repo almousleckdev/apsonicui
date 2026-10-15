@@ -62,11 +62,11 @@ export function EditorShell({ initial }: { initial: PageDetail }) {
   const insertAt = useCallback((type: string, index: number) => {
     const definition = byType.get(type);
     if (!definition) return;
-    const section = createSection(definition);
+    const section = createSection(definition, undefined, styleFields);
     edit((d) => insertSection(d, section, index));
     setSelectedId(section.id);
     setAddIndex(null);
-  }, [byType, edit]);
+  }, [byType, edit, styleFields]);
 
   const applyAction = useCallback((id: string, action: 'up' | 'down' | 'duplicate' | 'delete' | 'toggle-hidden') => {
     const index = doc.sections.findIndex((s) => s.id === id);

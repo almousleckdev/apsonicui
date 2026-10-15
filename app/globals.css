@@ -371,3 +371,22 @@ figcaption {
 .site-loader {
   animation: site-loader-failsafe 0.3s ease 5s forwards;
 }
+
+/* Page builder: colors chosen by editors arrive as validated custom properties (--pb-text, --pb-accent, --pb-own).
+   A section with its own text color recolors its text, but never its buttons (.pb-btn) or elements with their own
+   color (.pb-own, e.g. one highlighted figure). */
+.pb-text {
+  color: var(--pb-text);
+}
+.pb-text :is(h1, h2, h3, h4, h5, p, span, li, dt, dd, summary, blockquote, figcaption, label, small, strong, em, a, div):not(.pb-btn, .pb-btn *, .pb-own, .pb-own *) {
+  color: var(--pb-text) !important;
+}
+.pb-accent {
+  color: var(--pb-accent, #00a651);
+}
+.pb-accent-bg {
+  background-color: var(--pb-accent, #00a651);
+}
+.pb-own {
+  color: var(--pb-own);
+}

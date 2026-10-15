@@ -2,32 +2,42 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { CmsImage, CmsLink, EmptyHint, str, text, type SectionProps } from '../shared';
+import { clamp, cssPosition, cssSize, resolveStyle } from '@/lib/page-builder/style';
+import { Buttons, CoverImage, EmptyHint, Overlay, bool, buttonsOf, num, pick, str, styleProps, text, type SectionProps } from '../shared';
+
+const HEIGHTS = { sm: 'min-h-[200px]', md: 'min-h-[320px]', lg: 'min-h-[460px]', custom: '' } as const;
+const ALIGN = { left: 'items-start text-left', center: 'items-center text-center', right: 'items-end text-right' } as const;
 
 export function CtaBanner({ section, ctx }: SectionProps) {
   const c = section.content;
+  const r = resolveStyle(section.style);
   const heading = text(c, 'heading', ctx.locale);
   const body = text(c, 'text', ctx.locale);
-  const label = text(c, 'buttonLabel', ctx.locale);
-  const url = str(c, 'buttonUrl');
   const image = str(c, 'image');
-  if (!heading && !label) return <EmptyHint editing={ctx.editing}>Call to action: add a heading and a button.</EmptyHint>;
+  const ctas = buttonsOf(c);
+  const align = pick(c.align, ['left', 'center', 'right'] as const, 'center');
+  const height = pick(c.height, ['sm', 'md', 'lg', 'custom'] as const, 'md');
+  const own = styleProps(r);
+
+  if (!heading && ctas.length === 0) return <EmptyHint editing={ctx.editing}>Call to action: add a heading and a button.</EmptyHint>;
+
   return (
-    <section className={cn('relative isolate overflow-hidden', image ? 'bg-zinc-950' : 'bg-brand-green', 'px-4 py-16 sm:px-6 sm:py-20 lg:px-8')}>
+    <section className={cn('relative isolate overflow-hidden', own.className)} style={own.style}>
       {image && (
         <>
-          <CmsImage src={image} alt="" className="-z-10 object-cover" />
-          <div className="absolute inset-0 -z-10 bg-black/60" aria-hidden />
+          <div className="absolute inset-0 -z-10 overflow-hidden" aria-hidden>
+            <CoverImage src={image} size={cssSize(c.imageSize)} position={cssPosition(c.imagePosition)} fixed={bool(c, 'imageFixed', false)} />
+          </div>
+          <div className="absolute inset-0 -z-10" aria-hidden><Overlay color={str(c, 'overlayColor') || '#000000'} strength={clamp(num(c, 'overlay', 50), 0, 90)} /></div>
         </>
       )}
-      <div className="mx-auto max-w-3xl text-center text-white">
-        {heading && <h2 className="text-3xl font-extrabold tracking-tight text-balance sm:text-4xl">{heading}</h2>}
-        {body && <p className="mt-4 text-lg text-white/90">{body}</p>}
-        {label && url && (
-          <CmsLink href={url} className="mt-8 inline-flex items-center justify-center rounded-full bg-white px-8 py-3.5 text-sm font-bold uppercase tracking-wide text-zinc-900 transition-colors hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
-            {label}
-          </CmsLink>
-        )}
+      <div
+        className={cn('mx-auto flex flex-col justify-center px-4 sm:px-6 lg:px-8', r.padTop, r.padBottom, r.width, HEIGHTS[height], ALIGN[align])}
+        style={height === 'custom' ? { minHeight: clamp(num(c, 'minHeight', 320), 160, 800) } : undefined}
+      >
+        {heading && <h2 className="max-w-3xl text-3xl font-extrabold tracking-tight text-balance sm:text-4xl">{heading}</h2>}
+        {body && <p className="mt-4 max-w-2xl text-lg opacity-90">{body}</p>}
+        <Buttons items={ctas} section={section} ctx={ctx} onImage={!!image} className={cn('mt-8', align === 'center' && 'justify-center', align === 'right' && 'justify-end')} />
       </div>
     </section>
   );

@@ -7,7 +7,7 @@ export const LOCALE_LABELS: Record<Locale, string> = { en: 'English', fr: 'Fran√
 /** A translatable text value: {en, fr, zh}; missing languages fall back to English when rendered. */
 export type LocalizedText = Partial<Record<Locale, string>>;
 
-export type FieldKind = 'TEXT' | 'TEXTAREA' | 'RICHTEXT' | 'URL' | 'MEDIA' | 'ENUM' | 'NUMBER' | 'BOOLEAN' | 'LIST';
+export type FieldKind = 'TEXT' | 'TEXTAREA' | 'RICHTEXT' | 'URL' | 'MEDIA' | 'ENUM' | 'COLOR' | 'NUMBER' | 'BOOLEAN' | 'LIST';
 
 export interface FieldDef {
   name: string;
@@ -19,11 +19,18 @@ export interface FieldDef {
   min?: number;
   max?: number;
   options?: string[];
+  /** Friendly names for {@link options}, same order. */
+  optionLabels?: string[];
   defaultValue?: string | number | boolean;
   itemFields?: FieldDef[];
   minItems?: number;
   maxItems?: number;
   help?: string;
+  /** Editor grouping ("Picture", "Buttons"). */
+  group?: string;
+  /** Show only while a sibling field has one of these values ("*" = any non-empty value). */
+  showWhenField?: string;
+  showWhenValues?: string[];
 }
 
 export interface SectionDefinition {
@@ -32,6 +39,10 @@ export interface SectionDefinition {
   description: string;
   category: string;
   fields: FieldDef[];
+  /** Which shared style fields apply (absent = all of them). */
+  styleFieldNames?: string[] | null;
+  /** Style values a new section of this type starts with. */
+  styleDefaults?: Record<string, string>;
 }
 
 export interface SectionTypesResponse {
@@ -40,11 +51,26 @@ export interface SectionTypesResponse {
   locales: Locale[];
 }
 
+export type SectionSize = 'none' | 'sm' | 'md' | 'lg' | 'xl';
+
 export interface SectionStyle {
-  background?: 'white' | 'light' | 'dark' | 'brand';
-  paddingTop?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
-  paddingBottom?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
+  background?: 'white' | 'light' | 'dark' | 'brand' | 'custom';
+  backgroundColor?: string;
+  backgroundImage?: string;
+  backgroundSize?: 'cover' | 'contain' | 'auto';
+  backgroundPosition?: string;
+  backgroundFixed?: boolean;
+  backgroundOverlayColor?: string;
+  backgroundOverlay?: number;
+  textColor?: string;
+  accentColor?: string;
+  buttonColor?: string;
+  buttonTextColor?: string;
+  buttonShape?: 'pill' | 'rounded' | 'square';
+  paddingTop?: SectionSize;
+  paddingBottom?: SectionSize;
   width?: 'narrow' | 'normal' | 'wide';
+  showOn?: 'all' | 'desktop' | 'mobile';
 }
 
 export type SectionContent = Record<string, unknown>;

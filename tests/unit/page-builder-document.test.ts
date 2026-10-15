@@ -34,6 +34,15 @@ describe('section operations', () => {
   it('creates sections with registry defaults and a default style', () => {
     const s = createSection(hero, 'x');
     expect(s).toMatchObject({ id: 'x', type: 'hero', hidden: false, content: { overlay: 40, ctas: [] }, style: { background: 'white', width: 'normal' } });
+    // With the server's style catalogue, only the applicable fields get defaults, plus the type's own overrides.
+    const styleFields = [
+      { name: 'background', kind: 'ENUM' as const, label: 'Background', defaultValue: 'white' },
+      { name: 'buttonShape', kind: 'ENUM' as const, label: 'Shape', defaultValue: 'pill' },
+      { name: 'width', kind: 'ENUM' as const, label: 'Width', defaultValue: 'normal' },
+    ];
+    const cta = { ...hero, type: 'cta', styleFieldNames: ['background', 'buttonShape'], styleDefaults: { background: 'brand' } };
+    expect(createSection(cta, 'c', styleFields).style).toEqual({ background: 'brand', buttonShape: 'pill' });
+    expect(createSection(hero, 'h', styleFields).style).toEqual({ background: 'white', buttonShape: 'pill', width: 'normal' });
     expect(defaultContent(ctaFields)).toEqual({ variant: 'primary' });
   });
 

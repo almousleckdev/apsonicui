@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { Copy, Eye, EyeOff, Trash2 } from 'lucide-react';
+import { ChevronDown, Copy, Eye, EyeOff, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { addListItem, moveListItem, removeListItem, setContent, setHidden, setStyle } from '@/lib/page-builder/document';
+import { addListItem, applicableStyleFields, moveListItem, removeListItem, setContent, setHidden, setStyle } from '@/lib/page-builder/document';
+import { groupFields, isFieldVisible } from '@/lib/page-builder/fields';
 import { SectionIcon } from '../renderer/registry';
 import type { FieldDef, Locale, PageDocument, PageSection, SectionDefinition } from '@/lib/page-builder/types';
 import { FieldControl, type FieldContext, type Path } from './fields/FieldControl';
@@ -27,6 +28,7 @@ type Tab = 'content' | 'style';
 export function PropertiesPanel({ section, sectionIndex, definition, styleFields, locale, issues, edit, onDuplicate, onDelete }: Props) {
   const [tab, setTab] = useState<Tab>('content');
   const id = section.id;
+  const applicable = useMemo(() => applicableStyleFields(definition, styleFields), [definition, styleFields]);
 
   const contentCtx: FieldContext = useMemo(() => ({
     locale,
@@ -75,14 +77,14 @@ export function PropertiesPanel({ section, sectionIndex, definition, styleFields
         )}
         {tab === 'content' && (
           definition && definition.fields.length > 0
-            ? definition.fields.map((field) => (
-                <FieldControl key={`${id}:${field.name}`} field={field} value={section.content[field.name]} path={[field.name]} ctx={contentCtx} />
-              ))
+            ? <FieldGroups scope={`${id}:content`} fields={definition.fields} values={section.content} ctx={contentCtx} />
             : <p className="text-xs text-zinc-500">This section has nothing to configure.</p>
         )}
-        {tab === 'style' && styleFields.map((field) => (
-          <FieldControl key={`${id}:style:${field.name}`} field={field} value={section.style[field.name as keyof typeof section.style]} path={[field.name]} ctx={styleCtx} />
-        ))}
+        {tab === 'style' && (
+          applicable.length > 0
+            ? <FieldGroups scope={`${id}:style`} fields={applicable} values={section.style as Record<string, unknown>} ctx={styleCtx} />
+            : <p className="text-xs text-zinc-500">This section draws its own background, so it has no layout settings.</p>
+        )}
       </div>
     </div>
   );
@@ -94,5 +96,30 @@ function IconButton({ label, onClick, danger, children }: { label: string; onCli
       className={cn('rounded-md p-1.5 text-zinc-400 transition-colors', danger ? 'hover:bg-red-50 hover:text-red-600' : 'hover:bg-zinc-100 hover:text-zinc-800')}>
       {children}
     </button>
+  );
+}
+
+/**
+ * Fields collected under their group titles, each group collapsible. Fields that depend on another field (for
+ * example "Height (px)" only for a custom height) appear only while their condition holds.
+ */
+function FieldGroups({ scope, fields, values, ctx }: { scope: string; fields: FieldDef[]; values: Record<string, unknown>; ctx: FieldContext }) {
+  const visible = fields.filter((f) => isFieldVisible(f, values, fields));
+  return (
+    <div className="space-y-3">
+      {groupFields(visible).map((group, index) => (
+        <details key={group.title} open={index < 2} className="group/section rounded-xl border border-zinc-200 bg-white">
+          <summary className="flex cursor-pointer list-none items-center justify-between px-3 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.12em] text-zinc-500 [&::-webkit-details-marker]:hidden">
+            {group.title}
+            <ChevronDown className="h-4 w-4 text-zinc-400 transition-transform group-open/section:rotate-180" aria-hidden />
+          </summary>
+          <div className="space-y-4 border-t border-zinc-100 p-3">
+            {group.fields.map((field) => (
+              <FieldControl key={`${scope}:${field.name}`} field={field} value={values[field.name]} path={[field.name]} ctx={ctx} />
+            ))}
+          </div>
+        </details>
+      ))}
+    </div>
   );
 }

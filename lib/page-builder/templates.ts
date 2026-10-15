@@ -1,5 +1,5 @@
 import { createSection, emptyDocument } from './document';
-import type { PageDocument, SectionDefinition } from './types';
+import type { FieldDef, PageDocument, SectionDefinition } from './types';
 
 /**
  * Starting points offered when a page is created. A template is only a list of section types: each section is
@@ -22,11 +22,11 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
 ];
 
 /** Builds the starting document; section types the server does not know are skipped rather than failing. */
-export function buildTemplateDocument(template: PageTemplate, title: string, definitions: Map<string, SectionDefinition>): PageDocument {
+export function buildTemplateDocument(template: PageTemplate, title: string, definitions: Map<string, SectionDefinition>, styleFields: FieldDef[] = []): PageDocument {
   const doc = emptyDocument(title);
   doc.sections = template.sections.flatMap((type) => {
     const definition = definitions.get(type);
-    return definition ? [createSection(definition)] : [];
+    return definition ? [createSection(definition, undefined, styleFields)] : [];
   });
   return doc;
 }

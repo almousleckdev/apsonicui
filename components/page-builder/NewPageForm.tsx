@@ -22,7 +22,7 @@ import { INPUT_CLASS } from './editor/fields/FieldControl';
 export function NewPageForm() {
   const router = useRouter();
   const { toast } = useToast();
-  const { byType, isLoading: loadingSections } = useSectionTypes();
+  const { byType, styleFields, isLoading: loadingSections } = useSectionTypes();
 
   const [title, setTitle] = useState('');
   const [customSlug, setCustomSlug] = useState<string | null>(null);
@@ -41,7 +41,7 @@ export function NewPageForm() {
     setProblem(null);
     try {
       const template = PAGE_TEMPLATES.find((t) => t.id === templateId) ?? PAGE_TEMPLATES[0];
-      const page = await pagesService.create({ slug, title: title.trim(), document: buildTemplateDocument(template, title.trim(), byType) });
+      const page = await pagesService.create({ slug, title: title.trim(), document: buildTemplateDocument(template, title.trim(), byType, styleFields) });
       toast.success('Page created. It is a private draft until you publish it.');
       router.push(`/admin/pages/${page.id}`);
     } catch (err) {

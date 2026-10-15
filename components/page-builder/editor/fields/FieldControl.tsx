@@ -6,6 +6,8 @@ import { CompactMediaField } from '@/components/admin/shared/CompactMediaField';
 import { NewsRichTextEditor } from '@/components/admin/news/NewsRichTextEditor';
 import { cn } from '@/lib/utils';
 import { issuePath } from '@/lib/page-builder/document';
+import { isFieldVisible, optionLabel } from '@/lib/page-builder/fields';
+import { ColorField } from './ColorField';
 import type { FieldDef, Locale } from '@/lib/page-builder/types';
 
 export type Path = Array<string | number>;
@@ -25,7 +27,6 @@ export interface FieldContext {
 export const INPUT_CLASS =
   'w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-brand-green focus:outline-none focus:ring-2 focus:ring-brand-green/20';
 
-const titleCase = (value: string) => value.replace(/-/g, ' ').replace(/^./, (c) => c.toUpperCase());
 const looksLikeLink = (value: string) => /^(\/(?!\/)|#|https?:\/\/|mailto:|tel:)/i.test(value);
 
 interface Props {
@@ -102,10 +103,17 @@ export function FieldControl({ field, value, path, ctx }: Props) {
     }
     case 'MEDIA':
       control = (
-        <CompactMediaField value={(current as string) ?? ''} onChange={(url) => set(url)}
+        <CompactMediaField allowAddress value={(current as string) ?? ''} onChange={(url) => set(url)}
           accept={/video/i.test(field.name) ? 'video/mp4,video/webm' : 'image/*'} />
       );
       break;
+    case 'COLOR':
+      return (
+        <div>
+          <ColorField label={field.label} value={typeof current === 'string' ? current : undefined} onChange={(hex) => set(hex)} help={field.help} />
+          {error && <p role="alert" className="mt-1 text-[11px] font-semibold text-red-600">{error}</p>}
+        </div>
+      );
     case 'ENUM': {
       const options = field.options ?? [];
       const selected = (current as string) ?? field.defaultValue ?? '';
@@ -114,14 +122,14 @@ export function FieldControl({ field, value, path, ctx }: Props) {
           {options.map((option) => (
             <button key={option} type="button" role="radio" aria-checked={selected === option} onClick={() => set(option)}
               className={cn('flex-1 rounded-md px-2 py-1.5 text-xs font-bold transition-colors', selected === option ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500 hover:text-zinc-800')}>
-              {titleCase(option)}
+              {optionLabel(field, option, options.indexOf(option))}
             </button>
           ))}
         </div>
       ) : (
         <div className="relative">
           <select id={id} value={selected as string} onChange={(e) => set(e.target.value)} className={cn(INPUT_CLASS, 'appearance-none pr-8')}>
-            {options.map((option) => <option key={option} value={option}>{titleCase(option)}</option>)}
+            {options.map((option, i) => <option key={option} value={option}>{optionLabel(field, option, i)}</option>)}
           </select>
           <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" aria-hidden />
         </div>
@@ -204,7 +212,7 @@ function ListField({ field, items, path, ctx, error }: { field: FieldDef; items:
                   </span>
                 </summary>
                 <div className="space-y-3 border-t border-zinc-200 p-3">
-                  {itemFields.map((f) => (
+                  {itemFields.filter((f) => isFieldVisible(f, item, itemFields)).map((f) => (
                     <FieldControl key={f.name} field={f} value={item[f.name]} path={[...itemPath, f.name]} ctx={ctx} />
                   ))}
                 </div>

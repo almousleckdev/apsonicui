@@ -5,7 +5,8 @@ import type { FieldDef, Locale, PageDocument, PageMeta, PageSection, SectionDefi
  * what makes undo/redo, autosave comparison and React rendering straightforward. The backend re-validates all of it.
  */
 
-export const DEFAULT_STYLE: Required<SectionStyle> = {
+/** Used only when the server's style catalogue is not available. */
+export const DEFAULT_STYLE: SectionStyle = {
   background: 'white',
   paddingTop: 'md',
   paddingBottom: 'md',
@@ -35,9 +36,18 @@ export function defaultContent(fields: FieldDef[]): Record<string, unknown> {
   return content;
 }
 
+/** The shared style fields that apply to a section type (all of them unless the definition narrows the list). */
+export function applicableStyleFields(definition: SectionDefinition | undefined, styleFields: FieldDef[]): FieldDef[] {
+  const names = definition?.styleFieldNames;
+  return names ? styleFields.filter((f) => names.includes(f.name)) : styleFields;
+}
+
 /** A new section with the registry defaults, the same as the backend would create. */
-export function createSection(definition: SectionDefinition, id: string = newId()): PageSection {
-  return { id, type: definition.type, hidden: false, style: { ...DEFAULT_STYLE }, content: defaultContent(definition.fields) };
+export function createSection(definition: SectionDefinition, id: string = newId(), styleFields: FieldDef[] = []): PageSection {
+  const style: SectionStyle = styleFields.length > 0
+    ? { ...defaultContent(applicableStyleFields(definition, styleFields)), ...(definition.styleDefaults ?? {}) } as SectionStyle
+    : { ...DEFAULT_STYLE, ...(definition.styleDefaults ?? {}) } as SectionStyle;
+  return { id, type: definition.type, hidden: false, style, content: defaultContent(definition.fields) };
 }
 
 export function insertSection(doc: PageDocument, section: PageSection, index: number): PageDocument {
