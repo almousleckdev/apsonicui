@@ -1,0 +1,61 @@
+name: Frontend
+
+on:
+  push:
+    branches: [main, remediation]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontend-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Lint, typecheck, test, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true   # product media is stored in Git LFS
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint        # warnings are allowed; errors fail the build
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: Dependency audit (production dependencies)
+        run: npm audit --omit=dev --audit-level=high
+
+  image:
+    name: Build and scan the container image
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - name: Build image
+        run: docker build -t apsonic-frontend:ci --build-arg NEXT_PUBLIC_MAPBOX_TOKEN="${{ vars.NEXT_PUBLIC_MAPBOX_TOKEN }}" .
+      - name: Scan image (fail on fixable HIGH/CRITICAL vulnerabilities)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: apsonic-frontend:ci
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+
+  secrets:
+    name: Scan for committed secrets
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: gitleaks (working tree)
+        run: docker run --rm -v "$PWD:/repo:ro" zricethezav/gitleaks:latest dir /repo --no-banner --redact

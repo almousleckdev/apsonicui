@@ -23,7 +23,7 @@ interface ProductStorySplitProps {
 export const ProductStorySplit: React.FC<ProductStorySplitProps> = ({
   content,
 }) => {
-  const { title, description, background, variants } = content;
+  const { title, description, background, variants = [] } = content;
   const reduceMotion = useReducedMotion();
   const t = useTranslations("productDetail");
 
@@ -36,13 +36,17 @@ export const ProductStorySplit: React.FC<ProductStorySplitProps> = ({
     pause,
     resume,
   } = useCarousel({
-    itemsCount: variants.length,
+    itemsCount: Math.max(1, variants.length),
     autoPlay: true,
     interval: CAROUSEL_CONFIG.defaultInterval,
   });
 
-  const current = variants[currentIndex];
-  const next = variants[(currentIndex + 1) % variants.length];
+  if (!variants || variants.length === 0) {
+    return null;
+  }
+
+  const current = variants[currentIndex] || variants[0];
+  const next = variants[(currentIndex + 1) % variants.length] || current;
   const canSwipe = variants.length > 1;
 
   const handleDragEnd = (
@@ -65,19 +69,22 @@ export const ProductStorySplit: React.FC<ProductStorySplitProps> = ({
       onMouseEnter={pause}
       onMouseLeave={resume}
     >
-      <motion.div
-        animate={reduceMotion ? undefined : { y: [0, -14, 0] }}
-        transition={{ duration: 9, ease: "easeInOut", repeat: Infinity }}
-        className="pointer-events-none absolute bottom-0 left-0 w-95 select-none sm:w-130"
-      >
-        <Image 
-          src={background} 
-          alt="" 
-          width={380}
-          height={380}
-          priority={false} 
-        />
-      </motion.div>
+      {/* Decorative background shape if provided and valid */}
+      {background && !background.includes("aloba/split-bg.png") && (
+        <motion.div
+          animate={reduceMotion ? undefined : { y: [0, -14, 0] }}
+          transition={{ duration: 9, ease: "easeInOut", repeat: Infinity }}
+          className="pointer-events-none absolute bottom-0 left-0 w-95 select-none sm:w-130 opacity-40"
+        >
+          <Image 
+            src={background} 
+            alt="" 
+            width={380}
+            height={380}
+            priority={false} 
+          />
+        </motion.div>
+      )}
 
       <div className="relative z-10 mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <SectionHeader title={localTitle} description={localDescription} align="center" light />
@@ -85,15 +92,17 @@ export const ProductStorySplit: React.FC<ProductStorySplitProps> = ({
 
       <div className="relative mt-4 h-70 w-full sm:h-100 lg:h-120">
         {/* Next variant peeking in from the right edge */}
-        <div className="pointer-events-none absolute inset-y-0 right-0 z-0 w-full max-w-2xl translate-x-[55%] opacity-25 sm:translate-x-[50%]">
-          <Image
-            src={next.image}
-            alt=""
-            fill
-            className="object-contain"
-            sizes="60vw"
-          />
-        </div>
+        {canSwipe && (
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-0 w-full max-w-2xl translate-x-[55%] opacity-25 sm:translate-x-[50%]">
+            <Image
+              src={next.image || "/categories/弯梁车/AP110-A PLUS(白).png"}
+              alt=""
+              fill
+              className="object-contain"
+              sizes="60vw"
+            />
+          </div>
+        )}
 
         {/* Active variant - draggable on touch/mouse to swipe between colors */}
         <motion.div
@@ -107,21 +116,20 @@ export const ProductStorySplit: React.FC<ProductStorySplitProps> = ({
         >
           <AnimatePresence initial={false} mode="wait">
             <motion.div
-              key={current.id}
+              key={current.id || currentIndex}
               initial={reduceMotion ? false : { opacity: 0, x: 160 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -160 }}
               transition={{ duration: 0.7, ease: ENTERPRISE_EASE }}
               className="absolute inset-0"
             >
-              {/* Slow continuous zoom for a cinematic "living photo" feel */}
               <motion.div
                 className="absolute inset-0"
                 animate={reduceMotion ? undefined : { scale: [1, 1.05, 1] }}
                 transition={{ duration: 10, ease: "easeInOut", repeat: Infinity }}
               >
                 <Image
-                  src={current.image}
+                  src={current.image || "/categories/弯梁车/AP110-A PLUS(白).png"}
                   alt={`APSONIC Product Detail Variant - ${current.colorLabel}`}
                   fill
                   priority
@@ -135,51 +143,53 @@ export const ProductStorySplit: React.FC<ProductStorySplitProps> = ({
       </div>
 
       {/* Color-swatch indicator pills */}
-      <div className="relative z-10 mt-6 flex items-center justify-center gap-3">
-        {variants.map((variant, i) => {
-          const isActive = i === currentIndex;
-          return (
-            <button
-              key={variant.id}
-              type="button"
-              aria-label={`Show ${variant.colorLabel} color`}
-              aria-current={isActive}
-              onClick={() => goToSlide(i)}
-              className="p-1.5 cursor-pointer outline-none"
-            >
-              <motion.span
-                layout
-                animate={{ width: isActive ? 36 : 10 }}
-                transition={PREMIUM_SPRING}
-                className="block h-2.5 overflow-hidden rounded-full bg-black/10"
+      {variants.length > 1 && (
+        <div className="relative z-10 mt-6 flex items-center justify-center gap-3">
+          {variants.map((variant, i) => {
+            const isActive = i === currentIndex;
+            return (
+              <button
+                key={variant.id || `var-${i}`}
+                type="button"
+                aria-label={`Show ${variant.colorLabel} color`}
+                aria-current={isActive}
+                onClick={() => goToSlide(i)}
+                className="p-1.5 cursor-pointer outline-none"
               >
-                {isActive ? (
-                  <motion.span
-                    key={`${currentIndex}-${isPaused}`}
-                    initial={{ width: "0%" }}
-                    animate={{ width: isPaused ? "0%" : "100%" }}
-                    transition={
-                      isPaused
-                        ? { duration: 0.2 }
-                        : {
-                            duration: CAROUSEL_CONFIG.defaultInterval / 1000,
-                            ease: "linear",
-                          }
-                    }
-                    className="block h-full rounded-full"
-                    style={{ backgroundColor: variant.dotColor }}
-                  />
-                ) : (
-                  <span
-                    className="block h-full w-full rounded-full"
-                    style={{ backgroundColor: variant.dotColor }}
-                  />
-                )}
-              </motion.span>
-            </button>
-          );
-        })}
-      </div>
+                <motion.span
+                  layout
+                  animate={{ width: isActive ? 36 : 10 }}
+                  transition={PREMIUM_SPRING}
+                  className="block h-2.5 overflow-hidden rounded-full bg-black/10"
+                >
+                  {isActive ? (
+                    <motion.span
+                      key={`${currentIndex}-${isPaused}`}
+                      initial={{ width: "0%" }}
+                      animate={{ width: isPaused ? "0%" : "100%" }}
+                      transition={
+                        isPaused
+                          ? { duration: 0.2 }
+                          : {
+                              duration: CAROUSEL_CONFIG.defaultInterval / 1000,
+                              ease: "linear",
+                            }
+                      }
+                      className="block h-full rounded-full"
+                      style={{ backgroundColor: variant.dotColor }}
+                    />
+                  ) : (
+                    <span
+                      className="block h-full w-full rounded-full"
+                      style={{ backgroundColor: variant.dotColor }}
+                    />
+                  )}
+                </motion.span>
+              </button>
+            );
+          })}
+        </div>
+      )}
     </section>
   );
 };

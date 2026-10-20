@@ -1,0 +1,78 @@
+import type { CatalogNode } from '../text';
+
+/** Users and roles. */
+export const users = {
+  users: {
+    title: ['Users management', '用户管理'],
+    subtitle: ['Manage administrator credentials, roles and platform permissions.', '管理管理员凭据、角色和平台权限。'],
+    create: ['Create user', '创建用户'],
+    search: ['Search username or email…', '搜索用户名或邮箱…'],
+    roles: {
+      ALL: ['All roles', '全部角色'],
+      SUPER_ADMIN: ['Super admin', '超级管理员'],
+      ADMIN: ['Admin', '管理员'],
+      EDITOR: ['Editor', '编辑'],
+    },
+    columns: {
+      profile: ['User profile', '用户资料'],
+      email: ['Email address', '邮箱地址'],
+      roles: ['Assigned roles', '已分配角色'],
+      status: ['Status', '状态'],
+      actions: ['Actions', '操作'],
+    },
+    superAdmin: ['Super administrator', '超级管理员'],
+    active: ['Active', '正常'],
+    suspended: ['Suspended', '已停用'],
+    edit: ['Edit user', '编辑用户'],
+    delete: ['Delete user', '删除用户'],
+    emptyTitle: ['No matching users found', '没有找到匹配的用户'],
+    emptyText: ['No user accounts match your search.', '没有符合搜索条件的用户账号。'],
+    confirmDelete: ['Delete user account', '删除用户账号'],
+    confirmDeleteText: ['Are you sure you want to delete this system user? All of their session tokens and administrator rights will be permanently revoked.', '确定要删除此系统用户吗？其所有会话令牌和管理员权限将被永久撤销。'],
+    deleteConfirm: ['Delete user', '删除用户'],
+    loadFailed: ['Failed to fetch the user list', '无法获取用户列表'],
+    updated: ['User updated.', '用户已更新。'],
+    created: ['User created.', '用户已创建。'],
+    activated: ['User account activated.', '用户账号已启用。'],
+    suspendedToast: ['User account suspended.', '用户账号已停用。'],
+    statusFailed: ['Failed to update the user status', '无法更新用户状态'],
+    deleted: ['User account deleted.', '用户账号已删除。'],
+    deleteFailed: ['Failed to delete the user', '无法删除用户'],
+    form: {
+      editTitle: ['Edit user: @{name}', '编辑用户：@{name}'],
+      createTitle: ['Create a new system account', '创建新的系统账号'],
+      username: ['Username', '用户名'],
+      usernamePlaceholder: ['e.g. john_doe', '例如：john_doe'],
+      email: ['Email address', '邮箱地址'],
+      password: ['Account password', '账号密码'],
+      newPassword: ['New password (leave empty to keep)', '新密码（留空则保持不变）'],
+      firstName: ['First name', '名'],
+      lastName: ['Last name', '姓'],
+      needPassword: ['A password is required for a new user.', '创建新用户必须设置密码。'],
+      failed: ['The operation failed', '操作失败'],
+      saving: ['Saving…', '保存中…'],
+      save: ['Save user changes', '保存用户更改'],
+      createAccount: ['Create account', '创建账号'],
+    },
+    picker: {
+      title: ['Assign role and permissions', '分配角色和权限'],
+      hint: ['Choose the exact role level', '请选择确切的角色级别'],
+      SUPER_ADMIN: {
+        badge: ['Full root control', '完全控制'],
+        text: ['Complete control: create and manage admins and permissions, with full delete and block abilities across the whole system.', '完全控制：创建和管理管理员及权限，可在整个系统内删除和封禁。'],
+      },
+      ADMIN: {
+        badge: ['Management', '管理'],
+        text: ['Catalogue and content management: create, edit, activate and delete products, categories and news stories.', '目录与内容管理：创建、编辑、启用和删除产品、分类和新闻。'],
+      },
+      EDITOR: {
+        badge: ['Content only', '仅限内容'],
+        text: ['Content authoring: create and edit products, categories and news drafts. Cannot delete catalogue items or manage users.', '内容创作：创建和编辑产品、分类和新闻草稿。不能删除目录项目或管理用户。'],
+      },
+      USER: {
+        badge: ['Standard access', '普通权限'],
+        text: ['A regular registered customer. No administrative privileges.', '普通注册用户，没有管理权限。'],
+      },
+    },
+  },
+} as const satisfies CatalogNode;

@@ -1,0 +1,1990 @@
+{
+  "style" : [ {
+    "name" : "background",
+    "kind" : "ENUM",
+    "label" : "Background",
+    "localized" : false,
+    "required" : false,
+    "options" : [ "white", "light", "dark", "brand", "custom" ],
+    "optionLabels" : [ "White", "Light grey", "Dark", "Apsonic green", "My own color" ],
+    "defaultValue" : "white",
+    "group" : "Background"
+  }, {
+    "name" : "backgroundColor",
+    "kind" : "COLOR",
+    "label" : "Background color",
+    "localized" : false,
+    "required" : false,
+    "group" : "Background",
+    "showWhenField" : "background",
+    "showWhenValues" : [ "custom" ]
+  }, {
+    "name" : "backgroundImage",
+    "kind" : "MEDIA",
+    "label" : "Background picture",
+    "localized" : false,
+    "required" : false,
+    "group" : "Background"
+  }, {
+    "name" : "backgroundSize",
+    "kind" : "ENUM",
+    "label" : "Picture size",
+    "localized" : false,
+    "required" : false,
+    "options" : [ "cover", "contain", "auto" ],
+    "optionLabels" : [ "Fill the section", "Fit inside", "Original size" ],
+    "defaultValue" : "cover",
+    "group" : "Background",
+    "showWhenField" : "backgroundImage",
+    "showWhenValues" : [ "*" ]
+  }, {
+    "name" : "backgroundPosition",
+    "kind" : "ENUM",
+    "label" : "Picture position",
+    "localized" : false,
+    "required" : false,
+    "options" : [ "center", "top", "bottom", "left", "right", "top-left", "top-right", "bottom-left", "bottom-right" ],
+    "defaultValue" : "center",
+    "group" : "Background",
+    "showWhenField" : "backgroundImage",
+    "showWhenValues" : [ "*" ]
+  }, {
+    "name" : "backgroundFixed",
+    "kind" : "BOOLEAN",
+    "label" : "Keep the picture still while scrolling",
+    "localized" : false,
+    "required" : false,
+    "defaultValue" : false,
+    "group" : "Background",
+    "showWhenField" : "backgroundImage",
+    "showWhenValues" : [ "*" ]
+  }, {
+    "name" : "backgroundOverlayColor",
+    "kind" : "COLOR",
+    "label" : "Tint color",
+    "localized" : false,
+    "required" : false,
+    "group" : "Background",
+    "showWhenField" : "backgroundImage",
+    "showWhenValues" : [ "*" ]
+  }, {
+    "name" : "backgroundOverlay",
+    "kind" : "NUMBER",
+    "label" : "Tint strength (%)",
+    "localized" : false,
+    "required" : false,
+    "min" : 0,
+    "max" : 90,
+    "defaultValue" : 0,
+    "group" : "Background",
+    "showWhenField" : "backgroundImage",
+    "showWhenValues" : [ "*" ]
+  }, {
+    "name" : "textColor",
+    "kind" : "COLOR",
+    "label" : "Text color",
+    "localized" : false,
+    "required" : false,
+    "help" : "Leave empty to choose automatically from the background.",
+    "group" : "Text"
+  }, {
+    "name" : "accentColor",
+    "kind" : "COLOR",
+    "label" : "Accent color",
+    "localized" : false,
+    "required" : false,
+    "help" : "Small labels, icons and figures. Empty = Apsonic green.",
+    "group" : "Text"
+  }, {
+    "name" : "buttonColor",
+    "kind" : "COLOR",
+    "label" : "Button color",
+    "localized" : false,
+    "required" : false,
+    "group" : "Buttons"
+  }, {
+    "name" : "buttonTextColor",
+    "kind" : "COLOR",
+    "label" : "Button text color",
+    "localized" : false,
+    "required" : false,
+    "group" : "Buttons"
+  }, {
+    "name" : "buttonShape",
+    "kind" : "ENUM",
+    "label" : "Button shape",
+    "localized" : false,
+    "required" : false,
+    "options" : [ "pill", "rounded", "square" ],
+    "optionLabels" : [ "Pill", "Rounded", "Square" ],
+    "defaultValue" : "pill",
+    "group" : "Buttons"
+  }, {
+    "name" : "paddingTop",
+    "kind" : "ENUM",
+    "label" : "Space above",
+    "localized" : false,
+    "required" : false,
+    "options" : [ "none", "sm", "md", "lg", "xl" ],
+    "optionLabels" : [ "None", "Small", "Medium", "Large", "Extra large" ],
+    "defaultValue" : "md",
+    "group" : "Spacing"
+  }, {
+    "name" : "paddingBottom",
+    "kind" : "ENUM",
+    "label" : "Space below",
+    "localized" : false,
+    "required" : false,
+    "options" : [ "none", "sm", "md", "lg", "xl" ],
+    "optionLabels" : [ "None", "Small", "Medium", "Large", "Extra large" ],
+    "defaultValue" : "md",
+    "group" : "Spacing"
+  }, {
+    "name" : "width",
+    "kind" : "ENUM",
+    "label" : "Content width",
+    "localized" : false,
+    "required" : false,
+    "options" : [ "narrow", "normal", "wide" ],
+    "optionLabels" : [ "Narrow", "Normal", "Wide" ],
+    "defaultValue" : "normal",
+    "group" : "Spacing"
+  }, {
+    "name" : "showOn",
+    "kind" : "ENUM",
+    "label" : "Show on",
+    "localized" : false,
+    "required" : false,
+    "options" : [ "all", "desktop", "mobile" ],
+    "optionLabels" : [ "All screens", "Computers and tablets only", "Phones only" ],
+    "defaultValue" : "all",
+    "group" : "Visibility"
+  }, {
+    "name" : "eyebrowSize",
+    "kind" : "NUMBER",
+    "label" : "Size (%)",
+    "localized" : false,
+    "required" : false,
+    "min" : 50,
+    "max" : 300,
+    "defaultValue" : 100,
+    "group" : "Small label"
+  }, {
+    "name" : "eyebrowColor",
+    "kind" : "COLOR",
+    "label" : "Color",
+    "localized" : false,
+    "required" : false,
+    "help" : "Leave empty to use the section's text color.",
+    "group" : "Small label"
+  }, {
+    "name" : "eyebrowFont",
+    "kind" : "ENUM",
+    "label" : "Font",
+    "localized" : false,
+    "required" : false,
+    "options" : [ "default", "serif", "condensed", "mono" ],
+    "optionLabels" : [ "Apsonic default", "Elegant serif", "Bold condensed", "Typewriter" ],
+    "defaultValue" : "default",
+    "group" : "Small label"
+  }, {
+    "name" : "headingSize",
+    "kind" : "NUMBER",
+    "label" : "Size (%)",
+    "localized" : false,
+    "required" : false,
+    "min" : 50,
+    "max" : 300,
+    "defaultValue" : 100,
+    "group" : "Heading"
+  }, {
+    "name" : "headingColor",
+    "kind" : "COLOR",
+    "label" : "Color",
+    "localized" : false,
+    "required" : false,
+    "help" : "Leave empty to use the section's text color.",
+    "group" : "Heading"
+  }, {
+    "name" : "headingFont",
+    "kind" : "ENUM",
+    "label" : "Font",
+    "localized" : false,
+    "required" : false,
+    "options" : [ "default", "serif", "condensed", "mono" ],
+    "optionLabels" : [ "Apsonic default", "Elegant serif", "Bold condensed", "Typewriter" ],
+    "defaultValue" : "default",
+    "group" : "Heading"
+  }, {
+    "name" : "subheadingSize",
+    "kind" : "NUMBER",
+    "label" : "Size (%)",
+    "localized" : false,
+    "required" : false,
+    "min" : 50,
+    "max" : 300,
+    "defaultValue" : 100,
+    "group" : "Subheading"
+  }, {
+    "name" : "subheadingColor",
+    "kind" : "COLOR",
+    "label" : "Color",
+    "localized" : false,
+    "required" : false,
+    "help" : "Leave empty to use the section's text color.",
+    "group" : "Subheading"
+  }, {
+    "name" : "subheadingFont",
+    "kind" : "ENUM",
+    "label" : "Font",
+    "localized" : false,
+    "required" : false,
+    "options" : [ "default", "serif", "condensed", "mono" ],
+    "optionLabels" : [ "Apsonic default", "Elegant serif", "Bold condensed", "Typewriter" ],
+    "defaultValue" : "default",
+    "group" : "Subheading"
+  } ],
+  "sections" : [ {
+    "type" : "hero",
+    "label" : "Hero banner",
+    "description" : "Large banner with a heading, picture or video and buttons.",
+    "category" : "Banners",
+    "fields" : [ {
+      "name" : "eyebrow",
+      "kind" : "TEXT",
+      "label" : "Small label above",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 60,
+      "group" : "Text"
+    }, {
+      "name" : "heading",
+      "kind" : "TEXT",
+      "label" : "Heading",
+      "localized" : true,
+      "required" : true,
+      "maxLength" : 160,
+      "group" : "Text"
+    }, {
+      "name" : "subheading",
+      "kind" : "TEXTAREA",
+      "label" : "Subheading",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 400,
+      "group" : "Text"
+    }, {
+      "name" : "align",
+      "kind" : "ENUM",
+      "label" : "Text alignment",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "left", "center", "right" ],
+      "defaultValue" : "left",
+      "group" : "Text"
+    }, {
+      "name" : "verticalAlign",
+      "kind" : "ENUM",
+      "label" : "Text position",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "top", "center", "bottom" ],
+      "optionLabels" : [ "Top", "Middle", "Bottom" ],
+      "defaultValue" : "center",
+      "group" : "Text"
+    }, {
+      "name" : "desktopImage",
+      "kind" : "MEDIA",
+      "label" : "Picture",
+      "localized" : false,
+      "required" : false,
+      "group" : "Picture"
+    }, {
+      "name" : "mobileImage",
+      "kind" : "MEDIA",
+      "label" : "Picture for phones",
+      "localized" : false,
+      "required" : false,
+      "help" : "Shown on small screens. Falls back to the main picture.",
+      "group" : "Picture"
+    }, {
+      "name" : "videoUrl",
+      "kind" : "MEDIA",
+      "label" : "Background video",
+      "localized" : false,
+      "required" : false,
+      "help" : "Optional MP4/WebM. The picture is shown while it loads.",
+      "group" : "Picture"
+    }, {
+      "name" : "imageSize",
+      "kind" : "ENUM",
+      "label" : "Picture size",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "cover", "contain" ],
+      "optionLabels" : [ "Fill the banner", "Fit inside" ],
+      "defaultValue" : "cover",
+      "group" : "Picture"
+    }, {
+      "name" : "imagePosition",
+      "kind" : "ENUM",
+      "label" : "Picture position",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "center", "top", "bottom", "left", "right", "top-left", "top-right", "bottom-left", "bottom-right" ],
+      "defaultValue" : "center",
+      "help" : "Which part of the picture stays in view when it is cropped.",
+      "group" : "Picture"
+    }, {
+      "name" : "overlayColor",
+      "kind" : "COLOR",
+      "label" : "Tint color",
+      "localized" : false,
+      "required" : false,
+      "help" : "Needs a picture, a video or a background color to be visible.",
+      "group" : "Tint over the picture"
+    }, {
+      "name" : "overlay",
+      "kind" : "NUMBER",
+      "label" : "Tint strength (%)",
+      "localized" : false,
+      "required" : false,
+      "min" : 0,
+      "max" : 90,
+      "defaultValue" : 40,
+      "group" : "Tint over the picture"
+    }, {
+      "name" : "overlayStyle",
+      "kind" : "ENUM",
+      "label" : "Tint style",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "solid", "bottom", "top" ],
+      "optionLabels" : [ "Even", "Darker at the bottom", "Darker at the top" ],
+      "defaultValue" : "solid",
+      "group" : "Tint over the picture"
+    }, {
+      "name" : "backgroundColor",
+      "kind" : "COLOR",
+      "label" : "Background color",
+      "localized" : false,
+      "required" : false,
+      "help" : "Shown behind the picture. Empty = near black.",
+      "group" : "Tint over the picture"
+    }, {
+      "name" : "height",
+      "kind" : "ENUM",
+      "label" : "Height",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "md", "lg", "full", "custom" ],
+      "optionLabels" : [ "Medium", "Large", "Full screen", "My own height" ],
+      "defaultValue" : "lg",
+      "group" : "Size"
+    }, {
+      "name" : "minHeight",
+      "kind" : "NUMBER",
+      "label" : "Height (px)",
+      "localized" : false,
+      "required" : false,
+      "min" : 240,
+      "max" : 1000,
+      "defaultValue" : 560,
+      "group" : "Size",
+      "showWhenField" : "height",
+      "showWhenValues" : [ "custom" ]
+    }, {
+      "name" : "ctas",
+      "kind" : "LIST",
+      "label" : "Buttons",
+      "localized" : false,
+      "required" : false,
+      "itemFields" : [ {
+        "name" : "label",
+        "kind" : "TEXT",
+        "label" : "Label",
+        "localized" : true,
+        "required" : true,
+        "maxLength" : 60
+      }, {
+        "name" : "url",
+        "kind" : "URL",
+        "label" : "Link",
+        "localized" : false,
+        "required" : true
+      }, {
+        "name" : "variant",
+        "kind" : "ENUM",
+        "label" : "Style",
+        "localized" : false,
+        "required" : false,
+        "options" : [ "primary", "secondary" ],
+        "optionLabels" : [ "Solid", "Outline" ],
+        "defaultValue" : "primary"
+      }, {
+        "name" : "color",
+        "kind" : "COLOR",
+        "label" : "Color",
+        "localized" : false,
+        "required" : false,
+        "help" : "Overrides the section's button color."
+      }, {
+        "name" : "textColor",
+        "kind" : "COLOR",
+        "label" : "Text color",
+        "localized" : false,
+        "required" : false
+      }, {
+        "name" : "newTab",
+        "kind" : "BOOLEAN",
+        "label" : "Open in a new tab",
+        "localized" : false,
+        "required" : false,
+        "defaultValue" : false
+      } ],
+      "minItems" : 0,
+      "maxItems" : 3,
+      "group" : "Buttons"
+    } ],
+    "styleFieldNames" : [ "textColor", "accentColor", "showOn", "eyebrowSize", "eyebrowColor", "eyebrowFont", "headingSize", "headingColor", "headingFont", "subheadingSize", "subheadingColor", "subheadingFont", "buttonColor", "buttonTextColor", "buttonShape" ],
+    "styleDefaults" : { }
+  }, {
+    "type" : "rich-text",
+    "label" : "Rich text",
+    "description" : "Formatted text: headings, lists, links and images.",
+    "category" : "Content",
+    "fields" : [ {
+      "name" : "body",
+      "kind" : "RICHTEXT",
+      "label" : "Content",
+      "localized" : true,
+      "required" : true,
+      "maxLength" : 40000,
+      "group" : "Content"
+    }, {
+      "name" : "align",
+      "kind" : "ENUM",
+      "label" : "Alignment",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "left", "center", "right" ],
+      "defaultValue" : "left",
+      "group" : "Look"
+    }, {
+      "name" : "size",
+      "kind" : "ENUM",
+      "label" : "Text size",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "md", "lg" ],
+      "optionLabels" : [ "Normal", "Large" ],
+      "defaultValue" : "md",
+      "group" : "Look"
+    } ],
+    "styleFieldNames" : null,
+    "styleDefaults" : { }
+  }, {
+    "type" : "text-image",
+    "label" : "Text and image",
+    "description" : "Text next to an image, on either side.",
+    "category" : "Content",
+    "fields" : [ {
+      "name" : "eyebrow",
+      "kind" : "TEXT",
+      "label" : "Small label above",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 60,
+      "group" : "Text"
+    }, {
+      "name" : "heading",
+      "kind" : "TEXT",
+      "label" : "Heading",
+      "localized" : true,
+      "required" : true,
+      "maxLength" : 160,
+      "group" : "Text"
+    }, {
+      "name" : "body",
+      "kind" : "RICHTEXT",
+      "label" : "Text",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 10000,
+      "group" : "Text"
+    }, {
+      "name" : "textAlign",
+      "kind" : "ENUM",
+      "label" : "Text alignment",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "left", "center" ],
+      "defaultValue" : "left",
+      "group" : "Text"
+    }, {
+      "name" : "ctas",
+      "kind" : "LIST",
+      "label" : "Buttons",
+      "localized" : false,
+      "required" : false,
+      "itemFields" : [ {
+        "name" : "label",
+        "kind" : "TEXT",
+        "label" : "Label",
+        "localized" : true,
+        "required" : true,
+        "maxLength" : 60
+      }, {
+        "name" : "url",
+        "kind" : "URL",
+        "label" : "Link",
+        "localized" : false,
+        "required" : true
+      }, {
+        "name" : "variant",
+        "kind" : "ENUM",
+        "label" : "Style",
+        "localized" : false,
+        "required" : false,
+        "options" : [ "primary", "secondary" ],
+        "optionLabels" : [ "Solid", "Outline" ],
+        "defaultValue" : "primary"
+      }, {
+        "name" : "color",
+        "kind" : "COLOR",
+        "label" : "Color",
+        "localized" : false,
+        "required" : false,
+        "help" : "Overrides the section's button color."
+      }, {
+        "name" : "textColor",
+        "kind" : "COLOR",
+        "label" : "Text color",
+        "localized" : false,
+        "required" : false
+      }, {
+        "name" : "newTab",
+        "kind" : "BOOLEAN",
+        "label" : "Open in a new tab",
+        "localized" : false,
+        "required" : false,
+        "defaultValue" : false
+      } ],
+      "minItems" : 0,
+      "maxItems" : 2,
+      "group" : "Buttons"
+    }, {
+      "name" : "image",
+      "kind" : "MEDIA",
+      "label" : "Image",
+      "localized" : false,
+      "required" : false,
+      "group" : "Image"
+    }, {
+      "name" : "imageAlt",
+      "kind" : "TEXT",
+      "label" : "Image description",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 200,
+      "group" : "Image"
+    }, {
+      "name" : "imagePosition",
+      "kind" : "ENUM",
+      "label" : "Image side",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "left", "right" ],
+      "defaultValue" : "left",
+      "group" : "Image"
+    }, {
+      "name" : "imageRatio",
+      "kind" : "ENUM",
+      "label" : "Image shape",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "4-3", "1-1", "16-9", "3-4" ],
+      "optionLabels" : [ "Landscape 4:3", "Square", "Wide 16:9", "Portrait 3:4" ],
+      "defaultValue" : "4-3",
+      "group" : "Image"
+    }, {
+      "name" : "imageFit",
+      "kind" : "ENUM",
+      "label" : "Image fit",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "cover", "contain" ],
+      "optionLabels" : [ "Fill the frame", "Show the whole image" ],
+      "defaultValue" : "cover",
+      "group" : "Image"
+    }, {
+      "name" : "imageStyle",
+      "kind" : "ENUM",
+      "label" : "Image corners",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "rounded", "square", "circle" ],
+      "optionLabels" : [ "Rounded", "Square", "Circle" ],
+      "defaultValue" : "rounded",
+      "group" : "Image"
+    }, {
+      "name" : "verticalAlign",
+      "kind" : "ENUM",
+      "label" : "Align with image",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "top", "center", "bottom" ],
+      "optionLabels" : [ "Top", "Middle", "Bottom" ],
+      "defaultValue" : "center",
+      "group" : "Image"
+    } ],
+    "styleFieldNames" : null,
+    "styleDefaults" : { }
+  }, {
+    "type" : "gallery",
+    "label" : "Image gallery",
+    "description" : "A grid of images with optional captions.",
+    "category" : "Media",
+    "fields" : [ {
+      "name" : "eyebrow",
+      "kind" : "TEXT",
+      "label" : "Small label above",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 60,
+      "group" : "Text"
+    }, {
+      "name" : "heading",
+      "kind" : "TEXT",
+      "label" : "Heading",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 160,
+      "group" : "Text"
+    }, {
+      "name" : "intro",
+      "kind" : "TEXTAREA",
+      "label" : "Subheading",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 600,
+      "group" : "Text"
+    }, {
+      "name" : "items",
+      "kind" : "LIST",
+      "label" : "Images",
+      "localized" : false,
+      "required" : false,
+      "itemFields" : [ {
+        "name" : "image",
+        "kind" : "MEDIA",
+        "label" : "Image",
+        "localized" : false,
+        "required" : true
+      }, {
+        "name" : "caption",
+        "kind" : "TEXT",
+        "label" : "Caption",
+        "localized" : true,
+        "required" : false,
+        "maxLength" : 200
+      } ],
+      "minItems" : 1,
+      "maxItems" : 36,
+      "group" : "Images"
+    }, {
+      "name" : "columns",
+      "kind" : "ENUM",
+      "label" : "Columns",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "2", "3", "4", "5" ],
+      "defaultValue" : "3",
+      "group" : "Look"
+    }, {
+      "name" : "ratio",
+      "kind" : "ENUM",
+      "label" : "Image shape",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "4-3", "1-1", "16-9", "auto" ],
+      "optionLabels" : [ "Landscape 4:3", "Square", "Wide 16:9", "Original" ],
+      "defaultValue" : "4-3",
+      "group" : "Look"
+    }, {
+      "name" : "gap",
+      "kind" : "ENUM",
+      "label" : "Space between",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "sm", "md", "lg" ],
+      "optionLabels" : [ "Small", "Medium", "Large" ],
+      "defaultValue" : "md",
+      "group" : "Look"
+    }, {
+      "name" : "rounded",
+      "kind" : "ENUM",
+      "label" : "Corners",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "none", "md", "xl" ],
+      "optionLabels" : [ "Square", "Slightly rounded", "Rounded" ],
+      "defaultValue" : "xl",
+      "group" : "Look"
+    }, {
+      "name" : "lightbox",
+      "kind" : "BOOLEAN",
+      "label" : "Open large when clicked",
+      "localized" : false,
+      "required" : false,
+      "defaultValue" : true,
+      "group" : "Look"
+    } ],
+    "styleFieldNames" : null,
+    "styleDefaults" : { }
+  }, {
+    "type" : "video",
+    "label" : "Video",
+    "description" : "A single video with a poster image.",
+    "category" : "Media",
+    "fields" : [ {
+      "name" : "eyebrow",
+      "kind" : "TEXT",
+      "label" : "Small label above",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 60,
+      "group" : "Text"
+    }, {
+      "name" : "heading",
+      "kind" : "TEXT",
+      "label" : "Heading",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 160,
+      "group" : "Text"
+    }, {
+      "name" : "intro",
+      "kind" : "TEXTAREA",
+      "label" : "Subheading",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 600,
+      "group" : "Text"
+    }, {
+      "name" : "caption",
+      "kind" : "TEXT",
+      "label" : "Caption",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 300,
+      "group" : "Text"
+    }, {
+      "name" : "videoUrl",
+      "kind" : "MEDIA",
+      "label" : "Video file",
+      "localized" : false,
+      "required" : true,
+      "help" : "MP4 or WebM, uploaded or an https link.",
+      "group" : "Video"
+    }, {
+      "name" : "poster",
+      "kind" : "MEDIA",
+      "label" : "Poster image",
+      "localized" : false,
+      "required" : false,
+      "group" : "Video"
+    }, {
+      "name" : "ratio",
+      "kind" : "ENUM",
+      "label" : "Shape",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "16-9", "4-3", "1-1", "21-9" ],
+      "optionLabels" : [ "Wide 16:9", "Classic 4:3", "Square", "Cinema 21:9" ],
+      "defaultValue" : "16-9",
+      "group" : "Video"
+    }, {
+      "name" : "controls",
+      "kind" : "BOOLEAN",
+      "label" : "Show play controls",
+      "localized" : false,
+      "required" : false,
+      "defaultValue" : true,
+      "group" : "Video"
+    }, {
+      "name" : "autoplay",
+      "kind" : "BOOLEAN",
+      "label" : "Start by itself (muted)",
+      "localized" : false,
+      "required" : false,
+      "defaultValue" : false,
+      "group" : "Video"
+    }, {
+      "name" : "loop",
+      "kind" : "BOOLEAN",
+      "label" : "Repeat",
+      "localized" : false,
+      "required" : false,
+      "defaultValue" : false,
+      "group" : "Video"
+    }, {
+      "name" : "rounded",
+      "kind" : "BOOLEAN",
+      "label" : "Rounded corners",
+      "localized" : false,
+      "required" : false,
+      "defaultValue" : true,
+      "group" : "Video"
+    } ],
+    "styleFieldNames" : null,
+    "styleDefaults" : { }
+  }, {
+    "type" : "feature-grid",
+    "label" : "Feature grid",
+    "description" : "Icon cards that highlight strengths or steps.",
+    "category" : "Content",
+    "fields" : [ {
+      "name" : "eyebrow",
+      "kind" : "TEXT",
+      "label" : "Small label above",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 60,
+      "group" : "Text"
+    }, {
+      "name" : "heading",
+      "kind" : "TEXT",
+      "label" : "Heading",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 160,
+      "group" : "Text"
+    }, {
+      "name" : "intro",
+      "kind" : "TEXTAREA",
+      "label" : "Subheading",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 600,
+      "group" : "Text"
+    }, {
+      "name" : "items",
+      "kind" : "LIST",
+      "label" : "Cards",
+      "localized" : false,
+      "required" : false,
+      "itemFields" : [ {
+        "name" : "icon",
+        "kind" : "ENUM",
+        "label" : "Icon",
+        "localized" : false,
+        "required" : false,
+        "options" : [ "none", "shield", "truck", "wrench", "zap", "award", "globe", "users", "check", "star", "clock", "map-pin", "phone", "heart", "settings", "leaf", "bike" ],
+        "defaultValue" : "check"
+      }, {
+        "name" : "title",
+        "kind" : "TEXT",
+        "label" : "Title",
+        "localized" : true,
+        "required" : true,
+        "maxLength" : 100
+      }, {
+        "name" : "text",
+        "kind" : "TEXTAREA",
+        "label" : "Text",
+        "localized" : true,
+        "required" : false,
+        "maxLength" : 400
+      }, {
+        "name" : "url",
+        "kind" : "URL",
+        "label" : "Link (optional)",
+        "localized" : false,
+        "required" : false
+      } ],
+      "minItems" : 1,
+      "maxItems" : 12,
+      "group" : "Cards"
+    }, {
+      "name" : "columns",
+      "kind" : "ENUM",
+      "label" : "Columns",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "2", "3", "4" ],
+      "defaultValue" : "3",
+      "group" : "Look"
+    }, {
+      "name" : "cardStyle",
+      "kind" : "ENUM",
+      "label" : "Card style",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "boxed", "filled", "plain" ],
+      "optionLabels" : [ "With border", "Filled", "No card" ],
+      "defaultValue" : "boxed",
+      "group" : "Look"
+    }, {
+      "name" : "align",
+      "kind" : "ENUM",
+      "label" : "Alignment",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "left", "center" ],
+      "defaultValue" : "left",
+      "group" : "Look"
+    }, {
+      "name" : "iconStyle",
+      "kind" : "ENUM",
+      "label" : "Icon shape",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "square", "circle", "plain" ],
+      "optionLabels" : [ "Rounded square", "Circle", "Just the icon" ],
+      "defaultValue" : "square",
+      "group" : "Look"
+    }, {
+      "name" : "cardColor",
+      "kind" : "COLOR",
+      "label" : "Card color",
+      "localized" : false,
+      "required" : false,
+      "group" : "Look"
+    } ],
+    "styleFieldNames" : null,
+    "styleDefaults" : { }
+  }, {
+    "type" : "stats",
+    "label" : "Statistics",
+    "description" : "Key numbers and achievements.",
+    "category" : "Content",
+    "fields" : [ {
+      "name" : "eyebrow",
+      "kind" : "TEXT",
+      "label" : "Small label above",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 60,
+      "group" : "Text"
+    }, {
+      "name" : "heading",
+      "kind" : "TEXT",
+      "label" : "Heading",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 160,
+      "group" : "Text"
+    }, {
+      "name" : "intro",
+      "kind" : "TEXTAREA",
+      "label" : "Subheading",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 600,
+      "group" : "Text"
+    }, {
+      "name" : "items",
+      "kind" : "LIST",
+      "label" : "Figures",
+      "localized" : false,
+      "required" : false,
+      "itemFields" : [ {
+        "name" : "value",
+        "kind" : "TEXT",
+        "label" : "Value",
+        "localized" : false,
+        "required" : true,
+        "maxLength" : 20,
+        "help" : "For example 25+ or 1.2M"
+      }, {
+        "name" : "label",
+        "kind" : "TEXT",
+        "label" : "Label",
+        "localized" : true,
+        "required" : true,
+        "maxLength" : 100
+      }, {
+        "name" : "note",
+        "kind" : "TEXT",
+        "label" : "Small note",
+        "localized" : true,
+        "required" : false,
+        "maxLength" : 120
+      }, {
+        "name" : "icon",
+        "kind" : "ENUM",
+        "label" : "Icon",
+        "localized" : false,
+        "required" : false,
+        "options" : [ "none", "shield", "truck", "wrench", "zap", "award", "globe", "users", "check", "star", "clock", "map-pin", "phone", "heart", "settings", "leaf", "bike" ],
+        "defaultValue" : "none"
+      }, {
+        "name" : "color",
+        "kind" : "COLOR",
+        "label" : "Figure color",
+        "localized" : false,
+        "required" : false,
+        "help" : "Overrides the color for this figure only."
+      } ],
+      "minItems" : 1,
+      "maxItems" : 12,
+      "group" : "Figures"
+    }, {
+      "name" : "columns",
+      "kind" : "ENUM",
+      "label" : "Per row",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "auto", "2", "3", "4", "6" ],
+      "optionLabels" : [ "Automatic", "2", "3", "4", "6" ],
+      "defaultValue" : "auto",
+      "group" : "Look"
+    }, {
+      "name" : "align",
+      "kind" : "ENUM",
+      "label" : "Alignment",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "left", "center" ],
+      "defaultValue" : "center",
+      "group" : "Look"
+    }, {
+      "name" : "cardStyle",
+      "kind" : "ENUM",
+      "label" : "Card style",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "plain", "boxed", "filled" ],
+      "optionLabels" : [ "No card", "With border", "Filled" ],
+      "defaultValue" : "plain",
+      "group" : "Look"
+    }, {
+      "name" : "valueSize",
+      "kind" : "ENUM",
+      "label" : "Figure size",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "md", "lg", "xl" ],
+      "optionLabels" : [ "Medium", "Large", "Extra large" ],
+      "defaultValue" : "lg",
+      "group" : "Look"
+    }, {
+      "name" : "valueColor",
+      "kind" : "COLOR",
+      "label" : "Figures color",
+      "localized" : false,
+      "required" : false,
+      "help" : "Empty = the section's accent color.",
+      "group" : "Colors"
+    }, {
+      "name" : "labelColor",
+      "kind" : "COLOR",
+      "label" : "Labels color",
+      "localized" : false,
+      "required" : false,
+      "group" : "Colors"
+    }, {
+      "name" : "cardColor",
+      "kind" : "COLOR",
+      "label" : "Card color",
+      "localized" : false,
+      "required" : false,
+      "group" : "Colors",
+      "showWhenField" : "cardStyle",
+      "showWhenValues" : [ "boxed", "filled" ]
+    } ],
+    "styleFieldNames" : null,
+    "styleDefaults" : { }
+  }, {
+    "type" : "product-showcase",
+    "label" : "Product showcase",
+    "description" : "Shows products from the catalogue.",
+    "category" : "Showcase",
+    "fields" : [ {
+      "name" : "eyebrow",
+      "kind" : "TEXT",
+      "label" : "Small label above",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 60,
+      "group" : "Text"
+    }, {
+      "name" : "heading",
+      "kind" : "TEXT",
+      "label" : "Heading",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 160,
+      "group" : "Text"
+    }, {
+      "name" : "intro",
+      "kind" : "TEXTAREA",
+      "label" : "Subheading",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 600,
+      "group" : "Text"
+    }, {
+      "name" : "categorySlug",
+      "kind" : "TEXT",
+      "label" : "Category",
+      "localized" : false,
+      "required" : false,
+      "maxLength" : 80,
+      "help" : "Leave empty to show the latest products.",
+      "group" : "Products"
+    }, {
+      "name" : "limit",
+      "kind" : "NUMBER",
+      "label" : "Number of products",
+      "localized" : false,
+      "required" : false,
+      "min" : 1,
+      "max" : 12,
+      "defaultValue" : 4,
+      "group" : "Products"
+    }, {
+      "name" : "columns",
+      "kind" : "ENUM",
+      "label" : "Per row",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "2", "3", "4" ],
+      "defaultValue" : "4",
+      "group" : "Look"
+    }, {
+      "name" : "showCategory",
+      "kind" : "BOOLEAN",
+      "label" : "Show the category name",
+      "localized" : false,
+      "required" : false,
+      "defaultValue" : true,
+      "group" : "Look"
+    }, {
+      "name" : "ctas",
+      "kind" : "LIST",
+      "label" : "Buttons",
+      "localized" : false,
+      "required" : false,
+      "itemFields" : [ {
+        "name" : "label",
+        "kind" : "TEXT",
+        "label" : "Label",
+        "localized" : true,
+        "required" : true,
+        "maxLength" : 60
+      }, {
+        "name" : "url",
+        "kind" : "URL",
+        "label" : "Link",
+        "localized" : false,
+        "required" : true
+      }, {
+        "name" : "variant",
+        "kind" : "ENUM",
+        "label" : "Style",
+        "localized" : false,
+        "required" : false,
+        "options" : [ "primary", "secondary" ],
+        "optionLabels" : [ "Solid", "Outline" ],
+        "defaultValue" : "primary"
+      }, {
+        "name" : "color",
+        "kind" : "COLOR",
+        "label" : "Color",
+        "localized" : false,
+        "required" : false,
+        "help" : "Overrides the section's button color."
+      }, {
+        "name" : "textColor",
+        "kind" : "COLOR",
+        "label" : "Text color",
+        "localized" : false,
+        "required" : false
+      }, {
+        "name" : "newTab",
+        "kind" : "BOOLEAN",
+        "label" : "Open in a new tab",
+        "localized" : false,
+        "required" : false,
+        "defaultValue" : false
+      } ],
+      "minItems" : 0,
+      "maxItems" : 2,
+      "group" : "Buttons"
+    } ],
+    "styleFieldNames" : null,
+    "styleDefaults" : { }
+  }, {
+    "type" : "service-showcase",
+    "label" : "Service showcase",
+    "description" : "Cards describing the services you offer.",
+    "category" : "Showcase",
+    "fields" : [ {
+      "name" : "eyebrow",
+      "kind" : "TEXT",
+      "label" : "Small label above",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 60,
+      "group" : "Text"
+    }, {
+      "name" : "heading",
+      "kind" : "TEXT",
+      "label" : "Heading",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 160,
+      "group" : "Text"
+    }, {
+      "name" : "intro",
+      "kind" : "TEXTAREA",
+      "label" : "Subheading",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 600,
+      "group" : "Text"
+    }, {
+      "name" : "items",
+      "kind" : "LIST",
+      "label" : "Services",
+      "localized" : false,
+      "required" : false,
+      "itemFields" : [ {
+        "name" : "title",
+        "kind" : "TEXT",
+        "label" : "Title",
+        "localized" : true,
+        "required" : true,
+        "maxLength" : 100
+      }, {
+        "name" : "text",
+        "kind" : "TEXTAREA",
+        "label" : "Text",
+        "localized" : true,
+        "required" : false,
+        "maxLength" : 400
+      }, {
+        "name" : "image",
+        "kind" : "MEDIA",
+        "label" : "Image",
+        "localized" : false,
+        "required" : false
+      }, {
+        "name" : "url",
+        "kind" : "URL",
+        "label" : "Link",
+        "localized" : false,
+        "required" : false
+      } ],
+      "minItems" : 1,
+      "maxItems" : 12,
+      "group" : "Services"
+    }, {
+      "name" : "columns",
+      "kind" : "ENUM",
+      "label" : "Per row",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "2", "3", "4" ],
+      "defaultValue" : "3",
+      "group" : "Look"
+    }, {
+      "name" : "cardColor",
+      "kind" : "COLOR",
+      "label" : "Card color",
+      "localized" : false,
+      "required" : false,
+      "group" : "Look"
+    } ],
+    "styleFieldNames" : null,
+    "styleDefaults" : { }
+  }, {
+    "type" : "cta-banner",
+    "label" : "Call to action",
+    "description" : "A bold banner that sends visitors somewhere.",
+    "category" : "Conversion",
+    "fields" : [ {
+      "name" : "eyebrow",
+      "kind" : "TEXT",
+      "label" : "Small label above",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 60,
+      "group" : "Text"
+    }, {
+      "name" : "heading",
+      "kind" : "TEXT",
+      "label" : "Heading",
+      "localized" : true,
+      "required" : true,
+      "maxLength" : 160,
+      "group" : "Text"
+    }, {
+      "name" : "text",
+      "kind" : "TEXTAREA",
+      "label" : "Subheading",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 400,
+      "group" : "Text"
+    }, {
+      "name" : "align",
+      "kind" : "ENUM",
+      "label" : "Text alignment",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "left", "center", "right" ],
+      "defaultValue" : "center",
+      "group" : "Text"
+    }, {
+      "name" : "image",
+      "kind" : "MEDIA",
+      "label" : "Background picture",
+      "localized" : false,
+      "required" : false,
+      "group" : "Picture"
+    }, {
+      "name" : "imageSize",
+      "kind" : "ENUM",
+      "label" : "Picture size",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "cover", "contain", "auto" ],
+      "optionLabels" : [ "Fill the banner", "Fit inside", "Original size" ],
+      "defaultValue" : "cover",
+      "group" : "Picture",
+      "showWhenField" : "image",
+      "showWhenValues" : [ "*" ]
+    }, {
+      "name" : "imagePosition",
+      "kind" : "ENUM",
+      "label" : "Picture position",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "center", "top", "bottom", "left", "right", "top-left", "top-right", "bottom-left", "bottom-right" ],
+      "defaultValue" : "center",
+      "group" : "Picture",
+      "showWhenField" : "image",
+      "showWhenValues" : [ "*" ]
+    }, {
+      "name" : "imageFixed",
+      "kind" : "BOOLEAN",
+      "label" : "Keep the picture still while scrolling",
+      "localized" : false,
+      "required" : false,
+      "defaultValue" : false,
+      "group" : "Picture",
+      "showWhenField" : "image",
+      "showWhenValues" : [ "*" ]
+    }, {
+      "name" : "overlayColor",
+      "kind" : "COLOR",
+      "label" : "Tint color",
+      "localized" : false,
+      "required" : false,
+      "group" : "Picture",
+      "showWhenField" : "image",
+      "showWhenValues" : [ "*" ]
+    }, {
+      "name" : "overlay",
+      "kind" : "NUMBER",
+      "label" : "Tint strength (%)",
+      "localized" : false,
+      "required" : false,
+      "min" : 0,
+      "max" : 90,
+      "defaultValue" : 50,
+      "group" : "Picture",
+      "showWhenField" : "image",
+      "showWhenValues" : [ "*" ]
+    }, {
+      "name" : "height",
+      "kind" : "ENUM",
+      "label" : "Height",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "sm", "md", "lg", "custom" ],
+      "optionLabels" : [ "Small", "Medium", "Large", "My own height" ],
+      "defaultValue" : "md",
+      "group" : "Size"
+    }, {
+      "name" : "minHeight",
+      "kind" : "NUMBER",
+      "label" : "Height (px)",
+      "localized" : false,
+      "required" : false,
+      "min" : 160,
+      "max" : 800,
+      "defaultValue" : 320,
+      "group" : "Size",
+      "showWhenField" : "height",
+      "showWhenValues" : [ "custom" ]
+    }, {
+      "name" : "ctas",
+      "kind" : "LIST",
+      "label" : "Buttons",
+      "localized" : false,
+      "required" : false,
+      "itemFields" : [ {
+        "name" : "label",
+        "kind" : "TEXT",
+        "label" : "Label",
+        "localized" : true,
+        "required" : true,
+        "maxLength" : 60
+      }, {
+        "name" : "url",
+        "kind" : "URL",
+        "label" : "Link",
+        "localized" : false,
+        "required" : true
+      }, {
+        "name" : "variant",
+        "kind" : "ENUM",
+        "label" : "Style",
+        "localized" : false,
+        "required" : false,
+        "options" : [ "primary", "secondary" ],
+        "optionLabels" : [ "Solid", "Outline" ],
+        "defaultValue" : "primary"
+      }, {
+        "name" : "color",
+        "kind" : "COLOR",
+        "label" : "Color",
+        "localized" : false,
+        "required" : false,
+        "help" : "Overrides the section's button color."
+      }, {
+        "name" : "textColor",
+        "kind" : "COLOR",
+        "label" : "Text color",
+        "localized" : false,
+        "required" : false
+      }, {
+        "name" : "newTab",
+        "kind" : "BOOLEAN",
+        "label" : "Open in a new tab",
+        "localized" : false,
+        "required" : false,
+        "defaultValue" : false
+      } ],
+      "minItems" : 0,
+      "maxItems" : 2,
+      "group" : "Buttons"
+    } ],
+    "styleFieldNames" : [ "background", "backgroundColor", "paddingTop", "paddingBottom", "width", "textColor", "accentColor", "paddingTop", "paddingBottom", "width", "showOn", "eyebrowSize", "eyebrowColor", "eyebrowFont", "headingSize", "headingColor", "headingFont", "subheadingSize", "subheadingColor", "subheadingFont", "buttonColor", "buttonTextColor", "buttonShape" ],
+    "styleDefaults" : {
+      "background" : "brand",
+      "paddingBottom" : "lg",
+      "paddingTop" : "lg"
+    }
+  }, {
+    "type" : "testimonials",
+    "label" : "Testimonials",
+    "description" : "What customers say about Apsonic, with their photo and role.",
+    "category" : "Social proof",
+    "fields" : [ {
+      "name" : "eyebrow",
+      "kind" : "TEXT",
+      "label" : "Small label above",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 60,
+      "group" : "Text"
+    }, {
+      "name" : "heading",
+      "kind" : "TEXT",
+      "label" : "Heading",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 160,
+      "group" : "Text"
+    }, {
+      "name" : "intro",
+      "kind" : "TEXTAREA",
+      "label" : "Subheading",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 600,
+      "group" : "Text"
+    }, {
+      "name" : "source",
+      "kind" : "ENUM",
+      "label" : "Where the testimonials come from",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "custom", "site" ],
+      "optionLabels" : [ "Written here", "The site list (Home Page > Testimonials)" ],
+      "defaultValue" : "custom",
+      "group" : "Testimonials"
+    }, {
+      "name" : "limit",
+      "kind" : "NUMBER",
+      "label" : "Number shown",
+      "localized" : false,
+      "required" : false,
+      "min" : 1,
+      "max" : 12,
+      "defaultValue" : 3,
+      "group" : "Testimonials",
+      "showWhenField" : "source",
+      "showWhenValues" : [ "site" ]
+    }, {
+      "name" : "items",
+      "kind" : "LIST",
+      "label" : "Testimonials",
+      "localized" : false,
+      "required" : false,
+      "itemFields" : [ {
+        "name" : "quote",
+        "kind" : "TEXTAREA",
+        "label" : "What they said",
+        "localized" : true,
+        "required" : true,
+        "maxLength" : 600
+      }, {
+        "name" : "name",
+        "kind" : "TEXT",
+        "label" : "Name",
+        "localized" : false,
+        "required" : true,
+        "maxLength" : 80
+      }, {
+        "name" : "role",
+        "kind" : "TEXT",
+        "label" : "Role or company",
+        "localized" : true,
+        "required" : false,
+        "maxLength" : 100
+      }, {
+        "name" : "photo",
+        "kind" : "MEDIA",
+        "label" : "Photo",
+        "localized" : false,
+        "required" : false
+      }, {
+        "name" : "rating",
+        "kind" : "NUMBER",
+        "label" : "Stars (0 = none)",
+        "localized" : false,
+        "required" : false,
+        "min" : 0,
+        "max" : 5,
+        "defaultValue" : 5
+      } ],
+      "minItems" : 0,
+      "maxItems" : 12,
+      "group" : "Testimonials",
+      "showWhenField" : "source",
+      "showWhenValues" : [ "custom" ]
+    }, {
+      "name" : "columns",
+      "kind" : "ENUM",
+      "label" : "Per row",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "1", "2", "3" ],
+      "defaultValue" : "3",
+      "group" : "Look"
+    }, {
+      "name" : "cardStyle",
+      "kind" : "ENUM",
+      "label" : "Card style",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "filled", "boxed", "plain" ],
+      "optionLabels" : [ "Filled", "With border", "No card" ],
+      "defaultValue" : "filled",
+      "group" : "Look"
+    }, {
+      "name" : "align",
+      "kind" : "ENUM",
+      "label" : "Alignment",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "left", "center" ],
+      "defaultValue" : "left",
+      "group" : "Look"
+    }, {
+      "name" : "showQuoteIcon",
+      "kind" : "BOOLEAN",
+      "label" : "Show the quote mark",
+      "localized" : false,
+      "required" : false,
+      "defaultValue" : true,
+      "group" : "Look"
+    }, {
+      "name" : "cardColor",
+      "kind" : "COLOR",
+      "label" : "Card color",
+      "localized" : false,
+      "required" : false,
+      "group" : "Colors"
+    }, {
+      "name" : "starColor",
+      "kind" : "COLOR",
+      "label" : "Star color",
+      "localized" : false,
+      "required" : false,
+      "group" : "Colors"
+    } ],
+    "styleFieldNames" : null,
+    "styleDefaults" : { }
+  }, {
+    "type" : "news-list",
+    "label" : "News",
+    "description" : "The latest published news articles.",
+    "category" : "Showcase",
+    "fields" : [ {
+      "name" : "eyebrow",
+      "kind" : "TEXT",
+      "label" : "Small label above",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 60,
+      "group" : "Text"
+    }, {
+      "name" : "heading",
+      "kind" : "TEXT",
+      "label" : "Heading",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 160,
+      "group" : "Text"
+    }, {
+      "name" : "intro",
+      "kind" : "TEXTAREA",
+      "label" : "Subheading",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 600,
+      "group" : "Text"
+    }, {
+      "name" : "limit",
+      "kind" : "NUMBER",
+      "label" : "Number of articles",
+      "localized" : false,
+      "required" : false,
+      "min" : 1,
+      "max" : 6,
+      "defaultValue" : 3,
+      "group" : "News"
+    }, {
+      "name" : "columns",
+      "kind" : "ENUM",
+      "label" : "Per row",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "2", "3" ],
+      "defaultValue" : "3",
+      "group" : "News"
+    }, {
+      "name" : "showDate",
+      "kind" : "BOOLEAN",
+      "label" : "Show the date",
+      "localized" : false,
+      "required" : false,
+      "defaultValue" : true,
+      "group" : "News"
+    }, {
+      "name" : "ctaLabel",
+      "kind" : "TEXT",
+      "label" : "Button label",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 60,
+      "group" : "Buttons"
+    } ],
+    "styleFieldNames" : null,
+    "styleDefaults" : { }
+  }, {
+    "type" : "faq",
+    "label" : "FAQ",
+    "description" : "Questions and answers.",
+    "category" : "Content",
+    "fields" : [ {
+      "name" : "eyebrow",
+      "kind" : "TEXT",
+      "label" : "Small label above",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 60,
+      "group" : "Text"
+    }, {
+      "name" : "heading",
+      "kind" : "TEXT",
+      "label" : "Heading",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 160,
+      "group" : "Text"
+    }, {
+      "name" : "intro",
+      "kind" : "TEXTAREA",
+      "label" : "Subheading",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 600,
+      "group" : "Text"
+    }, {
+      "name" : "items",
+      "kind" : "LIST",
+      "label" : "Questions",
+      "localized" : false,
+      "required" : false,
+      "itemFields" : [ {
+        "name" : "question",
+        "kind" : "TEXT",
+        "label" : "Question",
+        "localized" : true,
+        "required" : true,
+        "maxLength" : 250
+      }, {
+        "name" : "answer",
+        "kind" : "RICHTEXT",
+        "label" : "Answer",
+        "localized" : true,
+        "required" : true,
+        "maxLength" : 5000
+      } ],
+      "minItems" : 1,
+      "maxItems" : 30,
+      "group" : "Questions"
+    }, {
+      "name" : "style",
+      "kind" : "ENUM",
+      "label" : "Look",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "boxed", "lines" ],
+      "optionLabels" : [ "Cards", "Simple lines" ],
+      "defaultValue" : "boxed",
+      "group" : "Look"
+    }, {
+      "name" : "openFirst",
+      "kind" : "BOOLEAN",
+      "label" : "Open the first question",
+      "localized" : false,
+      "required" : false,
+      "defaultValue" : false,
+      "group" : "Look"
+    } ],
+    "styleFieldNames" : null,
+    "styleDefaults" : { }
+  }, {
+    "type" : "dealers",
+    "label" : "Dealers and locations",
+    "description" : "Dealer addresses and contact details.",
+    "category" : "Showcase",
+    "fields" : [ {
+      "name" : "eyebrow",
+      "kind" : "TEXT",
+      "label" : "Small label above",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 60,
+      "group" : "Text"
+    }, {
+      "name" : "heading",
+      "kind" : "TEXT",
+      "label" : "Heading",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 160,
+      "group" : "Text"
+    }, {
+      "name" : "intro",
+      "kind" : "TEXTAREA",
+      "label" : "Subheading",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 600,
+      "group" : "Text"
+    }, {
+      "name" : "items",
+      "kind" : "LIST",
+      "label" : "Locations",
+      "localized" : false,
+      "required" : false,
+      "itemFields" : [ {
+        "name" : "name",
+        "kind" : "TEXT",
+        "label" : "Name",
+        "localized" : false,
+        "required" : true,
+        "maxLength" : 120
+      }, {
+        "name" : "city",
+        "kind" : "TEXT",
+        "label" : "City",
+        "localized" : false,
+        "required" : false,
+        "maxLength" : 80
+      }, {
+        "name" : "country",
+        "kind" : "TEXT",
+        "label" : "Country",
+        "localized" : false,
+        "required" : false,
+        "maxLength" : 80
+      }, {
+        "name" : "address",
+        "kind" : "TEXTAREA",
+        "label" : "Address",
+        "localized" : true,
+        "required" : false,
+        "maxLength" : 300
+      }, {
+        "name" : "phone",
+        "kind" : "TEXT",
+        "label" : "Phone",
+        "localized" : false,
+        "required" : false,
+        "maxLength" : 40
+      }, {
+        "name" : "email",
+        "kind" : "TEXT",
+        "label" : "Email",
+        "localized" : false,
+        "required" : false,
+        "maxLength" : 120
+      }, {
+        "name" : "mapUrl",
+        "kind" : "URL",
+        "label" : "Map link",
+        "localized" : false,
+        "required" : false
+      } ],
+      "minItems" : 1,
+      "maxItems" : 40,
+      "group" : "Locations"
+    }, {
+      "name" : "columns",
+      "kind" : "ENUM",
+      "label" : "Per row",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "2", "3" ],
+      "defaultValue" : "3",
+      "group" : "Look"
+    }, {
+      "name" : "cardColor",
+      "kind" : "COLOR",
+      "label" : "Card color",
+      "localized" : false,
+      "required" : false,
+      "group" : "Look"
+    } ],
+    "styleFieldNames" : null,
+    "styleDefaults" : { }
+  }, {
+    "type" : "contact",
+    "label" : "Contact details",
+    "description" : "Address, phone and email, with a link to the form.",
+    "category" : "Conversion",
+    "fields" : [ {
+      "name" : "eyebrow",
+      "kind" : "TEXT",
+      "label" : "Small label above",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 60,
+      "group" : "Text"
+    }, {
+      "name" : "heading",
+      "kind" : "TEXT",
+      "label" : "Heading",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 160,
+      "group" : "Text"
+    }, {
+      "name" : "intro",
+      "kind" : "TEXTAREA",
+      "label" : "Subheading",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 600,
+      "group" : "Text"
+    }, {
+      "name" : "email",
+      "kind" : "TEXT",
+      "label" : "Email",
+      "localized" : false,
+      "required" : false,
+      "maxLength" : 120,
+      "group" : "Details"
+    }, {
+      "name" : "phone",
+      "kind" : "TEXT",
+      "label" : "Phone",
+      "localized" : false,
+      "required" : false,
+      "maxLength" : 40,
+      "group" : "Details"
+    }, {
+      "name" : "address",
+      "kind" : "TEXTAREA",
+      "label" : "Address",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 300,
+      "group" : "Details"
+    }, {
+      "name" : "hours",
+      "kind" : "TEXT",
+      "label" : "Opening hours",
+      "localized" : true,
+      "required" : false,
+      "maxLength" : 200,
+      "group" : "Details"
+    }, {
+      "name" : "showFormLink",
+      "kind" : "BOOLEAN",
+      "label" : "Link to the contact form",
+      "localized" : false,
+      "required" : false,
+      "defaultValue" : true,
+      "group" : "Look"
+    } ],
+    "styleFieldNames" : null,
+    "styleDefaults" : { }
+  }, {
+    "type" : "spacer",
+    "label" : "Spacer",
+    "description" : "Empty vertical space, optionally with a line.",
+    "category" : "Layout",
+    "fields" : [ {
+      "name" : "size",
+      "kind" : "ENUM",
+      "label" : "Height",
+      "localized" : false,
+      "required" : false,
+      "options" : [ "sm", "md", "lg", "xl" ],
+      "optionLabels" : [ "Small", "Medium", "Large", "Extra large" ],
+      "defaultValue" : "md",
+      "group" : "Space"
+    }, {
+      "name" : "showLine",
+      "kind" : "BOOLEAN",
+      "label" : "Draw a line",
+      "localized" : false,
+      "required" : false,
+      "defaultValue" : false,
+      "group" : "Line"
+    }, {
+      "name" : "lineColor",
+      "kind" : "COLOR",
+      "label" : "Line color",
+      "localized" : false,
+      "required" : false,
+      "group" : "Line",
+      "showWhenField" : "showLine",
+      "showWhenValues" : [ "true" ]
+    } ],
+    "styleFieldNames" : [ "background", "backgroundColor", "showOn" ],
+    "styleDefaults" : { }
+  } ]
+}

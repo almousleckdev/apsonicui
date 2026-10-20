@@ -11,6 +11,7 @@ export interface UserProfileResponse {
   email: string;
   firstName?: string;
   lastName?: string;
+  avatarUrl?: string;
   enabled: boolean;
   roles: string[];
   permissions: string[];
@@ -18,9 +19,6 @@ export interface UserProfileResponse {
   updatedAt?: string;
 }
 
-// Neither response carries a refreshToken field - it travels exclusively as an
-// httpOnly cookie set by the backend (see services/api-client.ts), matching the
-// backend's AuthResponse/TokenRefreshResponse DTOs.
 export interface AuthResponse {
   accessToken: string;
   tokenType: string;
@@ -39,6 +37,49 @@ export interface AuthUser {
   username: string;
   email: string;
   name: string;
+  avatarUrl?: string;
   roles: string[];
   permissions: string[];
+}
+
+export interface UserManagementItem {
+  id: number;
+  username: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  avatarUrl?: string;
+  enabled: boolean;
+  roles: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateUserPayload {
+  username: string;
+  email: string;
+  password: string;
+  firstName?: string;
+  lastName?: string;
+  avatarUrl?: string;
+  enabled?: boolean;
+  roles: string[];
+}
+
+export interface UpdateUserPayload {
+  username?: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  avatarUrl?: string;
+  password?: string;
+  enabled?: boolean;
+  roles?: string[];
+}
+
+export interface RoleItem {
+  id: number;
+  name: string;
+  description?: string;
+  permissions?: string[];
 }

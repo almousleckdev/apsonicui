@@ -2,10 +2,14 @@
 
 import React from "react";
 import { useTranslations } from "next-intl";
-import { ArrowUp } from "lucide-react";
 import { Link } from "@/lib/i18n/navigation";
-import { SOCIAL_LINKS, getFooterSections } from "@/lib/constants";
+import { SOCIAL_LINKS, getFooterSections, type FooterLink } from "@/lib/constants";
 import { Logo } from "./logo";
+import { NavLink } from "./header/NavLink";
+import { useLocale } from "next-intl";
+import { useSiteNavigation } from "@/hooks/useSiteNavigation";
+import { toFooterColumns } from "@/lib/navigation/site";
+import type { Locale } from "@/lib/page-builder/types";
 
 // Custom inline SVG icons because trademarked social icons are excluded in this lucide-react build
 const FacebookIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -70,8 +74,8 @@ const YoutubeIcon = (props: React.SVGProps<SVGSVGElement>) => (
     height="1em"
     {...props}
   >
-    <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17z" />
-    <polygon points="10 15 15 12 10 9" />
+    <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z" />
+    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" />
   </svg>
 );
 
@@ -114,13 +118,20 @@ const SOCIAL_ICONS = [
   { name: "linkedin", Icon: LinkedinIcon, href: SOCIAL_LINKS.linkedin },
 ];
 
+/** A footer link; menus published in the CMS add the web-link flags. */
+type FooterItem = FooterLink & { external?: boolean; newTab?: boolean };
+
 export const Footer: React.FC = () => {
   const t = useTranslations("footer");
-  const footerSections = getFooterSections(t);
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  const locale = useLocale() as Locale;
+  const published = useSiteNavigation("footer").data;
+  // A footer menu published in the CMS replaces the built-in link columns; until then the built-in ones stay.
+  const footerSections: Array<{ title: string; items: FooterItem[] }> = published?.configured
+    ? toFooterColumns(published.items, locale).map((column) => ({
+        title: column.title,
+        items: column.items.map((i) => ({ label: i.label, href: i.href ?? undefined, external: i.external, newTab: i.newTab })),
+      }))
+    : getFooterSections(t);
 
   return (
     <footer
@@ -146,27 +157,23 @@ export const Footer: React.FC = () => {
 
           {/* Nav Sections */}
           {footerSections.map((section, idx) => {
-            interface CustomFooterItem {
-              label: string;
-              href?: string;
-              subItems?: Array<{ label: string; href?: string }>;
-            }
-
             return (
               <div key={idx} className="flex flex-col gap-4">
-                <h3 className="text-sm font-bold text-zinc-100 uppercase tracking-widest">
+                <span className="text-white text-xs font-bold uppercase tracking-wider">
                   {section.title}
-                </h3>
+                </span>
                 <ul className="flex flex-col gap-2.5">
-                  {(section.items as CustomFooterItem[]).map((item, itemIdx) => (
-                    <li key={itemIdx} className="space-y-2">
+                  {section.items.map((item, itemIdx) => (
+                    <li key={itemIdx} className="flex flex-col gap-2">
                       {item.href ? (
-                        <Link
+                        <NavLink
                           href={item.href}
+                          external={item.external}
+                          newTab={item.newTab}
                           className="text-zinc-400 text-xs hover:text-white transition-colors block"
                         >
                           {item.label}
-                        </Link>
+                        </NavLink>
                       ) : (
                         <span className="text-zinc-300 text-xs font-semibold block">
                           {item.label}
@@ -216,13 +223,6 @@ export const Footer: React.FC = () => {
             <span className="text-zinc-500 text-xs">
               &copy; {new Date().getFullYear()} {t("copyright")}
             </span>
-            <button
-              onClick={scrollToTop}
-              className="p-2.5 rounded-full bg-brand-green/10 border border-brand-green/20 text-brand-green hover:bg-brand-green hover:text-white transition-all cursor-pointer shadow-lg shadow-brand-green/5"
-              aria-label="Scroll back to top"
-            >
-              <ArrowUp className="w-4 h-4" />
-            </button>
           </div>
         </div>
       </div>

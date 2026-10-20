@@ -24,3 +24,15 @@ Two accepted trade-offs came with that choice, confirmed via a production build:
 - **Every route lost static rendering.** Next.js cannot statically prerender a page whose render path reads a per-request cookie, and `getLocale()` does exactly that on every request. Before this change, most marketing routes were static (and `/products/[id]` was prerendered via `generateStaticParams`); after, all 21 routes are server-rendered on every request. This was a known cost, explicitly accepted rather than discovered later — see `app/layout.tsx`.
 
 If/when either of these matters enough to revisit (SEO reach, or render latency at higher traffic), migrating to `next-intl`'s URL-based routing (`/en/...`, `/fr/...`, `/zh/...`) restores both, since each locale's pages become independently statically prerenderable again. That migration touches every route, every internal link, `proxy.ts`, `sitemap.ts`, and `robots.ts` — see https://next-intl.dev for that setup.
+
+
+## The admin portal is bilingual (中文 / English) and has its own catalog
+
+The admin does **not** use `en.json`/`zh.json`. Every admin label is written once, as an `[English, 中文]` pair, in `lib/i18n/admin/catalog/*.ts`, so the two languages can never drift apart (`tests/unit/admin-text.test.ts` also checks placeholders and that no Chinese entry is just English).
+
+- In components: `<T id="pages.title" />` renders both languages (Chinese first and drawn larger, see `.admin-bi` in `app/globals.css`); `const { t } = useAdminText()` gives one plain string for placeholders, tooltips and toasts. Keys are type-checked.
+- A person can show both, English only or Chinese only (cookie `ADMIN_TEXT`, set from the switch in the admin header; CSS hides the other language, so nothing re-renders).
+- Texts that arrive from the server in English (page-builder section and field names) are translated by `lib/i18n/admin/glossary/builder.ts`, keyed by the English text. `tests/unit/admin-glossary.test.ts` checks it against `tests/fixtures/section-registry.json`, a snapshot of the server's `SectionRegistry`: when you add a field on the server, refresh the snapshot and add the Chinese.
+- Validation problems are returned as `{ key, values }` (`lib/i18n/admin/problem.ts`) so forms can show them in the display language.
+
+This is separate from the languages of the *content* (English / Français / 中文 tabs on pages, news, categories...), which editors write per language; the "Copy from English" buttons (`components/admin/shared/CopyFromLanguage.tsx`) help start a translation.

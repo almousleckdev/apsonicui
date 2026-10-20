@@ -1,12 +1,21 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Link } from "@/lib/i18n/navigation";
 import { useLocale } from "next-intl";
 import { motion } from "framer-motion";
 import { ENTERPRISE_EASE } from "@/lib/constants/animations";
+import { categoryService, CategoryItem } from "@/services/category";
+import { productMenuService } from "@/services/product-menu-service";
+import {
+  DEFAULT_PRODUCT_MENU_GROUPS,
+  groupIdForCategory,
+  groupLabel,
+  type ProductMenuGroup,
+} from "@/lib/product-menu/groups";
 import { cn } from "@/lib/utils";
+import { isSafeImagePath } from "@/lib/media/safe-path";
 
 interface ProductsDropdownProps {
   onMouseEnter?: () => void;
@@ -15,6 +24,65 @@ interface ProductsDropdownProps {
   onClose?: () => void;
 }
 
+const SIDEBAR_TITLES: Record<string, string> = {
+  zh: "车型类别",
+  en: "VEHICLE CATEGORIES",
+  fr: "CATÉGORIES DE VÉHICULES",
+};
+
+const DEFAULT_SUBCATEGORIES_MAP: Record<
+  string,
+  Array<{
+    id: string;
+    label: Record<string, string>;
+    image: string;
+    href: string;
+  }>
+> = {
+  "two-wheeler": [
+    {
+      id: "standard",
+      label: { zh: "骑士车", en: "Knight", fr: "Knight" },
+      image: "/categories/骑士车/AP125-K(1.2).png",
+      href: "/products?category=standard",
+    },
+    {
+      id: "street",
+      label: { zh: "街车", en: "Street", fr: "Street" },
+      image: "/categories/街车/AP125-27 (2.2).png",
+      href: "/products?category=street",
+    },
+    {
+      id: "underbone",
+      label: { zh: "弯梁车", en: "Underbone", fr: "Underbone" },
+      image: "/categories/弯梁车/AP110 (2).png",
+      href: "/products?category=underbone",
+    },
+    {
+      id: "scooter",
+      label: { zh: "踏板车", en: "Scooter", fr: "Scooter" },
+      image: "/categories/踏板车/AP125T/AP125T 右侧 精修 白（2）.png",
+      href: "/products?category=scooter",
+    },
+  ],
+  "three-wheeler": [
+    {
+      id: "tricycle",
+      label: { zh: "货运三轮车", en: "Cargo Tricycle", fr: "Tricycle Cargo" },
+      image: "/categories/三轮车/其他更新/AP200ZH-3 (1).png",
+      href: "/products?category=tricycle",
+    },
+  ],
+  atv: [
+    {
+      id: "atv",
+      label: { zh: "全地形车", en: "All-Terrain (ATV)", fr: "Tout-terrain (ATV)" },
+      image: "/categories/骑士车/AP125-K(1.2).png",
+      href: "/products?category=atv",
+    },
+  ],
+};
+
 export const ProductsDropdown: React.FC<ProductsDropdownProps> = ({
   onMouseEnter,
   onMouseLeave,
@@ -22,96 +90,52 @@ export const ProductsDropdown: React.FC<ProductsDropdownProps> = ({
   onClose,
 }) => {
   const locale = useLocale();
-  const [activeCategory, setActiveCategory] = useState<string>("two-wheeler");
+  const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
+  const [dbCategories, setDbCategories] = useState<CategoryItem[]>([]);
+  const [groups, setGroups] = useState<ProductMenuGroup[]>(DEFAULT_PRODUCT_MENU_GROUPS);
 
-  // Multilingual sidebar titles
-  const sidebarTitles: Record<string, string> = {
-    zh: "车型类别",
-    en: "VEHICLE CATEGORIES",
-    fr: "CATÉGORIES DE VÉHICULES",
-  };
+  useEffect(() => {
+    categoryService.getPublicCategories().then((data: CategoryItem[]) => {
+      if (data && data.length > 0) {
+        setDbCategories(data);
+      }
+    }).catch(() => {});
+    productMenuService.getGroups().then(setGroups).catch(() => {});
+  }, []);
 
-  const categoriesList = [
-    {
-      id: "two-wheeler",
-      label: { zh: "两轮车", en: "Two-wheeler", fr: "Deux-roues" },
-    },
-    {
-      id: "three-wheeler",
-      label: { zh: "三轮车", en: "Three-wheeler", fr: "Trois-roues" },
-    },
-    {
-      id: "atv",
-      label: { zh: "全地形", en: "All-Terrain (ATV)", fr: "Tout-terrain (ATV)" },
-    },
-  ];
+  const subcategoriesMap = React.useMemo(() => {
+    if (!dbCategories || dbCategories.length === 0) {
+      return DEFAULT_SUBCATEGORIES_MAP;
+    }
 
-  const subcategoriesMap: Record<
-    string,
-    Array<{
-      id: string;
-      label: Record<string, string>;
-      image: string;
-      href: string;
-    }>
-  > = {
-    "two-wheeler": [
-      {
-        id: "standard",
-        label: { zh: "骑士车", en: "Knight", fr: "Knight" },
-        image: "/categories/骑士车/AP125-K(1.2).png",
-        href: "/products?category=standard",
-      },
-      {
-        id: "street",
-        label: { zh: "街车", en: "Street", fr: "Street" },
-        image: "/categories/街车/AP125-27 (2.2).png",
-        href: "/products?category=street",
-      },
-      {
-        id: "offroad",
-        label: { zh: "越野车", en: "Off-Road", fr: "Tout-Terrain" },
-        image: "/products/AP250GY (1).png",
-        href: "/products?category=offroad",
-      },
-      {
-        id: "underbone",
-        label: { zh: "弯梁车", en: "Underbone", fr: "Underbone" },
-        image: "/categories/弯梁车/AP110 (2).png",
-        href: "/products?category=underbone",
-      },
-      {
-        id: "scooter",
-        label: { zh: "踏板车", en: "Scooter", fr: "Scooter" },
-        image: "/categories/踏板车/AP125T/AP125T 右侧 精修 白（2）.png",
-        href: "/products?category=scooter",
-      },
-    ],
-    "three-wheeler": [
-      {
-        id: "passenger",
-        label: { zh: "载人三轮车", en: "Passenger Tricycle", fr: "Tricycle Passager" },
-        image: "/categories/三轮车/特殊/AP150ZK (1).png",
-        href: "/products?category=tricycle&search=ZK",
-      },
-      {
-        id: "cargo",
-        label: { zh: "载货三轮车", en: "Cargo Tricycle", fr: "Tricycle Cargo" },
-        image: "/categories/三轮车/AP150ZH-175 更新/AP150ZH-175 MAX (1).png",
-        href: "/products?category=tricycle&search=ZH",
-      },
-    ],
-    atv: [
-      {
-        id: "atv-sub",
-        label: { zh: "全地形", en: "ATV", fr: "ATV" },
-        image: "/categories/ATV/AP150ST-250 正右侧 投影.png",
-        href: "/products?category=atv",
-      },
-    ],
-  };
+    const map: Record<string, Array<{ id: string; label: Record<string, string>; image: string; href: string }>> = {};
+    groups.forEach((g) => {
+      map[g.id] = [];
+    });
 
-  const currentSubcategories = subcategoriesMap[activeCategory] || [];
+    dbCategories.forEach((cat) => {
+      const slug = (cat.slug || "").toLowerCase();
+      const groupId = groupIdForCategory(cat.parentType, groups);
+      if (!groupId) return;
+      map[groupId].push({
+        id: String(cat.id || slug),
+        label: {
+          zh: cat.nameZh || cat.name || cat.nameEn || slug,
+          en: cat.nameEn || cat.name || slug,
+          fr: cat.nameFr || cat.nameEn || cat.name || slug,
+        },
+        image: cat.imageUrl || "/categories/弯梁车/AP110 (2).png",
+        href: `/products?category=${slug}`,
+      });
+    });
+
+    return map;
+  }, [dbCategories, groups]);
+
+  // A group with nothing to show would be an empty panel, so it is left out of the sidebar.
+  const visibleGroups = groups.filter((g) => (subcategoriesMap[g.id] ?? []).length > 0);
+  const activeCategory = visibleGroups.some((g) => g.id === selectedGroup) ? selectedGroup : visibleGroups[0]?.id;
+  const currentSubcategories = (activeCategory && subcategoriesMap[activeCategory]) || [];
 
   return (
     <motion.div
@@ -130,20 +154,19 @@ export const ProductsDropdown: React.FC<ProductsDropdownProps> = ({
     >
       <div className="max-w-[1360px] mx-auto px-4 sm:px-8">
         <div className="flex">
-          
-          {/* Left Category Sidebar (Super Compact Height) */}
+          {/* Left Category Sidebar */}
           <div className="w-[200px] py-3 pr-4 border-r border-zinc-100 shrink-0">
             <span className="text-[9px] font-black tracking-widest text-zinc-400 uppercase mb-1.5 block">
-              {sidebarTitles[locale] || sidebarTitles.en}
+              {SIDEBAR_TITLES[locale] || SIDEBAR_TITLES.en}
             </span>
             <div className="space-y-0.5">
-              {categoriesList.map((category) => {
+              {visibleGroups.map((category) => {
                 const isActive = activeCategory === category.id;
-                const displayLabel = category.label[locale as keyof typeof category.label] || category.label.en;
+                const displayLabel = groupLabel(category, locale);
                 return (
                   <button
                     key={category.id}
-                    onMouseEnter={() => setActiveCategory(category.id)}
+                    onMouseEnter={() => setSelectedGroup(category.id)}
                     onClick={() => {
                       if (onClose) onClose();
                     }}
@@ -154,7 +177,14 @@ export const ProductsDropdown: React.FC<ProductsDropdownProps> = ({
                         : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-950 font-medium"
                     )}
                   >
-                    <span>{displayLabel}</span>
+                    <span className="flex items-center gap-2 min-w-0">
+                      {category.image && isSafeImagePath(category.image) && (
+                        <span className="relative h-5 w-8 shrink-0">
+                          <Image src={category.image} alt="" fill sizes="32px" unoptimized className="object-contain" />
+                        </span>
+                      )}
+                      <span className="truncate">{displayLabel}</span>
+                    </span>
                     {isActive && <span className="text-brand-green font-bold ml-2">→</span>}
                   </button>
                 );
@@ -162,7 +192,7 @@ export const ProductsDropdown: React.FC<ProductsDropdownProps> = ({
             </div>
           </div>
 
-          {/* Right Subcategories Grid (Super Flat Layout) */}
+          {/* Right Subcategories Grid */}
           <div className="flex-1 py-3 pl-6 grid grid-cols-5 gap-4 items-center">
             {currentSubcategories.map((sub) => {
               const displaySubLabel = sub.label[locale as keyof typeof sub.label] || sub.label.en;
@@ -176,13 +206,13 @@ export const ProductsDropdown: React.FC<ProductsDropdownProps> = ({
                   <span className="text-[11px] font-bold text-zinc-500 tracking-wide group-hover:text-brand-green transition-colors block mb-2">
                     {displaySubLabel}
                   </span>
-                  
-                  {/* Uniform Aspect-ratio Container for Equal Sized Images */}
+
                   <div className="relative w-full h-[76px] flex items-center justify-center">
                     <Image
                       src={sub.image}
                       alt={displaySubLabel}
                       fill
+                      unoptimized={sub.image.startsWith("/uploads") || sub.image.startsWith("http")}
                       sizes="120px"
                       className="object-contain transition-transform duration-500 group-hover:scale-105 drop-shadow-[0_4px_6px_rgba(0,0,0,0.02)]"
                     />
@@ -191,7 +221,6 @@ export const ProductsDropdown: React.FC<ProductsDropdownProps> = ({
               );
             })}
           </div>
-
         </div>
       </div>
     </motion.div>

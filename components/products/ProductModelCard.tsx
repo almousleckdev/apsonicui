@@ -6,7 +6,7 @@ import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import type { ProductModel } from "@/lib/types/products";
 import { buildProductDetailUrl } from "@/lib/data/products";
-import { ANIMATION_VARIANTS, PREMIUM_SPRING } from "@/lib/constants/animations";
+import { ANIMATION_VARIANTS } from "@/lib/constants/animations";
 
 interface ProductModelCardProps {
   product: ProductModel;

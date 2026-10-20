@@ -1,125 +1,445 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-green: #1fa84f;
-  --color-brand-green-dark: #058b4f;
-  --color-background-primary: #ffffff;
-  --color-background-secondary: #f8f9fa;
-  --color-background-tertiary: #f1f3f5;
-  
-  --color-text-primary: #121212;
-  --color-text-secondary: #4a4a4a;
-  --color-text-muted: #6c757d;
-  
-  /* Product specific palette */
-  --color-ink: #111111;
-  --color-charcoal: #1a1a1a;
-  --color-graphite: #2a2a2a;
-  --color-cream: #f5f5f2;
-  --color-olive: #55613b;
-  --color-army: #6b7646;
-  --color-sage: #8a946b;
-  --color-lime: #b8c64a;
-  --color-sand: #c7b08a;
+  /* Sizes below Tailwind's smallest, as tokens so the Chinese admin can enlarge them (see [data-admin-lang="zh"]). */
+  --text-2xs: 0.6875rem;
+  --text-3xs: 0.625rem;
+  --text-4xs: 0.5625rem;
+  --color-brand-green: #00A651;
+  --color-brand-green-hover: #008D44;
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+}
 
-  /* Custom animations configuration in Tailwind v4 */
-  --animate-fade-in: fadeIn 0.5s ease-in-out;
-  --animate-fade-in-up: fadeInUp 0.6s ease-out;
-  --animate-fade-in-down: fadeInDown 0.6s ease-out;
-  --animate-slide-in-right: slideInRight 0.5s ease-out;
-  --animate-slide-in-left: slideInLeft 0.5s ease-out;
-  --animate-scale-in: scaleIn 0.4s ease-out;
-  
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 154 80% 34%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 154 80% 34%;
+    --radius: 0.75rem;
   }
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  @keyframes fadeInDown {
-    from {
-      opacity: 0;
-      transform: translateY(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  @keyframes slideInRight {
-    from {
-      opacity: 0;
-      transform: translateX(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-  @keyframes slideInLeft {
-    from {
-      opacity: 0;
-      transform: translateX(-30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-  @keyframes scaleIn {
-    from {
-      opacity: 0;
-      transform: scale(0.9);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 154 80% 34%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 154 80% 34%;
   }
 }
 
-html,
-body {
-  max-width: 100vw;
-  scroll-behavior: smooth;
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
 }
 
-body {
-  background: var(--color-background-primary);
-  color: var(--color-text-primary);
+/* Custom Utilities */
+.text-balance {
+  text-wrap: balance;
 }
 
-/* Custom scrollbars */
+/* Glassmorphism utility */
+.glass {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.glass-dark {
+  background: rgba(9, 9, 11, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Premium Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-background-primary);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.15);
-  border-radius: 4px;
+  background: #d4d4d8;
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.25);
+  background: #a1a1aa;
 }
 
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+/* Swiper custom styling for smooth pagination */
+.swiper-pagination-bullet {
+  background: #00A651 !important;
+  opacity: 0.3 !important;
+  transition: all 0.3s ease !important;
 }
 
-.scrollbar-hide::-webkit-scrollbar {
+.swiper-pagination-bullet-active {
+  opacity: 1 !important;
+  width: 24px !important;
+  border-radius: 9999px !important;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* TipTap Editor Clean Styles */
+.ProseMirror {
+  outline: none !important;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  color: #a1a1aa;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.ProseMirror p,
+.prose p {
+  margin-top: 0.75rem !important;
+  margin-bottom: 0.75rem !important;
+}
+
+.ProseMirror p:empty,
+.prose p:empty {
+  min-height: 1.5rem;
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.25rem !important;
+}
+
+/* Headings Differentiation in Editor & Reader */
+.ProseMirror h1,
+.prose h1 {
+  font-size: 2.25rem !important;
+  line-height: 2.5rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.025em !important;
+  margin-top: 2rem !important;
+  margin-bottom: 1rem !important;
+  color: #09090b !important;
+}
+
+.ProseMirror h2,
+.prose h2 {
+  font-size: 1.75rem !important;
+  line-height: 2.25rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+  margin-top: 1.75rem !important;
+  margin-bottom: 0.75rem !important;
+  color: #18181b !important;
+}
+
+.ProseMirror h3,
+.prose h3 {
+  font-size: 1.35rem !important;
+  line-height: 1.75rem !important;
+  font-weight: 700 !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 0.5rem !important;
+  color: #27272a !important;
+}
+
+.ProseMirror strong,
+.prose strong {
+  font-weight: 800 !important;
+  color: #09090b !important;
+}
+
+.ProseMirror em,
+.prose em {
+  font-style: italic !important;
+}
+
+.ProseMirror u,
+.prose u {
+  text-decoration: underline !important;
+}
+
+.ProseMirror ul,
+.prose ul {
+  list-style-type: disc !important;
+  padding-left: 1.75rem !important;
+  margin: 1rem 0 !important;
+}
+
+.ProseMirror ol,
+.prose ol {
+  list-style-type: decimal !important;
+  padding-left: 1.75rem !important;
+  margin: 1rem 0 !important;
+}
+
+.ProseMirror li,
+.prose li {
+  margin: 0.35rem 0 !important;
+}
+
+.ProseMirror blockquote {
+  border-left: 4px solid #00A651;
+  padding-left: 1rem;
+  font-style: italic;
+  color: #3f3f46;
+  margin: 1.25rem 0;
+}
+
+.ProseMirror code {
+  background-color: #f4f4f5;
+  color: #09090b;
+  padding: 0.2em 0.4em;
+  border-radius: 0.375rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.875em;
+}
+
+/* Borderless Image & Video Sizing */
+.ProseMirror img {
+  border-radius: 0.75rem;
+  max-width: 680px;
+  width: 100%;
+  max-height: 520px;
+  margin: 0.75rem auto 0 auto;
+  display: block;
+  box-shadow: none !important;
+  border: none !important;
+  background: transparent !important;
+  object-fit: cover;
+}
+
+/* Medium Selected Image Green Outline */
+.ProseMirror img.ProseMirror-selectednode,
+.ProseMirror figure.ProseMirror-selectednode img,
+.ProseMirror figure:focus img {
+  outline: 2px solid #00A651 !important;
+  outline-offset: 3px;
+}
+
+.ProseMirror figure,
+.prose figure,
+figure {
+  margin: 1rem auto !important;
+  text-align: center !important;
+  display: block !important;
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  max-width: 680px !important;
+  width: 100% !important;
+}
+
+.ProseMirror figure img,
+.prose figure img,
+figure img {
+  margin: 0 auto 0 auto !important;
+  display: block !important;
+  border-radius: 0.75rem !important;
+}
+
+.ProseMirror figcaption,
+.prose figcaption,
+figure figcaption,
+figcaption {
+  text-align: center !important;
+  font-size: 0.8125rem !important;
+  color: #71717a !important;
+  font-style: italic !important;
+  margin-top: 0.25rem !important;
+  margin-bottom: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  outline: none !important;
+}
+
+/* Only display placeholder in active editor, never in published public articles */
+.ProseMirror figcaption:empty::before {
+  content: "Type caption for image (optional)" !important;
+  color: #a1a1aa !important;
+  font-style: normal !important;
+  font-size: 0.8125rem !important;
+  pointer-events: none !important;
+  display: inline-block !important;
+}
+
+.ProseMirror iframe,
+.ProseMirror video {
+  border-radius: 1rem;
+  max-width: 680px;
+  width: 100%;
+  margin: 1.5rem auto;
+  display: block;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Text Alignment Classes for TipTap */
+.ProseMirror [style*="text-align: center"],
+.ProseMirror p[style*="text-align: center"],
+.ProseMirror h1[style*="text-align: center"],
+.ProseMirror h2[style*="text-align: center"],
+.ProseMirror h3[style*="text-align: center"] {
+  text-align: center !important;
+}
+
+.ProseMirror [style*="text-align: right"],
+.ProseMirror p[style*="text-align: right"],
+.ProseMirror h1[style*="text-align: right"],
+.ProseMirror h2[style*="text-align: right"],
+.ProseMirror h3[style*="text-align: right"] {
+  text-align: right !important;
+}
+
+.ProseMirror [style*="text-align: left"],
+.ProseMirror p[style*="text-align: left"],
+.ProseMirror h1[style*="text-align: left"],
+.ProseMirror h2[style*="text-align: left"],
+.ProseMirror h3[style*="text-align: left"] {
+  text-align: left !important;
+}
+
+/* Failsafe for the full-screen site loader: it is in the server HTML and normally removed by React after hydration.
+   If scripts are slow or blocked, this still uncovers the page so a visitor never has to reload. */
+@keyframes site-loader-failsafe {
+  to {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+.site-loader {
+  animation: site-loader-failsafe 0.3s ease 5s forwards;
+}
+
+/* Page builder: colors chosen by editors arrive as validated custom properties (--pb-text, --pb-accent, --pb-own).
+   A section with its own text color recolors its text, but never its buttons (.pb-btn) or elements with their own
+   color (.pb-own, e.g. one highlighted figure). */
+.pb-text {
+  color: var(--pb-text);
+}
+.pb-text :is(h1, h2, h3, h4, h5, p, span, li, dt, dd, summary, blockquote, figcaption, label, small, strong, em, a, div):not(.pb-btn, .pb-btn *, .pb-own, .pb-own *, .pb-t) {
+  color: var(--pb-text) !important;
+}
+/* Styled text (small label, heading, subheading): its own color is set inline; the size scales a base that depends on
+   where the text sits, so the default look is unchanged until an editor picks a size. */
+.pb-scaled {
+  font-size: calc(var(--pb-base) * var(--pb-scale, 1));
+}
+.pb-base-h1 { --pb-base: 2.25rem; }
+.pb-base-h2 { --pb-base: 1.875rem; }
+.pb-base-eyebrow { --pb-base: 0.75rem; }
+.pb-base-sub { --pb-base: 1rem; }
+.pb-base-sub-lg { --pb-base: 1.125rem; }
+@media (min-width: 640px) {
+  .pb-base-h1 { --pb-base: 3rem; }
+  .pb-base-h2 { --pb-base: 2.25rem; }
+  .pb-base-sub { --pb-base: 1.125rem; }
+  .pb-base-sub-lg { --pb-base: 1.25rem; }
+}
+@media (min-width: 768px) {
+  .pb-base-h1 { --pb-base: 3.75rem; }
+}
+.pb-accent {
+  color: var(--pb-accent, #00a651);
+}
+.pb-accent-bg {
+  background-color: var(--pb-accent, #00a651);
+}
+.pb-own {
+  color: var(--pb-own);
+}
+
+/* Admin text: every label carries Chinese and English (see components/admin/T.tsx). Chinese is drawn larger because its
+   characters look smaller than Latin letters of the same size. The display mode on <html data-admin-text> hides one
+   of the two for people who prefer a single language. */
+.admin-bi .admin-zh {
+  font-size: 1.14em;
+}
+.admin-bi .admin-en {
+  font-size: 0.82em;
+  opacity: 0.72;
+  margin-left: 0.4em;
+}
+.admin-bi.admin-stack {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.admin-bi.admin-stack .admin-en {
+  margin-left: 0;
+}
+html[data-admin-text="en"] .admin-bi .admin-zh,
+html[data-admin-text="zh"] .admin-bi .admin-en {
+  display: none;
+}
+html[data-admin-text="en"] .admin-bi .admin-en,
+html[data-admin-text="zh"] .admin-bi .admin-en {
+  font-size: 1em;
+  opacity: 1;
+  margin-left: 0;
 }

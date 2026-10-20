@@ -1,7 +1,3 @@
-/**
- * A generic filtering utility to unify filtering logic across the application.
- */
-
 export interface FilterOptions<T> {
   // Exact match filters (e.g., category, status)
   exact?: Partial<Record<keyof T, unknown>>;

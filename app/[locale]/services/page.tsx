@@ -31,6 +31,7 @@ interface ServicesPageProps {
 
 export default async function ServicesPage({ params }: ServicesPageProps) {
   const { locale } = await params;
+  
   const t = await getTranslations("services");
   const cards = getFeatureCards(t);
   const faqs = getLocalizedFaqs(locale);

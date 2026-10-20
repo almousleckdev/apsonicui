@@ -10,16 +10,20 @@ import { useProductFilters } from "@/hooks/useProductFilters";
 import { groupProductsByCategory } from "@/lib/data/product-models";
 import { motion } from "framer-motion";
 import { STAGGER_CONTAINER } from "@/lib/constants/animations";
+import { Loader2 } from "lucide-react";
 
 // Category display order
 const CATEGORY_ORDER = [
+  "underbone",
   "standard",
   "street",
   "offroad",
-  "underbone",
   "scooter",
   "atv",
   "tricycle",
+  "cargo-tricycle",
+  "passenger-tricycle",
+  "special-tricycle",
 ];
 
 // Map category slug → translation key
@@ -31,25 +35,17 @@ const CATEGORY_KEY_MAP: Record<string, string> = {
   scooter: "categories.scooter",
   atv: "categories.atv",
   tricycle: "categories.tricycle",
-};
-
-// Map category slugs to filter types
-const CATEGORY_SLUG_TO_TYPE: Record<string, string> = {
-  underbone: "underbone",
-  standard: "standard",
-  street: "street",
-  offroad: "offroad",
-  scooter: "scooter",
-  atv: "atv",
-  tricycle: "tricycle",
+  "cargo-tricycle": "categories.tricycle",
+  "passenger-tricycle": "categories.tricycle",
+  "special-tricycle": "categories.tricycle",
 };
 
 function filtersFromSearchParams(searchParams: URLSearchParams): ProductFiltersType {
   const category = searchParams.get("category");
   const brand = searchParams.get("brand");
   const initialFilters: ProductFiltersType = {};
-  if (category && CATEGORY_SLUG_TO_TYPE[category]) {
-    initialFilters.type = CATEGORY_SLUG_TO_TYPE[category];
+  if (category) {
+    initialFilters.type = category;
   }
   if (brand) {
     initialFilters.brand = brand;
@@ -71,7 +67,7 @@ export function ProductsContent() {
     setFilters(filtersFromSearchParams(searchParams));
   }
 
-  const filteredProducts = useProductFilters(filters);
+  const { filteredProducts, loading } = useProductFilters(filters);
   const groupedProducts = groupProductsByCategory(filteredProducts);
 
   return (
@@ -79,44 +75,55 @@ export function ProductsContent() {
       <ProductFilters filters={filters} onFilterChange={setFilters} />
 
       <div className="max-w-[1360px] mx-auto px-4 sm:px-10 py-12 sm:py-20">
-        <div className="space-y-20">
-          {CATEGORY_ORDER.map((category) => {
-            const products = groupedProducts[category];
-            if (!products || products.length === 0) return null;
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-24 gap-3">
+            <Loader2 className="w-8 h-8 text-brand-green animate-spin" />
+            <p className="text-xs font-semibold text-zinc-400">Loading APSONIC Catalog...</p>
+          </div>
+        ) : (
+          <div className="space-y-20">
+            {CATEGORY_ORDER.map((category) => {
+              const products = groupedProducts[category];
+              if (!products || products.length === 0) return null;
 
-            return (
-              <section key={category}>
-                <div className="mb-8">
-                  <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-gray-900">
-                    {t(CATEGORY_KEY_MAP[category])}
-                  </h2>
-                </div>
+              const categoryTitle = CATEGORY_KEY_MAP[category]
+                ? t(CATEGORY_KEY_MAP[category])
+                : category.toUpperCase();
 
-                <motion.div
-                  variants={STAGGER_CONTAINER}
-                  initial="hidden"
-                  whileInView="show"
-                  viewport={{ once: true, amount: 0.05 }}
-                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 gap-y-12"
-                >
-                  {products.map((product) => (
-                    <ProductModelCard
-                      key={product.id}
-                      product={product}
-                      className="w-full"
-                    />
-                  ))}
-                </motion.div>
-              </section>
-            );
-          })}
+              return (
+                <section key={category}>
+                  <div className="mb-8">
+                    <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-gray-900">
+                      {categoryTitle}
+                    </h2>
+                  </div>
 
-          {filteredProducts.length === 0 && (
-            <div className="text-center py-20">
-              <p className="text-gray-300 italic text-2xl">{t("noResults")}</p>
-            </div>
-          )}
-        </div>
+                  <motion.div
+                    variants={STAGGER_CONTAINER}
+                    initial="hidden"
+                    whileInView="show"
+                    viewport={{ once: true, amount: 0.05 }}
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 gap-y-12"
+                  >
+                    {products.map((product) => (
+                      <ProductModelCard
+                        key={product.id}
+                        product={product}
+                        className="w-full"
+                      />
+                    ))}
+                  </motion.div>
+                </section>
+              );
+            })}
+
+            {filteredProducts.length === 0 && (
+              <div className="text-center py-20">
+                <p className="text-gray-400 italic text-xl">No motorcycles found in this filter.</p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </main>
   );

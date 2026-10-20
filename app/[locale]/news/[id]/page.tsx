@@ -41,7 +41,7 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
 
   // Fetch all articles to display recommendations in the sidebar
   const allNews = await newsService.getNews(locale);
-  const recommendedNews = allNews.filter((i) => i.id !== id).slice(0, 4);
+  const recommendedNews = allNews.filter((i: { id: string }) => i.id !== id).slice(0, 4);
 
   return <NewsDetailClient item={item} recommendedNews={recommendedNews} />;
 }

@@ -82,6 +82,10 @@ export interface ProductFilters {
   displacement?: number;
   brand?: string;
   search?: string;
+  /** Aliases used by the storefront filter bar; take precedence over `category`/`search`. */
+  category?: string;
+  selectedCategory?: string;
+  searchQuery?: string;
 }
 
 export interface FeaturedModel {

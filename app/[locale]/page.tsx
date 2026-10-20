@@ -6,6 +6,7 @@ import { VoicesSection } from "@/components/features/voices-section";
 import { NewsSection } from "@/components/features/news-section";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { newsService } from "@/services/news";
+import { homepageService } from "@/services/homepage-service";
 import { locales } from "@/lib/i18n/locales";
 
 export function generateStaticParams() {
@@ -19,27 +20,24 @@ interface PageProps {
 export default async function Home({ params }: PageProps) {
   const { locale } = await params;
   
-  // Fetch news data on the server (Server Component) with locale fallback
+  // Fetch news data on the server with locale fallback
   const news = await newsService.getNews(locale);
-
-  const heroVideos = [
-    "/videos/hero2.mp4",
-    "/videos/723_1770449481.mp4"
-  ];
+  // Fetch CMS config on the server
+  const config = await homepageService.getHomepageConfig();
 
   return (
     <main className="relative bg-white space-y-0 w-full min-h-screen">
       {/* 1. Header slideshow */}
-      <VideoHero videos={heroVideos} interval={8000} />
+      <VideoHero initialConfig={config.hero} />
 
       {/* 2. Bike Featured Carousel */}
       <ScrollReveal variant="fadeUp" delay={0.1}>
-        <RecommendedModels />
+        <RecommendedModels initialConfig={config.recommendedModels} />
       </ScrollReveal>
 
       {/* 3. Category Lineup Slider */}
       <ScrollReveal variant="fadeUp" delay={0.15}>
-        <CategoryCarousel />
+        <CategoryCarousel initialConfig={config.categories} />
       </ScrollReveal>
 
       {/* 4. Interactive Locator */}
@@ -47,10 +45,12 @@ export default async function Home({ params }: PageProps) {
         <ServiceSupport />
       </ScrollReveal>
 
-      {/* 5. Client Testimonials */}
-      <ScrollReveal variant="fadeUp" delay={0.1}>
-        <VoicesSection />
-      </ScrollReveal>
+      {/* 5. Client Testimonials (managed in the admin: Home Page > Testimonials) */}
+      {config.visibility.showVoices && (
+        <ScrollReveal variant="fadeUp" delay={0.1}>
+          <VoicesSection initialConfig={config.testimonials} />
+        </ScrollReveal>
+      )}
 
       {/* 6. Blog & News Center */}
       <ScrollReveal variant="fadeUp" delay={0.1}>

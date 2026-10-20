@@ -2,21 +2,17 @@ import { ApiResponse, ApiErrorResponse } from '@/lib/types/api';
 import { tokenStorage } from './token-storage';
 import { reportError } from '@/lib/error-reporting';
 
-// In the browser, a same-origin relative path is correct: the browser never
-// learns the backend's real address, and next.config.ts rewrites /api/* to it
-// server-to-server. But that rewrite only applies to requests that arrive at
-// the Next.js HTTP server - it can't help a fetch() issued from inside a
-// Server Component/route handler, and Node's fetch (unlike the browser's)
-// throws "Invalid URL" on a relative path since there is no document to
-// resolve it against. So on the server we call INTERNAL_API_URL directly.
-const BASE_URL =
-  typeof window === 'undefined'
-    ? `${process.env.INTERNAL_API_URL}/api/v1`
-    : '/api/v1';
-const DEFAULT_TIMEOUT_MS = 8000;
+const getBaseUrl = () => {
+  if (typeof window === 'undefined') {
+    const serverUrl = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
+    return serverUrl.endsWith('/api/v1') ? serverUrl : `${serverUrl}/api/v1`;
+  }
+  return '/api/v1';
+};
 
-// Dispatched instead of a hard `window.location` redirect so this HTTP client
-// stays free of routing concerns; context/AuthContext.tsx owns the navigation.
+const BASE_URL = getBaseUrl();
+const DEFAULT_TIMEOUT_MS = 30000;
+
 export const SESSION_EXPIRED_EVENT = 'apsonic:session-expired';
 
 export class ApiError extends Error {
@@ -52,29 +48,6 @@ export const cancelRequest = (cancelId: string) => {
   }
 };
 
-interface RefreshWaiter {
-  resolve: (token: string) => void;
-  reject: (error: unknown) => void;
-}
-
-let isRefreshing = false;
-let refreshQueue: RefreshWaiter[] = [];
-
-// Settles every request that queued up behind an in-flight refresh. Failing to
-// call this on the error path (as the previous implementation did) leaves every
-// queued request hanging forever - this is the fix for that bug.
-function settleRefreshQueue(outcome: { token: string } | { error: unknown }) {
-  const waiters = refreshQueue;
-  refreshQueue = [];
-  for (const waiter of waiters) {
-    if ('token' in outcome) {
-      waiter.resolve(outcome.token);
-    } else {
-      waiter.reject(outcome.error);
-    }
-  }
-}
-
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function notifySessionExpired() {
@@ -83,23 +56,56 @@ function notifySessionExpired() {
   }
 }
 
+// Required by the backend on cookie-authenticated endpoints (/auth/refresh, /auth/logout): a custom header
+// cannot be sent by a cross-site page without a CORS preflight, which the API only grants to our own origins.
+export const CSRF_HEADER = { 'X-Requested-With': 'apsonic-web' } as const;
+
 // The refresh token itself is an httpOnly cookie the browser attaches
 // automatically - nothing to read or send from JS here.
-async function performRefresh(): Promise<string> {
-  const refreshRes = await fetch(`${BASE_URL}/auth/refresh`, {
+async function requestRefresh(): Promise<Response> {
+  return fetch(`${BASE_URL}/auth/refresh`, {
     method: 'POST',
     credentials: 'include',
+    headers: CSRF_HEADER,
     signal: AbortSignal.timeout(DEFAULT_TIMEOUT_MS),
   });
+}
+
+async function performRefresh(): Promise<string> {
+  let refreshRes = await requestRefresh();
+
+  // Another tab may have rotated the cookie a moment ago; the browser now holds the new one, so retry once.
+  if (refreshRes.status === 401) {
+    await sleep(300);
+    refreshRes = await requestRefresh();
+  }
 
   if (!refreshRes.ok) {
     throw new ApiError('Session expired', 401);
   }
 
-  const refreshData = await refreshRes.json();
-  const newToken: string = refreshData.data.accessToken;
+  const refreshData = await refreshRes.json().catch(() => ({}));
+  const newToken: string | undefined = refreshData?.data?.accessToken;
+  if (!newToken) {
+    throw new ApiError('Invalid refresh response payload', 401);
+  }
   tokenStorage.setAccessToken(newToken);
   return newToken;
+}
+
+let inFlightRefresh: Promise<string> | null = null;
+
+/**
+ * Single-flight session refresh: concurrent callers (parallel 401s, StrictMode double effects) share one
+ * request, so the rotating refresh token is never presented twice.
+ */
+export function refreshSession(): Promise<string> {
+  if (!inFlightRefresh) {
+    inFlightRefresh = performRefresh().finally(() => {
+      inFlightRefresh = null;
+    });
+  }
+  return inFlightRefresh;
 }
 
 export async function apiClient<T>(
@@ -132,6 +138,7 @@ export async function apiClient<T>(
   const signal = AbortSignal.any(signals);
 
   const headers = new Headers(customHeaders);
+  headers.set('X-Requested-With', CSRF_HEADER['X-Requested-With']);
   if (!headers.has('Content-Type') && !(restOptions.body instanceof FormData)) {
     headers.set('Content-Type', 'application/json');
   }
@@ -165,29 +172,16 @@ export async function apiClient<T>(
     let response = await fetchWithRetry(1);
 
     if (response.status === 401 && requiresAuth) {
-      if (!isRefreshing) {
-        isRefreshing = true;
-        try {
-          const newToken = await performRefresh();
-          isRefreshing = false;
-          settleRefreshQueue({ token: newToken });
-          headers.set('Authorization', `Bearer ${newToken}`);
-          response = await doFetch();
-        } catch (refreshError) {
-          isRefreshing = false;
-          settleRefreshQueue({ error: refreshError });
-          tokenStorage.clearAll();
-          notifySessionExpired();
-          throw refreshError instanceof ApiError
-            ? refreshError
-            : new ApiError('Session expired', 401);
-        }
-      } else {
-        const newToken = await new Promise<string>((resolve, reject) => {
-          refreshQueue.push({ resolve, reject });
-        });
+      try {
+        const newToken = await refreshSession();
         headers.set('Authorization', `Bearer ${newToken}`);
         response = await doFetch();
+      } catch (refreshError) {
+        tokenStorage.clearAll();
+        notifySessionExpired();
+        throw refreshError instanceof ApiError
+          ? refreshError
+          : new ApiError('Session expired', 401);
       }
     }
 
@@ -216,10 +210,7 @@ export async function apiClient<T>(
     if (error instanceof Error && error.name === 'AbortError') {
       throw new ApiError('Request cancelled', 499);
     }
-    // Genuinely unexpected (network failure, malformed response) rather than
-    // a routine HTTP error status, which callers already handle explicitly.
-    // `silent` opts out for calls the caller already knows will fail today
-    // (see NO_BACKEND_YET in news-service.ts) and handles via fallback data.
+
     if (!silent) {
       reportError(error, { endpoint });
     }

@@ -12,13 +12,13 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     const isDark = variant === "dark";
 
     return (
-      <div className="w-full">
+      <div className="w-full space-y-1.5 text-left">
         {label && (
           <label
             htmlFor={props.id}
             className={cn(
-              "mb-2 block text-xs font-bold uppercase tracking-widest",
-              isDark ? "text-zinc-400" : "text-zinc-600"
+              "block text-xs font-bold uppercase tracking-widest",
+              isDark ? "text-white/80" : "text-zinc-500"
             )}
           >
             {label}
@@ -28,20 +28,20 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           <textarea
             ref={ref}
             className={cn(
-              "flex w-full px-4 py-3.5 text-xs sm:text-sm min-h-[120px] transition-all duration-200 outline-none disabled:cursor-not-allowed disabled:opacity-50",
+              "flex w-full px-5 py-3.5 text-xs sm:text-sm font-semibold min-h-[120px] transition-all duration-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
               "rounded-2xl border",
               isDark
                 ? cn(
-                    "bg-zinc-900/60 text-white placeholder-zinc-500",
+                    "bg-zinc-900 text-white placeholder-zinc-500",
                     error
                       ? "border-red-500/80 focus:ring-2 focus:ring-red-500/20"
-                      : "border-zinc-800 hover:border-zinc-700 focus:border-brand-green focus:ring-2 focus:ring-brand-green/20"
+                      : "border-zinc-800 focus:border-brand-green focus:ring-2 focus:ring-brand-green/20"
                   )
                 : cn(
-                    "bg-zinc-50 text-zinc-900 placeholder-zinc-400",
+                    "bg-zinc-50 text-zinc-900 placeholder-zinc-400 border border-zinc-200",
                     error
                       ? "border-red-500/80 focus:ring-2 focus:ring-red-500/20"
-                      : "border-zinc-200 hover:border-zinc-300 focus:border-brand-green focus:ring-2 focus:ring-brand-green/20"
+                      : "focus:border-brand-green focus:bg-white focus:ring-2 focus:ring-brand-green/20"
                   ),
               className
             )}
@@ -49,7 +49,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           />
         </div>
         {error && (
-          <p className="mt-1.5 text-xs text-red-500 font-semibold pl-1 animate-fade-in">
+          <p className="mt-1 text-xs text-red-500 font-semibold pl-1">
             {error}
           </p>
         )}

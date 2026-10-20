@@ -2,7 +2,6 @@
 
 import React from "react";
 import Image from "next/image";
-import { Link } from "@/lib/i18n/navigation";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useLocale } from "next-intl";
@@ -24,69 +23,80 @@ export const NewsDetailClient: React.FC<NewsDetailClientProps> = ({
   const locale = useLocale();
 
   return (
-    <main className="min-h-screen bg-white">
-      {/* Enterprise Style Hero for Article */}
-      <div className="relative h-[65vh] w-full overflow-hidden bg-zinc-950">
+    <main className="min-h-screen bg-white font-sans">
+      {/* Enterprise Style Hero for Article with top header clearance */}
+      <div className="relative min-h-[500px] h-[65vh] w-full overflow-hidden bg-zinc-950 pt-20 sm:pt-24 flex items-end">
         <Image
-          src={item.thumbnail}
-          alt={item.title}
+          src={item.thumbnail || "/images/logo/apsoniclogo.png"}
+          alt={item.title || "Article Banner"}
           fill
           priority
+          loading="eager"
+          unoptimized
           sizes="100vw"
-          className="object-cover opacity-50"
+          className="object-cover opacity-45"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-900/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-zinc-950/40" />
 
-        <div className="absolute inset-0 flex items-end pb-12 sm:pb-16">
-          <div className="mx-auto max-w-[1360px] w-full px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="max-w-4xl"
-            >
-              <div className="flex flex-wrap gap-3 mb-6 sm:mb-8">
-                <span className="bg-brand-green text-white px-3.5 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 shadow-lg shadow-brand-green/20">
-                  <Tag className="w-3.5 h-3.5" /> {item.category}
-                </span>
+        <div className="relative z-10 mx-auto max-w-[1360px] w-full px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="max-w-4xl"
+          >
+            <div className="flex flex-wrap gap-3 mb-4 sm:mb-6">
+              <span className="bg-brand-green text-white px-3.5 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 shadow-lg shadow-brand-green/20">
+                <Tag className="w-3.5 h-3.5" /> {item.category || "Corporate"}
+              </span>
+              <span className="text-white px-3.5 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 bg-white/10 backdrop-blur-md border border-white/10">
+                <Calendar className="text-brand-green w-3.5 h-3.5" />{" "}
+                {item.date
+                  ? new Date(item.date).toLocaleDateString(
+                      locale === "zh" ? "zh-CN" : locale === "fr" ? "fr-FR" : "en-US",
+                      {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      }
+                    )
+                  : "Recent"}
+              </span>
+              {item.authorName && (
                 <span className="text-white px-3.5 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 bg-white/10 backdrop-blur-md border border-white/10">
-                  <Calendar className="text-brand-green w-3.5 h-3.5" />{" "}
-                  {new Date(item.date).toLocaleDateString(locale === "zh" ? "zh-CN" : locale === "fr" ? "fr-FR" : "en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
+                  <User className="text-brand-green w-3.5 h-3.5" /> {item.authorName}
                 </span>
-                {item.authorName && (
-                  <span className="text-white px-3.5 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 bg-white/10 backdrop-blur-md border border-white/10">
-                    <User className="text-brand-green w-3.5 h-3.5" /> {item.authorName}
-                  </span>
-                )}
-              </div>
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight mb-6 sm:mb-8">
-                {item.title}
-              </h1>
+              )}
+            </div>
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-snug sm:leading-tight mb-4 sm:mb-6 font-serif">
+              {item.title}
+            </h1>
 
-              {/* Author Detail Row */}
-              <div className="flex items-center gap-4 py-5 border-t border-white/10">
-                <div className="relative h-12 w-12 rounded-full overflow-hidden border-2 border-brand-green shadow-xl shrink-0">
-                  <Image
-                    src={item.authorImage || "/images/about-hero.png"}
-                    alt={item.authorName || "Author"}
-                    fill
-                    sizes="48px"
-                    className="object-cover"
-                  />
-                </div>
-                <div>
-                  <p className="text-white font-bold text-base mb-0.5">{item.authorName}</p>
-                  <p className="text-zinc-400 text-[9px] uppercase tracking-[0.2em] font-extrabold">
-                    {locale === "zh" ? "官方贡献者" : locale === "fr" ? "Contributeur Officiel" : "Official Contributor"}
-                  </p>
-                </div>
+            {/* Author Detail Row */}
+            <div className="flex items-center gap-3.5 py-4 border-t border-white/15">
+              <div className="relative h-10 w-10 sm:h-12 sm:w-12 rounded-full overflow-hidden border-2 border-brand-green shadow-xl shrink-0 bg-zinc-900">
+                <Image
+                  src={item.authorImage || "/images/logo/apsoniclogo.png"}
+                  alt={item.authorName || "Author"}
+                  fill
+                  unoptimized
+                  sizes="48px"
+                  className="object-cover"
+                />
               </div>
-            </motion.div>
-          </div>
+              <div>
+                <p className="text-white font-bold text-sm sm:text-base mb-0.5">{item.authorName || "APSONIC Team"}</p>
+                <p className="text-zinc-400 text-[9px] uppercase tracking-[0.2em] font-extrabold">
+                  {item.authorRole ||
+                    (locale === "zh"
+                      ? "官方贡献者"
+                      : locale === "fr"
+                      ? "Contributeur Officiel"
+                      : "Official Contributor")}
+                </p>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </div>
 
@@ -100,14 +110,19 @@ export const NewsDetailClient: React.FC<NewsDetailClientProps> = ({
                 <Button
                   onClick={() => router.push("/news")}
                   variant="outline"
-                  className="rounded-full border-zinc-200 text-zinc-600 hover:text-brand-green hover:border-brand-green px-6 text-xs uppercase tracking-wider font-bold"
+                  className="rounded-full border-zinc-200 text-zinc-600 hover:text-brand-green hover:border-brand-green px-6 text-xs uppercase tracking-wider font-bold cursor-pointer"
                 >
-                  <ArrowLeft className="mr-2 w-4 h-4" /> {locale === "zh" ? "所有文章" : locale === "fr" ? "Toutes les histoires" : "All Stories"}
+                  <ArrowLeft className="mr-2 w-4 h-4" />{" "}
+                  {locale === "zh"
+                    ? "所有文章"
+                    : locale === "fr"
+                    ? "Toutes les histoires"
+                    : "All Stories"}
                 </Button>
               </div>
 
               <article className="prose prose-lg max-w-none text-zinc-700 font-light leading-relaxed">
-                <NewsContent blocks={item.content} />
+                <NewsContent contentHtml={item.contentHtml} sections={item.sections} blocks={item.content} />
               </article>
             </div>
 
@@ -121,50 +136,35 @@ export const NewsDetailClient: React.FC<NewsDetailClientProps> = ({
                       {locale === "zh" ? "最新更新" : locale === "fr" ? "Mises à jour" : "Latest Updates"}
                     </h3>
                     <div className="space-y-6">
-                      {recommendedNews.map((newsItem) => (
-                        <Link key={newsItem.id} href={`/news/${newsItem.id}`} className="group flex gap-4 cursor-pointer">
-                          <div className="relative h-16 w-16 flex-shrink-0 rounded-lg overflow-hidden border border-zinc-100 shadow-sm bg-zinc-50">
+                      {recommendedNews.map((rec) => (
+                        <div
+                          key={rec.id}
+                          onClick={() => router.push(`/news/${rec.id}`)}
+                          className="group cursor-pointer flex gap-4 items-center bg-zinc-50/50 hover:bg-zinc-50 p-3 rounded-2xl border border-zinc-100 transition-all"
+                        >
+                          <div className="relative h-20 w-24 rounded-xl overflow-hidden shrink-0 bg-zinc-900">
                             <Image
-                              src={newsItem.thumbnail}
-                              alt={newsItem.title}
+                              src={rec.thumbnail || "/images/logo/apsoniclogo.png"}
+                              alt={rec.title}
                               fill
-                              sizes="80px"
-                              className="object-cover transition-transform duration-700 group-hover:scale-110"
+                              unoptimized
+                              sizes="96px"
+                              className="object-cover group-hover:scale-105 transition-transform duration-300"
                             />
                           </div>
-                          <div className="flex flex-col justify-center min-w-0">
-                            <span className="text-[9px] text-brand-green font-bold uppercase tracking-widest mb-1">
-                              {newsItem.category}
+                          <div>
+                            <span className="text-[10px] font-bold text-brand-green uppercase tracking-wider block mb-1">
+                              {rec.category || "News"}
                             </span>
-                            <h4 className="text-xs font-bold text-zinc-900 line-clamp-2 group-hover:text-brand-green transition-colors leading-snug">
-                              {newsItem.title}
+                            <h4 className="text-xs sm:text-sm font-bold text-zinc-900 line-clamp-2 group-hover:text-brand-green transition-colors">
+                              {rec.title}
                             </h4>
-                            <span className="text-[9px] text-zinc-400 mt-1 leading-none">
-                              {new Date(newsItem.date).toLocaleDateString(locale === "zh" ? "zh-CN" : locale === "fr" ? "fr-FR" : "en-US")}
-                            </span>
                           </div>
-                        </Link>
+                        </div>
                       ))}
                     </div>
                   </div>
                 )}
-
-                {/* Corporate CTA */}
-                <div className="p-8 rounded-3xl bg-zinc-50 border border-zinc-100">
-                  <h4 className="text-base font-bold text-zinc-950 mb-3">APSONIC</h4>
-                  <p className="text-xs text-zinc-500 mb-5 leading-relaxed font-light">
-                    {locale === "zh" 
-                      ? "了解更多关于我们在非洲的使命和全球影响。" 
-                      : locale === "fr"
-                      ? "En savoir plus sur notre mission en Afrique et notre impact mondial."
-                      : "Learn more about our mission in Africa and our global impact."}
-                  </p>
-                  <Link href="/about">
-                    <Button variant="outline" className="w-full rounded-xl border-zinc-200 text-xs font-bold uppercase tracking-wider">
-                      {locale === "zh" ? "关于我们" : locale === "fr" ? "Notre Histoire" : "Our Story"}
-                    </Button>
-                  </Link>
-                </div>
               </div>
             </aside>
           </div>
