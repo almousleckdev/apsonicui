@@ -66,7 +66,7 @@ const UserEditForm: React.FC<Omit<UserEditModalProps, 'isOpen'>> = ({
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="space-y-6 font-sans">
+      <form onSubmit={handleSubmit} className="space-y-5 font-sans">
         {errorMsg && (
           <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold">
             {errorMsg}
@@ -171,6 +171,7 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({ isOpen, editingUse
   <Modal
     isOpen={isOpen}
     onClose={onClose}
+    maxWidthClass="max-w-xl"
     title={<T id={editingUser ? 'users.form.editTitle' : 'users.form.createTitle'} values={{ name: editingUser?.username ?? '' }} />}
   >
     {/* Modal unmounts its children when closed, so the form (and its fields) starts fresh on every open. */}

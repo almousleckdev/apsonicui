@@ -23,8 +23,13 @@ export function useRichTextEditor({
   onPlusMenuClose,
 }: UseRichTextEditorProps) {
   const editor = useEditor({
+    // The editor is only rendered on the client; stating it keeps Next.js from warning about hydration.
+    immediatelyRender: false,
     extensions: [
       StarterKit.configure({
+        // StarterKit already bundles these two; they are added below with our own settings.
+        link: false,
+        underline: false,
         heading: {
           levels: [1, 2, 3],
         },

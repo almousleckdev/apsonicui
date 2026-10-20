@@ -58,12 +58,12 @@ export const Modal: React.FC<ModalProps> = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 16 }}
             className={cn(
-              'relative w-full bg-white rounded-3xl border border-zinc-100 shadow-2xl overflow-hidden z-10 font-sans my-8',
+              'relative w-full bg-white rounded-3xl border border-zinc-100 shadow-2xl overflow-hidden z-10 font-sans flex flex-col max-h-[calc(100dvh-2rem)]',
               maxWidthClass
             )}
           >
             {title && (
-              <div className="flex items-center justify-between p-6 border-b border-zinc-100 bg-zinc-50/50">
+              <div className="flex shrink-0 items-center justify-between px-6 py-4 border-b border-zinc-100 bg-zinc-50/50">
                 <h3 className="text-lg font-black text-zinc-900 tracking-tight">{title}</h3>
                 <button
                   onClick={onClose}
@@ -74,7 +74,7 @@ export const Modal: React.FC<ModalProps> = ({
                 </button>
               </div>
             )}
-            <div className="p-6 sm:p-8">{children}</div>
+            <div className="p-6 overflow-y-auto">{children}</div>
           </motion.div>
         </div>
       )}

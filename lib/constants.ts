@@ -64,23 +64,12 @@ export function getFooterSections(t: (key: string) => string): FooterSection[] {
     ],
   };
 
-  const about = {
-    title: t('about.title'),
-    items: [
-      { label: t('about.brandIntro'), href: '/about' },
-      { label: t('about.brandCulture'), href: '/about' },
-      { label: t('about.history'), href: '/about' },
-      { label: t('about.news'), href: '/news' },
-      { label: t('about.social'), href: '/about' },
-    ],
-  };
-
   const contact = {
     title: t('contact.title'),
     items: [{ label: t('contact.inquiry'), href: '/contact' }],
   };
 
-  return [products, services, about, contact];
+  return [products, services, contact];
 }
 
 // Navigation Items

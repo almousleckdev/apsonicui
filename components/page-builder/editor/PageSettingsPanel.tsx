@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { setMeta, setSeo } from '@/lib/page-builder/document';
 import type { Locale, PageDocument, PageMeta } from '@/lib/page-builder/types';
 import { INPUT_CLASS } from './fields/FieldControl';
+import { FooterPlacement } from './FooterPlacement';
 
 interface Props {
   pageId: number;
@@ -47,6 +48,8 @@ export function PageSettingsPanel({ pageId, doc, slug, everPublished, locale, is
             help={t(locale === 'en' ? 'editor.settingsPanel.pageTitleHelpEn' : 'editor.settingsPanel.pageTitleHelpOther')} />
           <SlugField pageId={pageId} slug={slug} everPublished={everPublished} onChange={onSlugChange} />
         </Group>
+
+        <FooterPlacement pageId={pageId} />
 
         <Group title={<T id="editor.settingsPanel.searchEngines" />}>
           <TextField label={<T id="editor.settingsPanel.searchTitle" />} copyValues={inEveryLanguage('seoTitle')} locale={locale} value={meta.seoTitle ?? ''} placeholder={placeholderFor('seoTitle') ?? meta.title} maxLength={120} recommended={60}

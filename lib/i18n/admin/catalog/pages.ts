@@ -66,7 +66,7 @@ export const pages = {
     submit: ['Create page and open editor', '创建页面并打开编辑器'],
     created: ['Page created. It is a private draft until you publish it.', '页面已创建。在发布之前，它只是私有草稿。'],
     createFailed: ['The page could not be created.', '无法创建页面。'],
-    addressTaken: ['That web address is already used by another page. Please choose a different one.', '该网址已被其他页面使用，请换一个。'],
+    addressTaken: ['That web address is already used by another page, or by a page in the Trash. Choose a different one, or delete that page for good from the Trash.', '该网址已被其他页面（或回收站中的页面）使用。请换一个，或在回收站中彻底删除该页面。'],
   },
   templates: {
     blank: { label: ['Blank page', '空白页面'], text: ['Start from nothing and add the sections you need.', '从空白开始，按需添加区块。'] },

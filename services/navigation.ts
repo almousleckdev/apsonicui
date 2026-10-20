@@ -17,6 +17,29 @@ export const navigationService = {
     });
     return res.data;
   },
+  /** Keeps a removed item (and everything under it) in the trash so it can be restored. */
+  async trashItem(menu: MenuKey, item: MenuItem, title: string): Promise<MenuView> {
+    const res = await apiClient<MenuView>(`${ADMIN}/${menu}/trash`, {
+      method: 'POST', requiresAuth: true, retryCount: 0, body: JSON.stringify({ item, title }),
+    });
+    return res.data;
+  },
+  /** Takes the menu offline so the website shows its built-in version again. The draft is kept. */
+  async resetToOriginal(menu: MenuKey, expectedVersion: number): Promise<MenuView> {
+    const res = await apiClient<MenuView>(`${ADMIN}/${menu}/reset`, {
+      method: 'POST', requiresAuth: true, retryCount: 0, body: JSON.stringify({ expectedVersion }),
+    });
+    return res.data;
+  },
+  /** Lists a page under a footer section (created when new). Takes effect immediately; no editor needed. */
+  async showPageInFooter(pageId: number, section: string): Promise<void> {
+    await apiClient<void>(`${ADMIN}/footer/pages/${pageId}`, {
+      method: 'PUT', requiresAuth: true, retryCount: 0, body: JSON.stringify({ section }),
+    });
+  },
+  async hidePageFromFooter(pageId: number): Promise<void> {
+    await apiClient<void>(`${ADMIN}/footer/pages/${pageId}`, { method: 'DELETE', requiresAuth: true, retryCount: 0 });
+  },
   async publish(menu: MenuKey, expectedVersion: number): Promise<MenuView> {
     const res = await apiClient<MenuView>(`${ADMIN}/${menu}/publish`, {
       method: 'POST', requiresAuth: true, retryCount: 0, body: JSON.stringify({ expectedVersion }),
