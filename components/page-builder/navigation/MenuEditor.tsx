@@ -16,7 +16,8 @@ import { navigationService } from '@/services/navigation';
 import { cn } from '@/lib/utils';
 import { getErrorMessage } from '@/lib/utils/errors';
 import { localized } from '@/lib/page-builder/document';
-import { canHaveChildren, countItems, find, flatten, indent, insertAfter, moveDown, moveTo, moveUp, newMenuItem, outdent, remove, treesEqual, update, warningsFor } from '@/lib/navigation/tree';
+import { countItems, find, flatten, insertAfter, moveDown, moveTo, moveUp, newMenuItem, remove, treesEqual, update, warningsFor } from '@/lib/navigation/tree';
+import { starterFooter } from '@/lib/navigation/starter';
 import { BUILT_IN_ROUTES, MENU_MAX_DEPTH, type ItemKind, type MenuItem, type MenuKey, type MenuView } from '@/lib/navigation/types';
 import { ItemForm } from './ItemForm';
 import { MenuItemRow } from './MenuItemRow';
@@ -56,14 +57,17 @@ function MenuEditorBody({ menu, initial }: { menu: MenuKey; initial: MenuView })
   const { t } = useAdminText();
   const maxDepth = MENU_MAX_DEPTH[menu];
   const [server, setServer] = useState(initial);
-  const [items, setItems] = useState<MenuItem[]>(initial.draft);
-  const [selectedId, setSelectedId] = useState<string | null>(initial.draft[0]?.id ?? null);
+  // A footer nobody has customised yet starts from the standard layout, so the team edits what they can see.
+  const [items, setItems] = useState<MenuItem[]>(() => (menu === 'footer' && !initial.configured && initial.draft.length === 0 ? starterFooter() : initial.draft));
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [locale, setLocale] = useState<AdminLang>('en');
-  const [busy, setBusy] = useState<'save' | 'publish' | 'discard' | null>(null);
+  const [busy, setBusy] = useState<'save' | 'publish' | 'discard' | 'original' | null>(null);
   const [problems, setProblems] = useState<Problem[]>([]);
   const [conflict, setConflict] = useState(false);
-  const [confirm, setConfirm] = useState<'publish' | 'discard' | null>(null);
+  const [confirm, setConfirm] = useState<'publish' | 'discard' | 'original' | null>(null);
   const [addOpen, setAddOpen] = useState(false);
+  const [removing, setRemoving] = useState(false);
+  const [confirmRemove, setConfirmRemove] = useState(false);
 
   const { data: pageOptions = [] } = useQuery({ queryKey: ['nav-page-options'], queryFn: () => navigationService.pageOptions() });
   const pagesById = useMemo(() => new Map(pageOptions.map((p) => [p.id, p])), [pageOptions]);
@@ -102,7 +106,7 @@ function MenuEditorBody({ menu, initial }: { menu: MenuKey; initial: MenuView })
 
   const adopt = (view: MenuView) => { setServer(view); setItems(view.draft); setProblems([]); setConflict(false); };
 
-  const run = async (kind: 'save' | 'publish' | 'discard', action: () => Promise<MenuView>, success: string): Promise<boolean> => {
+  const run = async (kind: 'save' | 'publish' | 'discard' | 'original', action: () => Promise<MenuView>, success: string): Promise<boolean> => {
     setBusy(kind);
     try {
       adopt(await action());
@@ -118,7 +122,6 @@ function MenuEditorBody({ menu, initial }: { menu: MenuKey; initial: MenuView })
     }
   };
 
-  const save = () => run('save', () => navigationService.saveDraft(menu, server.version, items), t('navigation.done.draftSaved'));
   const publish = async () => {
     setConfirm(null);
     if (dirty) {
@@ -139,11 +142,31 @@ function MenuEditorBody({ menu, initial }: { menu: MenuKey; initial: MenuView })
     await run('publish', () => navigationService.publish(menu, server.version), t('navigation.done.live', { menu: t(MENU_NAME[menu]) }));
   };
   const discard = async () => { setConfirm(null); await run('discard', () => navigationService.discard(menu, server.version), t('navigation.done.backToPublished')); };
+  const useOriginal = async () => { setConfirm(null); await run('original', () => navigationService.resetToOriginal(menu, server.version), t('navigation.originalBack')); };
   const reload = async () => { try { adopt(await navigationService.get(menu)); toast.success(t('navigation.done.loadedLatest')); } catch (e) { toast.error(getErrorMessage(e, t('navigation.done.reloadFailed'))); } };
+
+  const removeSelected = async () => {
+    if (!selected) return;
+    setRemoving(true);
+    try {
+      const saved = await navigationService.trashItem(menu, selected, localized(selected.labels, 'en') || t('navigation.untitledItem'));
+      // The server already dropped the item from the saved draft; keep any other edits made on this screen.
+      setServer(saved);
+      setItems((c) => remove(c, selected.id));
+      setSelectedId(null);
+      setConfirmRemove(false);
+    } catch (e) {
+      toast.error(getErrorMessage(e, t('navigation.form.removeFailed')));
+    } finally {
+      setRemoving(false);
+    }
+  };
 
   const add = (kind: ItemKind) => {
     const item = newMenuItem(kind);
-    setItems((current) => insertAfter(current, selected ? selected.id : null, item));
+    // With a section title selected, a new link goes inside that section.
+    if (selected?.kind === 'GROUP' && kind !== 'GROUP') setItems((current) => update(current, selected.id, (g) => ({ ...g, children: [...g.children, item] })));
+    else setItems((current) => insertAfter(current, selected ? selected.id : null, item));
     setSelectedId(item.id);
     setAddOpen(false);
   };
@@ -165,10 +188,12 @@ function MenuEditorBody({ menu, initial }: { menu: MenuKey; initial: MenuView })
               <RotateCcw className="h-3.5 w-3.5" aria-hidden /> <T id={dirty ? 'navigation.undoChanges' : 'navigation.backToPublished'} />
             </button>
           )}
-          <button type="button" onClick={save} disabled={!dirty || busy !== null}
-            className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 px-4 py-2 text-xs font-bold text-zinc-700 hover:bg-zinc-50 disabled:opacity-40">
-            {busy === 'save' && <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />} <T id="navigation.saveDraft" />
-          </button>
+          {menu === 'footer' && server.configured && (
+            <button type="button" onClick={() => setConfirm('original')} disabled={busy !== null}
+              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold text-zinc-600 hover:bg-zinc-100 disabled:opacity-50">
+              <T id="navigation.useOriginal" />
+            </button>
+          )}
           <button type="button" onClick={() => setConfirm('publish')} disabled={publishDisabled}
             className="inline-flex items-center gap-2 rounded-lg bg-brand-green px-5 py-2 text-xs font-extrabold uppercase tracking-wide text-white hover:bg-brand-green-hover disabled:cursor-not-allowed disabled:opacity-50">
             {(busy === 'publish') && <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />} <T id="navigation.publish" />
@@ -235,14 +260,12 @@ function MenuEditorBody({ menu, initial }: { menu: MenuKey; initial: MenuView })
                 <SortableContext items={flat.map((f) => f.item.id)} strategy={verticalListSortingStrategy}>
                   <ul className="space-y-1.5">
                     {flat.map((f) => {
-                      const prev = f.index > 0 ? flat.find((x) => x.parentId === f.parentId && x.index === f.index - 1)?.item : undefined;
                       return (
                         <MenuItemRow key={f.item.id} item={f.item} depth={f.depth} label={labelFor(f.item)} subtitle={subtitleFor(f.item)} selected={f.item.id === selectedId}
                           warnings={warningsFor(f.item)} canMoveUp={f.index > 0} canMoveDown={f.index < f.siblings - 1}
-                          canIndent={!!prev && canHaveChildren(prev) && indent(items, f.item.id, maxDepth) !== items} canOutdent={f.parentId !== null}
                           onSelect={() => setSelectedId(f.item.id)}
                           onUp={() => setItems((c) => moveUp(c, f.item.id))} onDown={() => setItems((c) => moveDown(c, f.item.id))}
-                          onIndent={() => setItems((c) => indent(c, f.item.id, maxDepth))} onOutdent={() => setItems((c) => outdent(c, f.item.id))} />
+                          />
                       );
                     })}
                   </ul>
@@ -261,7 +284,7 @@ function MenuEditorBody({ menu, initial }: { menu: MenuKey; initial: MenuView })
               <ItemForm key={selected.id} item={selected} pages={pageOptions} usedPageIds={usedPageIds} usedRoutes={usedRoutes}
                 issues={problems.filter((p) => describeProblem(p.path).id === selected.id).map((p) => p.message)}
                 onChange={(change) => setItems((c) => update(c, selected.id, change))}
-                onRemove={() => { setItems((c) => remove(c, selected.id)); setSelectedId(null); }} />
+                onRemove={() => setConfirmRemove(true)} />
             ) : (
               <p className="text-xs text-zinc-500"><T id="navigation.selectHint" /></p>
             )}
@@ -274,6 +297,14 @@ function MenuEditorBody({ menu, initial }: { menu: MenuKey; initial: MenuView })
         title={t('navigation.confirmPublish', { menu: t(MENU_NAME[menu]) })}
         description={`${t('navigation.confirmPublishText')}${menu === 'footer' ? ` ${t('navigation.confirmPublishFooter')}` : ''}`}
         confirmLabel={<T id="navigation.publish" />} />
+      <ActionModal
+        isOpen={confirmRemove && !!selected} onClose={() => setConfirmRemove(false)} onConfirm={removeSelected} variant="danger" isLoading={removing}
+        title={t('navigation.form.confirmTitle')}
+        description={selected ? t(selected.children.length > 0 ? 'navigation.form.confirmTextWithDropdown' : 'navigation.form.confirmText', { name: labelFor(selected) }) : ''}
+        confirmLabel={<T id="navigation.form.remove" />} />
+      <ActionModal
+        isOpen={confirm === 'original'} onClose={() => setConfirm(null)} onConfirm={useOriginal} variant="warning"
+        title={t('navigation.confirmOriginal')} description={t('navigation.confirmOriginalText')} confirmLabel={<T id="navigation.useOriginal" />} />
       <ActionModal
         isOpen={confirm === 'discard'} onClose={() => setConfirm(null)} onConfirm={discard} variant="warning"
         title={t('navigation.confirmDiscard')} description={t('navigation.confirmDiscardText')} confirmLabel={<T id="navigation.discardDraft" />} />

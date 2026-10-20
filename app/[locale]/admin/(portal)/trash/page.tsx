@@ -27,6 +27,7 @@ const TABS: { id: TrashResourceType; label: AdminKey }[] = [
   { id: 'news', label: 'trash.tabs.news' },
   { id: 'users', label: 'trash.tabs.users' },
   { id: 'notifications', label: 'trash.tabs.notifications' },
+  { id: 'navigation', label: 'trash.tabs.navigation' },
 ];
 
 export default function TrashPage() {

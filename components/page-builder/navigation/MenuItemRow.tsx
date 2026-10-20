@@ -3,7 +3,7 @@
 import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, EyeOff, FileText, GripVertical, Heading, Home, Link2, TriangleAlert } from 'lucide-react';
+import { ArrowDown, ArrowUp, EyeOff, FileText, GripVertical, Heading, Home, Link2, TriangleAlert } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ItemKind, MenuItem } from '@/lib/navigation/types';
 import type { AdminKey } from '@/lib/i18n/admin/catalog';
@@ -21,16 +21,12 @@ interface Props {
   warnings: AdminKey[];
   canMoveUp: boolean;
   canMoveDown: boolean;
-  canIndent: boolean;
-  canOutdent: boolean;
   onSelect: () => void;
   onUp: () => void;
   onDown: () => void;
-  onIndent: () => void;
-  onOutdent: () => void;
 }
 
-export function MenuItemRow({ item, depth, label, subtitle, selected, warnings, canMoveUp, canMoveDown, canIndent, canOutdent, onSelect, onUp, onDown, onIndent, onOutdent }: Props) {
+export function MenuItemRow({ item, depth, label, subtitle, selected, warnings, canMoveUp, canMoveDown, onSelect, onUp, onDown }: Props) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
   const Icon = ICONS[item.kind];
   const { t } = useAdminText();
@@ -56,8 +52,6 @@ export function MenuItemRow({ item, depth, label, subtitle, selected, warnings, 
         <span className="flex shrink-0 items-center pr-1 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
           <Mini label={t('navigation.row.up')} disabled={!canMoveUp} onClick={onUp}><ArrowUp className="h-3.5 w-3.5" /></Mini>
           <Mini label={t('navigation.row.down')} disabled={!canMoveDown} onClick={onDown}><ArrowDown className="h-3.5 w-3.5" /></Mini>
-          <Mini label={t('navigation.row.indent')} disabled={!canIndent} onClick={onIndent}><ArrowRight className="h-3.5 w-3.5" /></Mini>
-          <Mini label={t('navigation.row.outdent')} disabled={!canOutdent} onClick={onOutdent}><ArrowLeft className="h-3.5 w-3.5" /></Mini>
         </span>
       </div>
     </li>

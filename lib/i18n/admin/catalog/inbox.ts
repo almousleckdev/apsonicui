@@ -44,7 +44,7 @@ export const inbox = {
   trash: {
     title: ['Trash management', '回收站管理'],
     subtitle: ['View and restore deleted items (kept for 3 months)', '查看并恢复已删除的项目（保留 3 个月）'],
-    clear: ['Clear {type} trash', '清空{type}回收站'],
+    clear: ['Clear', '清空'],
     tabs: {
       pages: ['Pages', '页面'],
       products: ['Products', '产品'],
@@ -52,6 +52,7 @@ export const inbox = {
       news: ['News', '新闻'],
       users: ['Users', '用户'],
       notifications: ['Notifications', '通知'],
+      navigation: ['Menu items', '菜单项'],
     },
     columns: {
       name: ['Original name / title', '原名称 / 标题'],
