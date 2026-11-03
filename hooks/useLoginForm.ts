@@ -11,9 +11,9 @@ import { ApiError } from '@/services/api-client';
 export const useLoginForm = () => {
   const router = useRouter();
   const { login } = useAuth();
-  const { t: adminT } = useAdminText();
+  const { parts } = useAdminText();
   // The sign-in messages live in the admin catalog as login.*; the schema factory asks for them by short key.
-  const t = (key: string) => adminT(`login.${key}` as AdminKey);
+  const t = (key: string) => parts(`login.${key}` as AdminKey).zh;
   const [errorMessage, setErrorMessage] = useState<string>('');
 
   const {

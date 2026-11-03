@@ -6,6 +6,8 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   error?: string;
   helperText?: string;
   icon?: React.ReactNode;
+  /** Shown inside the field on the right, e.g. a show/hide password button. */
+  trailing?: React.ReactNode;
   variant?: 'default' | 'dark';
 }
 
@@ -18,6 +20,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       error,
       helperText,
       icon,
+      trailing,
       variant = 'default',
       id,
       disabled,
@@ -59,7 +62,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             disabled={disabled}
             className={cn(
               'w-full text-xs sm:text-sm font-semibold rounded-2xl transition-all duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed',
-              icon ? 'pl-11 pr-4' : 'px-5',
+              icon ? 'pl-11' : 'pl-5',
+              trailing ? 'pr-12' : icon ? 'pr-4' : 'pr-5',
               'py-3.5 h-12',
               isDark
                 ? 'bg-white/10 text-white placeholder-white/40 border border-white/15 focus:border-brand-green/80 focus:ring-2 focus:ring-brand-green/30 focus:bg-white/15'
@@ -69,6 +73,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             )}
             {...props}
           />
+          {trailing && <div className="absolute right-2 flex items-center">{trailing}</div>}
         </div>
         {error ? (
           <p className={cn('text-xs font-semibold mt-1 pl-1', isDark ? 'text-red-300' : 'text-red-500')}>{error}</p>
