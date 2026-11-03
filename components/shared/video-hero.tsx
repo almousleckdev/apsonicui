@@ -1,9 +1,17 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocale } from "next-intl";
 import { HomeHeroConfig, DEFAULT_HOMEPAGE_CONFIG } from "@/lib/types/homepage";
+
+/** Bundled videos ship a small poster frame (public/videos/posters/<name>.jpg) so the hero is never a black box. */
+function posterFor(src: string): string | undefined {
+  const match = src.match(/^\/videos\/([\w-]+)\.mp4$/);
+  return match ? `/videos/posters/${match[1]}.jpg` : undefined;
+}
+
+const DEFAULT_HERO_VIDEOS = ["/videos/hero2.mp4", "/videos/723_1770449481.mp4"];
 
 interface VideoHeroProps {
   initialConfig?: HomeHeroConfig;
@@ -14,9 +22,16 @@ export const VideoHero: React.FC<VideoHeroProps> = ({
 }) => {
   const heroConfig = initialConfig;
   const [currentIndex, setCurrentIndex] = useState(0);
+  // Rotation only starts once the current video is actually playing, so a slow download never skips ahead
+  // and the next video is never fetched while the current one is still loading.
+  const [playing, setPlaying] = useState(false);
   const locale = useLocale() as "zh" | "en" | "fr";
 
-  const videos = heroConfig.videos && heroConfig.videos.length > 0 ? heroConfig.videos : ["/videos/hero2.mp4", "/videos/723_1770449481.mp4"];
+  const configuredVideos = heroConfig.videos;
+  const videos = useMemo(
+    () => (configuredVideos && configuredVideos.length > 0 ? configuredVideos : DEFAULT_HERO_VIDEOS),
+    [configuredVideos],
+  );
   const interval = heroConfig.interval || 8000;
 
   const currentTagline =
@@ -38,14 +53,15 @@ export const VideoHero: React.FC<VideoHeroProps> = ({
     "APSONIC Motorcycles - Built for Africa's Rugged Roads";
 
   useEffect(() => {
-    if (videos.length <= 1) return;
+    if (videos.length <= 1 || !playing) return;
 
-    const timer = setInterval(() => {
+    const timer = setTimeout(() => {
+      setPlaying(false);
       setCurrentIndex((prev) => (prev + 1) % videos.length);
     }, interval);
 
-    return () => clearInterval(timer);
-  }, [videos, interval]);
+    return () => clearTimeout(timer);
+  }, [videos, interval, playing, currentIndex]);
 
   return (
     <div className="relative w-full h-screen overflow-hidden bg-zinc-950">
@@ -68,6 +84,9 @@ export const VideoHero: React.FC<VideoHeroProps> = ({
             ) : (
               <video
                 src={videos[currentIndex]}
+                poster={posterFor(videos[currentIndex])}
+                preload="auto"
+                onPlaying={() => setPlaying(true)}
                 autoPlay
                 muted
                 loop
@@ -117,7 +136,11 @@ export const VideoHero: React.FC<VideoHeroProps> = ({
           {videos.map((_, index) => (
             <button
               key={index}
-              onClick={() => setCurrentIndex(index)}
+              onClick={() => {
+                if (index === currentIndex) return;
+                setPlaying(false);
+                setCurrentIndex(index);
+              }}
               className="relative h-1 w-16 overflow-hidden rounded-full bg-white/20 transition-all hover:bg-white/40 cursor-pointer"
               aria-label={`Go to video ${index + 1}`}
             >

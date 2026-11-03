@@ -180,7 +180,7 @@ export const ProductsDropdown: React.FC<ProductsDropdownProps> = ({
                     <span className="flex items-center gap-2 min-w-0">
                       {category.image && isSafeImagePath(category.image) && (
                         <span className="relative h-5 w-8 shrink-0">
-                          <Image src={category.image} alt="" fill sizes="32px" unoptimized className="object-contain" />
+                          <Image src={category.image} alt="" fill sizes="32px" unoptimized={category.image.startsWith("http")} className="object-contain" />
                         </span>
                       )}
                       <span className="truncate">{displayLabel}</span>
@@ -212,7 +212,8 @@ export const ProductsDropdown: React.FC<ProductsDropdownProps> = ({
                       src={sub.image}
                       alt={displaySubLabel}
                       fill
-                      unoptimized={sub.image.startsWith("/uploads") || sub.image.startsWith("http")}
+                      // Uploaded images go through the optimizer too: a 120px slot should not download the full-size original.
+                      unoptimized={sub.image.startsWith("http")}
                       sizes="120px"
                       className="object-contain transition-transform duration-500 group-hover:scale-105 drop-shadow-[0_4px_6px_rgba(0,0,0,0.02)]"
                     />
