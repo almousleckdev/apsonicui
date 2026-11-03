@@ -9,9 +9,9 @@ export const newsService = {
   /**
    * Fetch public news articles from live backend DB.
    */
-  async getNewsList(locale: string = 'en', category?: string): Promise<NewsItem[]> {
+  async getNewsList(locale: string = 'en', category?: string, size: number = 50): Promise<NewsItem[]> {
     try {
-      const queryParams = new URLSearchParams({ locale, size: '50' });
+      const queryParams = new URLSearchParams({ locale, size: String(size) });
       if (category && category !== 'ALL') {
         queryParams.set('category', category);
       }
@@ -32,8 +32,8 @@ export const newsService = {
     return [];
   },
 
-  async getNews(locale: string = 'en', category?: string): Promise<NewsItem[]> {
-    return newsService.getNewsList(locale, category);
+  async getNews(locale: string = 'en', category?: string, size?: number): Promise<NewsItem[]> {
+    return newsService.getNewsList(locale, category, size);
   },
 
   /**

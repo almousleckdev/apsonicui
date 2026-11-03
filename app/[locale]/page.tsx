@@ -9,6 +9,8 @@ import { newsService } from "@/services/news";
 import { homepageService } from "@/services/homepage-service";
 import { locales } from "@/lib/i18n/locales";
 
+const HOME_NEWS_LIMIT = 3;
+
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
@@ -20,10 +22,10 @@ interface PageProps {
 export default async function Home({ params }: PageProps) {
   const { locale } = await params;
   
-  // Fetch news data on the server with locale fallback
-  const news = await newsService.getNews(locale);
-  // Fetch CMS config on the server
-  const config = await homepageService.getHomepageConfig();
+  const [news, config] = await Promise.all([
+    newsService.getNews(locale, undefined, HOME_NEWS_LIMIT),
+    homepageService.getHomepageConfig(),
+  ]);
 
   return (
     <main className="relative bg-white space-y-0 w-full min-h-screen">
@@ -54,7 +56,7 @@ export default async function Home({ params }: PageProps) {
 
       {/* 6. Blog & News Center */}
       <ScrollReveal variant="fadeUp" delay={0.1}>
-        <NewsSection news={news} limit={3} />
+        <NewsSection news={news} limit={HOME_NEWS_LIMIT} />
       </ScrollReveal>
     </main>
   );
