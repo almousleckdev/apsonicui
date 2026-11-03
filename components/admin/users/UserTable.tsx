@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { ColumnDef } from '@tanstack/react-table';
-import { ShieldCheck, CheckCircle2, XCircle, Edit2, Trash2, Users } from 'lucide-react';
+import { ShieldCheck, CheckCircle2, XCircle, Edit2, Trash2, Users, Mail } from 'lucide-react';
 import { DataTable } from '@/components/admin/DataTable';
 import { useAuth } from '@/hooks/useAuth';
 import { canManageUsers } from '@/lib/utils/permissions';
@@ -17,6 +17,7 @@ interface UserTableProps {
   onEdit: (user: UserManagementItem) => void;
   onDelete: (user: UserManagementItem) => void;
   onToggleStatus: (user: UserManagementItem) => void;
+  onResendInvitation: (user: UserManagementItem) => void;
 }
 
 export const UserTable: React.FC<UserTableProps> = ({
@@ -25,6 +26,7 @@ export const UserTable: React.FC<UserTableProps> = ({
   onEdit,
   onDelete,
   onToggleStatus,
+  onResendInvitation,
 }) => {
   const { user: currentUser } = useAuth();
   const allowDelete = canManageUsers(currentUser);
@@ -128,6 +130,17 @@ export const UserTable: React.FC<UserTableProps> = ({
             >
               <Edit2 className="w-4 h-4" />
             </button>
+            {user.enabled && (
+              <button
+                type="button"
+                onClick={() => onResendInvitation(user)}
+                className="p-2 hover:bg-zinc-100 text-zinc-600 rounded-xl transition-colors cursor-pointer"
+                title={t('users.resendInvitation')}
+                aria-label={t('users.resendInvitation')}
+              >
+                <Mail className="w-4 h-4" />
+              </button>
+            )}
             {allowDelete && (
               <button
                 type="button"

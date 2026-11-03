@@ -30,6 +30,7 @@ export default function AdminUsersPage() {
     handleOpenEditModal,
     handleSaveUser,
     handleToggleStatus,
+    handleResendInvitation,
     handleDeleteUser,
     filteredUsers,
   } = useAdminUsers();
@@ -78,6 +79,7 @@ export default function AdminUsersPage() {
           onEdit={handleOpenEditModal}
           onDelete={(u) => setDeletingUser(u)}
           onToggleStatus={handleToggleStatus}
+          onResendInvitation={handleResendInvitation}
         />
 
         {/* Create / Edit User Modal */}

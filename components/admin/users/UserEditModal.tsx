@@ -36,17 +36,13 @@ const UserEditForm: React.FC<Omit<UserEditModalProps, 'isOpen'>> = ({
     e.preventDefault();
     setErrorMsg(null);
 
-    if (!editingUser && !password.trim()) {
-      setErrorMsg(t('users.form.needPassword'));
-      return;
-    }
-
     setSaving(true);
     try {
       const payload: CreateUserPayload = {
         username: username.trim(),
         email: email.trim(),
-        password: password.trim() || '',
+        // New accounts get an email invitation instead of a password chosen by the admin.
+        password: editingUser ? password.trim() || '' : undefined,
         firstName: firstName.trim() || undefined,
         lastName: lastName.trim() || undefined,
         roles: [role.replace('ROLE_', '')],
@@ -107,22 +103,23 @@ const UserEditForm: React.FC<Omit<UserEditModalProps, 'isOpen'>> = ({
             </div>
           </div>
 
-          <div>
-            <label className="text-xs font-bold text-zinc-700 block mb-1.5">
-              <T id={editingUser ? 'users.form.newPassword' : 'users.form.password'} />{!editingUser && ' *'}
-            </label>
-            <div className="relative">
-              <input
-                type="password"
-                required={!editingUser}
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-9 pr-4 py-2.5 rounded-2xl border border-zinc-200 bg-zinc-50 text-xs font-bold text-zinc-900 focus:outline-none focus:border-brand-green focus:bg-white"
-              />
-              <KeyRound className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+          {editingUser && (
+            <div>
+              <label className="text-xs font-bold text-zinc-700 block mb-1.5">
+                <T id="users.form.newPassword" />
+              </label>
+              <div className="relative">
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2.5 rounded-2xl border border-zinc-200 bg-zinc-50 text-xs font-bold text-zinc-900 focus:outline-none focus:border-brand-green focus:bg-white"
+                />
+                <KeyRound className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+              </div>
             </div>
-          </div>
+          )}
 
           <div>
             <label className="text-xs font-bold text-zinc-700 block mb-1.5"><T id="users.form.firstName" /></label>
@@ -145,6 +142,13 @@ const UserEditForm: React.FC<Omit<UserEditModalProps, 'isOpen'>> = ({
             />
           </div>
         </div>
+
+        {!editingUser && (
+          <p className="flex items-start gap-2 p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold leading-relaxed">
+            <Mail className="w-4 h-4 mt-0.5 flex-shrink-0" />
+            <T id="users.form.inviteNotice" />
+          </p>
+        )}
 
         <div className="flex justify-end gap-3 pt-4 border-t border-zinc-100">
           <button

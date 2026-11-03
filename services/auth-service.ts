@@ -38,6 +38,27 @@ export const authService = {
     return res.data;
   },
 
+  /** Emails a reset link. The server answers the same for unknown addresses, so this never reveals who has an account. */
+  async forgotPassword(email: string): Promise<void> {
+    await apiClient('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+      requiresAuth: false,
+      retryCount: 1,
+    });
+  },
+
+  /** Sets a new password from the link in a reset or invitation email. */
+  async resetPassword(token: string, password: string): Promise<void> {
+    await apiClient('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ token, password }),
+      requiresAuth: false,
+      retryCount: 1,
+      silent: true,
+    });
+  },
+
   /**
    * Refresh access token using HTTP-only refresh token cookie.
    */
@@ -136,6 +157,11 @@ export const userService = {
     });
 
     return res.data;
+  },
+
+  /** Emails the person a fresh link to choose their password; earlier links stop working. */
+  async resendInvitation(id: number): Promise<void> {
+    await apiClient(`/admin/users/${id}/invitation`, { method: 'POST', requiresAuth: true });
   },
 
   async updateUser(id: number, payload: UpdateUserPayload): Promise<UserManagementItem> {

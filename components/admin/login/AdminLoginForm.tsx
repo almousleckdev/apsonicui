@@ -1,18 +1,19 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useAdminText } from '@/context/AdminTextContext';
-import { Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Mail, AlertCircle } from 'lucide-react';
 import { useLoginForm } from '@/hooks/useLoginForm';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { PasswordInput } from './PasswordInput';
 
 export const AdminLoginForm: React.FC = () => {
   const { register, errors, errorMessage, isSubmitting, onSubmit } = useLoginForm();
   const { parts } = useAdminText();
   const zh = (key: Parameters<typeof parts>[0]) => parts(key).zh;
-  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <motion.div
@@ -52,27 +53,21 @@ export const AdminLoginForm: React.FC = () => {
           />
 
           {/* Password Field */}
-          <Input
-            type={showPassword ? 'text' : 'password'}
-            label={zh('login.passwordLabel')}
-            placeholder={zh('login.passwordPlaceholder')}
-            error={errors.password?.message}
-            icon={<Lock className="w-5 h-5" />}
-            trailing={
-              <button
-                type="button"
-                onClick={() => setShowPassword((visible) => !visible)}
-                aria-label={zh(showPassword ? 'login.hidePassword' : 'login.showPassword')}
-                aria-pressed={showPassword}
-                className="p-2 text-white/60 hover:text-white transition-colors rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/60"
-              >
-                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-              </button>
-            }
-            variant="dark"
-            disabled={isSubmitting}
-            {...register('password')}
-          />
+          <div className="space-y-2">
+            <PasswordInput
+              label={zh('login.passwordLabel')}
+              placeholder={zh('login.passwordPlaceholder')}
+              error={errors.password?.message}
+              autoComplete="current-password"
+              disabled={isSubmitting}
+              {...register('password')}
+            />
+            <div className="text-right">
+              <Link href="/admin/forgot-password" className="text-xs font-semibold text-white/70 hover:text-brand-green transition-colors">
+                {zh('login.forgotLink')}
+              </Link>
+            </div>
+          </div>
 
           {/* Submit Button */}
           <Button

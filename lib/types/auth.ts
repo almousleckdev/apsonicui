@@ -53,12 +53,15 @@ export interface UserManagementItem {
   roles: string[];
   createdAt?: string;
   updatedAt?: string;
+  /** Only on a just-created account without a password: whether its invitation email was sent. */
+  invitationSent?: boolean;
 }
 
 export interface CreateUserPayload {
   username: string;
   email: string;
-  password: string;
+  /** Leave out to email the person an invitation to choose their own password. */
+  password?: string;
   firstName?: string;
   lastName?: string;
   avatarUrl?: string;
