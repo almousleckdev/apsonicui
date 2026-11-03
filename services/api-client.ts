@@ -12,6 +12,9 @@ const getBaseUrl = () => {
 
 const BASE_URL = getBaseUrl();
 const DEFAULT_TIMEOUT_MS = 30000;
+const IS_SERVER = typeof window === 'undefined';
+// Retrying on the server only delays the page render (the sleep happens while the visitor waits).
+const DEFAULT_RETRY_COUNT = IS_SERVER ? 1 : 2;
 
 export const SESSION_EXPIRED_EVENT = 'apsonic:session-expired';
 
@@ -114,7 +117,7 @@ export async function apiClient<T>(
 ): Promise<ApiResponse<T>> {
   const {
     requiresAuth = true,
-    retryCount = 2,
+    retryCount = DEFAULT_RETRY_COUNT,
     retryDelay = 1000,
     timeoutMs = DEFAULT_TIMEOUT_MS,
     cancelId,

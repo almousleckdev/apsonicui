@@ -29,7 +29,10 @@ RUN npm run build
 # ---- runtime ---------------------------------------------------------------------------------
 FROM ${NODE_IMAGE} AS runner
 WORKDIR /app
-ENV NODE_ENV=production \
+# Server components call the backend at this address at runtime (the build stage's value is not inherited).
+ARG INTERNAL_API_URL=http://backend:8080
+ENV INTERNAL_API_URL=${INTERNAL_API_URL} \
+    NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
     PORT=3000 \
     HOSTNAME=0.0.0.0
