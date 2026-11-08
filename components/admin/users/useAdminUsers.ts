@@ -54,8 +54,10 @@ export function useAdminUsers() {
       await userService.updateUser(editingUser.id, updatePayload);
       toast.success(t('users.updated'));
     } else {
-      await userService.createUser(payload);
-      toast.success(t('users.created'));
+      const created = await userService.createUser(payload);
+      if (created.invitationSent === true) toast.success(t('users.createdInvited'));
+      else if (created.invitationSent === false) toast.warning(t('users.createdNotInvited'));
+      else toast.success(t('users.created'));
     }
     await fetchUserList();
   };
@@ -68,6 +70,16 @@ export function useAdminUsers() {
     } catch (err: unknown) {
       console.error(err);
       toast.error(err instanceof Error ? err.message : t('users.statusFailed'));
+    }
+  };
+
+  const handleResendInvitation = async (user: UserManagementItem) => {
+    try {
+      await userService.resendInvitation(user.id);
+      toast.success(t('users.invitationResent'));
+    } catch (err: unknown) {
+      console.error(err);
+      toast.error(t('users.invitationFailed'));
     }
   };
 
@@ -121,6 +133,7 @@ export function useAdminUsers() {
     handleOpenEditModal,
     handleSaveUser,
     handleToggleStatus,
+    handleResendInvitation,
     handleDeleteUser,
     filteredUsers,
   };
