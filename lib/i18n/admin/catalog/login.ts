@@ -53,6 +53,7 @@ export const login = {
     },
     errors: {
       invalidCredentials: ['Invalid credentials, please check and try again', '账号或密码有误，请检查后重试'],
+      accountLocked: ['Your account is locked after 5 failed sign-ins. Try again in 30 minutes, or ask an administrator to unlock it.', '登录失败次数过多，账号已被锁定。请 30 分钟后重试，或联系管理员解锁。'],
       connectionError: ['Unable to connect to the server, please try again', '无法连接服务器，请重试'],
     },
   },

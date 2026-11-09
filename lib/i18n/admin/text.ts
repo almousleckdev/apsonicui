@@ -1,13 +1,13 @@
 /**
- * The admin shows every label in Chinese and English together (Chinese first, drawn larger). Each string lives once in
- * the catalog as an [English, Chinese] pair, so the two languages can never drift apart. People who prefer a single
- * language can hide the other with the display mode; it is a preference, kept in a cookie so the server renders it.
+ * The admin is shown in one language at a time: 中文 (the default) or English. Each string lives once in the catalog as
+ * an [English, Chinese] pair, so the two languages can never drift apart. The choice is a preference, kept in a cookie
+ * so the server renders it. An older saved choice of "both languages together" is read as 中文.
  */
 
 export const ADMIN_TEXT_COOKIE = 'ADMIN_TEXT';
-export const ADMIN_TEXT_MODES = ['both', 'en', 'zh'] as const;
+export const ADMIN_TEXT_MODES = ['zh', 'en'] as const;
 export type AdminTextMode = (typeof ADMIN_TEXT_MODES)[number];
-export const DEFAULT_ADMIN_TEXT_MODE: AdminTextMode = 'both';
+export const DEFAULT_ADMIN_TEXT_MODE: AdminTextMode = 'zh';
 
 export function normalizeAdminTextMode(value: string | undefined | null): AdminTextMode {
   return (ADMIN_TEXT_MODES as readonly string[]).includes(value ?? '') ? (value as AdminTextMode) : DEFAULT_ADMIN_TEXT_MODE;

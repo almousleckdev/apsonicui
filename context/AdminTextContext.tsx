@@ -37,9 +37,7 @@ const translators = {
 
 /** Joins the two versions according to the display mode. Exported for tests and for code outside React. */
 export function joinText(text: BilingualText, mode: AdminTextMode): string {
-  if (mode === 'en') return text.en;
-  if (mode === 'zh') return text.zh;
-  return text.zh === text.en ? text.en : `${text.zh} / ${text.en}`;
+  return mode === 'en' ? text.en : text.zh;
 }
 
 export function AdminTextProvider({ initialMode, children }: { initialMode: AdminTextMode; children: React.ReactNode }) {

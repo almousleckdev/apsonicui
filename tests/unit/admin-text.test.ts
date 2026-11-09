@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { adminCatalog } from '@/lib/i18n/admin/catalog';
-import { normalizeAdminTextMode, splitCatalog, type CatalogNode, type Pair } from '@/lib/i18n/admin/text';
+import { ADMIN_TEXT_MODES, DEFAULT_ADMIN_TEXT_MODE, normalizeAdminTextMode, splitCatalog, type CatalogNode, type Pair } from '@/lib/i18n/admin/text';
 import { joinText } from '@/context/AdminTextContext';
 
 function pairs(node: CatalogNode, path = ''): Array<[string, Pair]> {
@@ -40,17 +40,22 @@ describe('splitCatalog', () => {
 });
 
 describe('display mode', () => {
-  it('falls back to showing both languages for anything unknown', () => {
-    expect(normalizeAdminTextMode('zh')).toBe('zh');
-    expect(normalizeAdminTextMode('fr')).toBe('both');
-    expect(normalizeAdminTextMode(undefined)).toBe('both');
+  it('offers 中文 and English only, with 中文 as the default', () => {
+    expect(ADMIN_TEXT_MODES).toEqual(['zh', 'en']);
+    expect(DEFAULT_ADMIN_TEXT_MODE).toBe('zh');
   });
 
-  it('joins plain strings with Chinese first, and only the chosen language otherwise', () => {
+  it('keeps a saved choice, and reads anything else (including the old "both") as 中文', () => {
+    expect(normalizeAdminTextMode('zh')).toBe('zh');
+    expect(normalizeAdminTextMode('en')).toBe('en');
+    expect(normalizeAdminTextMode('both')).toBe('zh');
+    expect(normalizeAdminTextMode('fr')).toBe('zh');
+    expect(normalizeAdminTextMode(undefined)).toBe('zh');
+  });
+
+  it('shows exactly one language, never the two joined', () => {
     const text = { en: 'Products', zh: '产品管理' };
-    expect(joinText(text, 'both')).toBe('产品管理 / Products');
     expect(joinText(text, 'en')).toBe('Products');
     expect(joinText(text, 'zh')).toBe('产品管理');
-    expect(joinText({ en: 'EN', zh: 'EN' }, 'both')).toBe('EN');
   });
 });

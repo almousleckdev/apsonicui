@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { ColumnDef } from '@tanstack/react-table';
-import { ShieldCheck, CheckCircle2, XCircle, Edit2, Trash2, Users, Mail, Clock, Lock, Ban, UserCheck } from 'lucide-react';
+import { ShieldCheck, CheckCircle2, XCircle, Edit2, Trash2, Users, Mail, Clock, Lock, LockOpen, Ban, UserCheck } from 'lucide-react';
 import { DataTable } from '@/components/admin/DataTable';
 import { useAuth } from '@/hooks/useAuth';
 import { canManageUsers } from '@/lib/utils/permissions';
@@ -18,6 +18,7 @@ interface UserTableProps {
   onDelete: (user: UserManagementItem) => void;
   onToggleStatus: (user: UserManagementItem) => void;
   onResendInvitation: (user: UserManagementItem) => void;
+  onUnlock: (user: UserManagementItem) => void;
 }
 
 type StatusLook = { label: 'users.active' | 'users.invited' | 'users.invitationExpired' | 'users.suspended' | 'users.locked'; color: string; icon: typeof CheckCircle2 };
@@ -47,6 +48,7 @@ export const UserTable: React.FC<UserTableProps> = ({
   onDelete,
   onToggleStatus,
   onResendInvitation,
+  onUnlock,
 }) => {
   const { user: currentUser } = useAuth();
   const allowDelete = canManageUsers(currentUser);
@@ -128,6 +130,11 @@ export const UserTable: React.FC<UserTableProps> = ({
             <span className={`flex items-center gap-1 font-bold ${look.color}`}>
               <Icon className="w-4 h-4" /> <T id={look.label} />
             </span>
+            {status === 'LOCKED' && user.lockedUntil && (
+              <span className="text-2xs text-zinc-500">
+                {t('users.lockedUntil', { time: new Date(user.lockedUntil).toLocaleString() })}
+              </span>
+            )}
             {status === 'INVITED' && user.invitationExpiresAt && (
               <span className="text-2xs text-zinc-500">
                 {t('users.linkUntil', { time: new Date(user.invitationExpiresAt).toLocaleString() })}
@@ -152,6 +159,17 @@ export const UserTable: React.FC<UserTableProps> = ({
             >
               <Edit2 className="w-4 h-4" />
             </button>
+            {accountStatus(user) === 'LOCKED' && (
+              <button
+                type="button"
+                onClick={() => onUnlock(user)}
+                className="p-2 hover:bg-red-50 text-red-600 rounded-xl transition-colors cursor-pointer"
+                title={t('users.unlock')}
+                aria-label={t('users.unlock')}
+              >
+                <LockOpen className="w-4 h-4" />
+              </button>
+            )}
             {canResend(user) && (
               <button
                 type="button"

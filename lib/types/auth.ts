@@ -57,6 +57,8 @@ export interface UserManagementItem {
   status?: UserAccountStatus;
   /** While invited: when the newest link stops working. */
   invitationExpiresAt?: string | null;
+  /** While locked: when the block ends by itself. An administrator can lift it earlier. */
+  lockedUntil?: string | null;
   roles: string[];
   createdAt?: string;
   updatedAt?: string;
