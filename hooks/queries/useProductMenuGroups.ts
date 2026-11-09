@@ -9,7 +9,7 @@ const KEY = ['product-menu-groups'] as const;
 /** The Products menu groups for the admin, with a helper that saves a change against the latest saved list. */
 export function useProductMenuGroups() {
   const queryClient = useQueryClient();
-  const query = useQuery({ queryKey: KEY, queryFn: () => productMenuService.getGroups(), staleTime: 0 });
+  const query = useQuery({ queryKey: KEY, queryFn: () => productMenuService.getGroups(), staleTime: 5 * 60_000 });
 
   const update = async (change: (current: ProductMenuGroup[]) => ProductMenuGroup[]) => {
     const next = await productMenuService.updateGroups(change);
@@ -19,7 +19,8 @@ export function useProductMenuGroups() {
 
   return {
     groups: query.data ?? DEFAULT_PRODUCT_MENU_GROUPS,
-    loading: query.isFetching,
+    loading: query.isPending,
+    refreshing: query.isFetching,
     update,
   };
 }

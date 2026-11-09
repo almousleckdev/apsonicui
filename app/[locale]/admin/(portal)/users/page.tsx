@@ -33,6 +33,7 @@ export default function AdminUsersPage() {
     handleResendInvitation,
     handleDeleteUser,
     filteredUsers,
+    refreshing,
   } = useAdminUsers();
 
   const { t } = useAdminText();
@@ -53,7 +54,7 @@ export default function AdminUsersPage() {
           actionLabel={<T id="users.create" />}
           onActionClick={handleOpenCreateModal}
           onRefresh={fetchUserList}
-          isRefreshing={loading}
+          isRefreshing={refreshing}
         />
 
         {/* Filter and Search Toolbar */}

@@ -19,7 +19,7 @@ export default function AdminNotificationsPage() {
   const [currentTab, setCurrentTab] = useState<NotificationStatusTab>('all');
   const [selectedMessage, setSelectedMessage] = useState<ContactMessageItem | null>(null);
 
-  const { data: messages, loading: isLoading, refetch: refetchMessages } = useRemoteList<ContactMessageItem>(
+  const { data: messages, loading: isLoading, refreshing, refetch: refetchMessages } = useRemoteList<ContactMessageItem>(
     ['admin', 'contact', 'messages', currentTab],
     async () => (await fetchAdminContactMessages(currentTab, 0, 50)).data?.content ?? [],
     (err) => console.error('Failed to load notifications', err)
@@ -54,10 +54,10 @@ export default function AdminNotificationsPage() {
 
           <button
             onClick={loadData}
-            disabled={isLoading}
+            disabled={refreshing}
             className="px-3 py-1.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 rounded-xl transition-all cursor-pointer flex items-center gap-2 text-xs font-bold"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
             <span><T id="common.refresh" /></span>
           </button>
         </div>

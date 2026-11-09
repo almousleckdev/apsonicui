@@ -10,8 +10,10 @@ export interface RemoteList<T> {
   data: T[];
   /** Optimistically replace the cached list (e.g. after toggling or deleting one row). */
   setData: (updater: (previous: T[]) => T[]) => void;
-  /** True during every fetch, including manual refreshes (drives spinners). */
+  /** True only while there is nothing to show yet (first visit): drives skeleton rows and full-page spinners. */
   loading: boolean;
+  /** True during every fetch, including the quiet background refresh of rows already on screen (drives the refresh icon). */
+  refreshing: boolean;
   refetch: () => Promise<unknown>;
   isError: boolean;
   error: Error | null;
@@ -20,7 +22,7 @@ export interface RemoteList<T> {
 /**
  * Admin list backed by TanStack Query instead of fetch-in-useEffect + useState.
  * `staleTime: 0` keeps the admin behaviour of reloading on every visit (edits made on other pages must show up),
- * while cached rows still render instantly during the refetch. Keys are hashed structurally, so inline arrays are fine.
+ * while cached rows render instantly and the refetch happens quietly behind them (no spinner when rows are cached). Keys are hashed structurally, so inline arrays are fine.
  */
 export function useRemoteList<T>(
   key: readonly (string | number)[],
@@ -51,7 +53,8 @@ export function useRemoteList<T>(
     setData: (updater) => {
       queryClient.setQueryData<T[]>(key, (previous) => updater(previous ?? []));
     },
-    loading: query.isFetching,
+    loading: query.isPending,
+    refreshing: query.isFetching,
     // Wrapped so click handlers can pass `refetch` directly without the event becoming query options.
     refetch: () => query.refetch(),
     isError: query.isError,

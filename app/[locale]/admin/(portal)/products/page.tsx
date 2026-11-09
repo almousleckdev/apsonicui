@@ -14,7 +14,7 @@ import { useAdminText } from '@/context/AdminTextContext';
 export default function AdminProductsPage() {
   const { toast } = useToast();
   const { t } = useAdminText();
-  const { data: products, loading, refetch: fetchData } = useRemoteList<ProductListItem>(
+  const { data: products, loading, refreshing, refetch: fetchData } = useRemoteList<ProductListItem>(
     ['admin', 'products'],
     () => productService.getAdminProducts(),
     (e) => toast.error(e.message || t('products.loadFailed'))
@@ -71,7 +71,7 @@ export default function AdminProductsPage() {
           actionLabel={<T id="products.add" />}
           actionHref="/admin/products/new"
           onRefresh={fetchData}
-          isRefreshing={loading}
+          isRefreshing={refreshing}
         />
 
         {/* Filter Bar with Brand Tabs */}
