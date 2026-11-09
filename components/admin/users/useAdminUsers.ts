@@ -78,9 +78,10 @@ export function useAdminUsers() {
     try {
       await userService.resendInvitation(user.id);
       toast.success(t('users.invitationResent'));
+      await fetchUserList();
     } catch (err: unknown) {
       console.error(err);
-      toast.error(t('users.invitationFailed'));
+      toast.error(err instanceof Error && err.message ? err.message : t('users.invitationFailed'));
     }
   };
 

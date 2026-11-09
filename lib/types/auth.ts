@@ -42,6 +42,9 @@ export interface AuthUser {
   permissions: string[];
 }
 
+/** What user management shows for an account. Someone who has not opened their invitation is not "active". */
+export type UserAccountStatus = 'ACTIVE' | 'INVITED' | 'INVITATION_EXPIRED' | 'SUSPENDED' | 'LOCKED';
+
 export interface UserManagementItem {
   id: number;
   username: string;
@@ -50,6 +53,10 @@ export interface UserManagementItem {
   lastName?: string;
   avatarUrl?: string;
   enabled: boolean;
+  /** Absent on servers that predate invitations; fall back to `enabled`. */
+  status?: UserAccountStatus;
+  /** While invited: when the newest link stops working. */
+  invitationExpiresAt?: string | null;
   roles: string[];
   createdAt?: string;
   updatedAt?: string;

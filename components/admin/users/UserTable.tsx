@@ -3,11 +3,11 @@
 import React from 'react';
 import Image from 'next/image';
 import { ColumnDef } from '@tanstack/react-table';
-import { ShieldCheck, CheckCircle2, XCircle, Edit2, Trash2, Users, Mail } from 'lucide-react';
+import { ShieldCheck, CheckCircle2, XCircle, Edit2, Trash2, Users, Mail, Clock, Lock, Ban, UserCheck } from 'lucide-react';
 import { DataTable } from '@/components/admin/DataTable';
 import { useAuth } from '@/hooks/useAuth';
 import { canManageUsers } from '@/lib/utils/permissions';
-import type { UserManagementItem } from '@/lib/types/auth';
+import type { UserAccountStatus, UserManagementItem } from '@/lib/types/auth';
 import { T } from '@/components/admin/T';
 import { useAdminText } from '@/context/AdminTextContext';
 
@@ -19,6 +19,26 @@ interface UserTableProps {
   onToggleStatus: (user: UserManagementItem) => void;
   onResendInvitation: (user: UserManagementItem) => void;
 }
+
+type StatusLook = { label: 'users.active' | 'users.invited' | 'users.invitationExpired' | 'users.suspended' | 'users.locked'; color: string; icon: typeof CheckCircle2 };
+
+const STATUS_LOOK: Record<UserAccountStatus, StatusLook> = {
+  ACTIVE: { label: 'users.active', color: 'text-emerald-600', icon: CheckCircle2 },
+  INVITED: { label: 'users.invited', color: 'text-amber-600', icon: Clock },
+  INVITATION_EXPIRED: { label: 'users.invitationExpired', color: 'text-orange-600', icon: Clock },
+  SUSPENDED: { label: 'users.suspended', color: 'text-zinc-400', icon: XCircle },
+  LOCKED: { label: 'users.locked', color: 'text-red-600', icon: Lock },
+};
+
+/** The server sends the status; older servers only say whether the account is enabled. */
+const accountStatus = (user: UserManagementItem): UserAccountStatus =>
+  user.status ?? (user.enabled ? 'ACTIVE' : 'SUSPENDED');
+
+/** A new link can be sent only to someone who has not chosen a password yet and is not suspended. */
+const canResend = (user: UserManagementItem): boolean => {
+  const status = accountStatus(user);
+  return status === 'INVITED' || status === 'INVITATION_EXPIRED';
+};
 
 export const UserTable: React.FC<UserTableProps> = ({
   loading,
@@ -96,22 +116,24 @@ export const UserTable: React.FC<UserTableProps> = ({
       },
     },
     {
-      accessorKey: 'enabled',
+      id: 'status',
       header: () => <T id="users.columns.status" />,
       cell: ({ row }) => {
         const user = row.original;
+        const status = accountStatus(user);
+        const look = STATUS_LOOK[status];
+        const Icon = look.icon;
         return (
-          <button
-            type="button"
-            onClick={() => onToggleStatus(user)}
-            className="flex items-center gap-1.5 cursor-pointer"
-          >
-            {user.enabled ? (
-              <span className="flex items-center gap-1 text-emerald-600 font-bold"><CheckCircle2 className="w-4 h-4" /> <T id="users.active" /></span>
-            ) : (
-              <span className="flex items-center gap-1 text-zinc-400 font-bold"><XCircle className="w-4 h-4" /> <T id="users.suspended" /></span>
+          <div className="flex flex-col gap-0.5">
+            <span className={`flex items-center gap-1 font-bold ${look.color}`}>
+              <Icon className="w-4 h-4" /> <T id={look.label} />
+            </span>
+            {status === 'INVITED' && user.invitationExpiresAt && (
+              <span className="text-2xs text-zinc-500">
+                {t('users.linkUntil', { time: new Date(user.invitationExpiresAt).toLocaleString() })}
+              </span>
             )}
-          </button>
+          </div>
         );
       },
     },
@@ -130,7 +152,7 @@ export const UserTable: React.FC<UserTableProps> = ({
             >
               <Edit2 className="w-4 h-4" />
             </button>
-            {user.enabled && (
+            {canResend(user) && (
               <button
                 type="button"
                 onClick={() => onResendInvitation(user)}
@@ -141,6 +163,15 @@ export const UserTable: React.FC<UserTableProps> = ({
                 <Mail className="w-4 h-4" />
               </button>
             )}
+            <button
+              type="button"
+              onClick={() => onToggleStatus(user)}
+              className="p-2 hover:bg-zinc-100 text-zinc-600 rounded-xl transition-colors cursor-pointer"
+              title={t(user.enabled ? 'users.suspend' : 'users.activate')}
+              aria-label={t(user.enabled ? 'users.suspend' : 'users.activate')}
+            >
+              {user.enabled ? <Ban className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
+            </button>
             {allowDelete && (
               <button
                 type="button"
