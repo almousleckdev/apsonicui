@@ -74,13 +74,25 @@ export function useAdminUsers() {
     }
   };
 
+  const handleUnlock = async (user: UserManagementItem) => {
+    try {
+      await userService.unlockUser(user.id);
+      toast.success(t('users.unlocked'));
+      await fetchUserList();
+    } catch (err: unknown) {
+      console.error(err);
+      toast.error(err instanceof Error && err.message ? err.message : t('users.unlockFailed'));
+    }
+  };
+
   const handleResendInvitation = async (user: UserManagementItem) => {
     try {
       await userService.resendInvitation(user.id);
       toast.success(t('users.invitationResent'));
+      await fetchUserList();
     } catch (err: unknown) {
       console.error(err);
-      toast.error(t('users.invitationFailed'));
+      toast.error(err instanceof Error && err.message ? err.message : t('users.invitationFailed'));
     }
   };
 
@@ -136,6 +148,7 @@ export function useAdminUsers() {
     handleSaveUser,
     handleToggleStatus,
     handleResendInvitation,
+    handleUnlock,
     handleDeleteUser,
     filteredUsers,
   };

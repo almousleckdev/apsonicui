@@ -39,10 +39,8 @@ export const shell = {
   },
   display: {
     label: ['Language shown', '显示语言'],
-    both: ['Both', '双语'],
     en: ['EN', 'EN'],
     zh: ['中文', '中文'],
-    bothHint: ['Show Chinese and English together', '同时显示中文和英文'],
     enHint: ['Show English only', '仅显示英文'],
     zhHint: ['Show Chinese only', '仅显示中文'],
   },

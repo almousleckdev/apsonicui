@@ -42,7 +42,8 @@ export const useLoginForm = () => {
       router.push('/admin/dashboard');
     } catch (error) {
       if (error instanceof ApiError) {
-        setErrorMessage(error.message || t('errors.invalidCredentials'));
+        // 423: blocked after repeated wrong passwords; the sign-in page is Chinese-only, so show our own wording.
+        setErrorMessage(error.status === 423 ? t('errors.accountLocked') : error.message || t('errors.invalidCredentials'));
       } else {
         setErrorMessage(t('errors.connectionError'));
       }

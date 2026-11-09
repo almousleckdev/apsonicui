@@ -164,6 +164,15 @@ export const userService = {
     await apiClient(`/admin/users/${id}/invitation`, { method: 'POST', requiresAuth: true });
   },
 
+  /** Lifts a block caused by repeated wrong passwords (administrators and super administrators only). */
+  async unlockUser(id: number): Promise<UserManagementItem> {
+    const res: ApiResponse<UserManagementItem> = await apiClient(`/admin/users/${id}/unlock`, {
+      method: 'POST',
+      requiresAuth: true,
+    });
+    return res.data;
+  },
+
   async updateUser(id: number, payload: UpdateUserPayload): Promise<UserManagementItem> {
     const res: ApiResponse<UserManagementItem> = await apiClient(`/admin/users/${id}`, {
       method: 'PUT',

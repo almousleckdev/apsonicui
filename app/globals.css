@@ -415,8 +415,8 @@ figcaption {
 }
 
 /* Admin text: every label carries Chinese and English (see components/admin/T.tsx). Chinese is drawn larger because its
-   characters look smaller than Latin letters of the same size. The display mode on <html data-admin-text> hides one
-   of the two for people who prefer a single language. */
+   characters look smaller than Latin letters of the same size. The language choice (data-admin-text, set by the server
+   on the admin wrapper and mirrored on <html> for modals) hides the one that is not chosen, so only one language shows. */
 .admin-bi .admin-zh {
   font-size: 1.14em;
 }
@@ -433,12 +433,11 @@ figcaption {
 .admin-bi.admin-stack .admin-en {
   margin-left: 0;
 }
-html[data-admin-text="en"] .admin-bi .admin-zh,
-html[data-admin-text="zh"] .admin-bi .admin-en {
+[data-admin-text="en"] .admin-bi .admin-zh,
+[data-admin-text="zh"] .admin-bi .admin-en {
   display: none;
 }
-html[data-admin-text="en"] .admin-bi .admin-en,
-html[data-admin-text="zh"] .admin-bi .admin-en {
+[data-admin-text="en"] .admin-bi .admin-en {
   font-size: 1em;
   opacity: 1;
   margin-left: 0;
