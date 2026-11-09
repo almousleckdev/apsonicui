@@ -88,7 +88,8 @@ export const VideoHero: React.FC<VideoHeroProps> = ({
 
   return (
     <div className="relative w-full h-screen overflow-hidden bg-zinc-950">
-      <AnimatePresence mode="popLayout">
+      {/* initial={false}: the first slide is part of the server HTML and must be visible before any script runs; later slides still fade in. */}
+      <AnimatePresence mode="popLayout" initial={false}>
         <motion.div
           key={currentIndex}
           initial={{ opacity: 0, scale: 1.05 }}
@@ -127,7 +128,7 @@ export const VideoHero: React.FC<VideoHeroProps> = ({
       {/* Floating Content (100% Original Exact Design) */}
       <div className="absolute inset-0 flex flex-col justify-end pb-32 sm:pb-40 px-6 sm:px-12 md:px-16 max-w-[1360px] mx-auto w-full z-10 select-none pointer-events-none">
         <motion.span
-          initial={{ opacity: 0, y: 15 }}
+          initial={false}
           animate={{ opacity: 0.8, y: 0 }}
           transition={{ delay: 0.3, duration: 0.8 }}
           className="text-brand-green text-xs font-black uppercase tracking-[0.25em] mb-3"
@@ -136,7 +137,7 @@ export const VideoHero: React.FC<VideoHeroProps> = ({
         </motion.span>
         
         <motion.h1
-          initial={{ opacity: 0, y: 20 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.8 }}
           className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white mb-4 uppercase drop-shadow-md"
@@ -145,7 +146,7 @@ export const VideoHero: React.FC<VideoHeroProps> = ({
         </motion.h1>
 
         <motion.p
-          initial={{ opacity: 0, y: 20 }}
+          initial={false}
           animate={{ opacity: 0.9, y: 0 }}
           transition={{ delay: 0.7, duration: 0.8 }}
           className="text-sm sm:text-lg md:text-xl text-zinc-300 max-w-xl font-medium leading-relaxed drop-shadow"
