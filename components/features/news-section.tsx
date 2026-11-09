@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import { bypassImageOptimizer } from '@/lib/media/safe-path';
 import { useLocale } from "next-intl";
 import { motion } from "framer-motion";
 import { Calendar, ArrowRight } from "lucide-react";
@@ -55,7 +56,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
                     src={item.thumbnail || "/images/logo/apsoniclogo.png"}
                     alt={item.title || "Story Thumbnail"}
                     fill
-                    unoptimized
+                    unoptimized={bypassImageOptimizer(item.thumbnail)}
                     sizes="(max-width: 768px) 100vw, 380px"
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                   />
@@ -73,7 +74,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({
                         src={item.authorImage || "/images/logo/apsoniclogo.png"}
                         alt={item.authorName || "Author"}
                         fill
-                        unoptimized
+                        unoptimized={bypassImageOptimizer(item.authorImage)}
                         sizes="48px"
                         className="object-cover"
                       />

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocale } from "next-intl";
 import { HomeHeroConfig, DEFAULT_HOMEPAGE_CONFIG } from "@/lib/types/homepage";
@@ -25,7 +25,30 @@ export const VideoHero: React.FC<VideoHeroProps> = ({
   // Rotation only starts once the current video is actually playing, so a slow download never skips ahead
   // and the next video is never fetched while the current one is still loading.
   const [playing, setPlaying] = useState(false);
+  // The video waits until the page's pictures have finished loading, so it never competes with them for a slow
+  // connection (the poster shows meanwhile). Visitors who ask their browser to save data never download it.
+  const [videoAllowed, setVideoAllowed] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const locale = useLocale() as "zh" | "en" | "fr";
+
+  useEffect(() => {
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    if (connection?.saveData) return;
+    let cancelled = false;
+    const allow = () => {
+      if (!cancelled) setVideoAllowed(true);
+    };
+    if (document.readyState === "complete") allow();
+    else window.addEventListener("load", allow, { once: true });
+    return () => {
+      cancelled = true;
+      window.removeEventListener("load", allow);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (videoAllowed) videoRef.current?.play().catch(() => {});
+  }, [videoAllowed, currentIndex]);
 
   const configuredVideos = heroConfig.videos;
   const videos = useMemo(
@@ -83,11 +106,12 @@ export const VideoHero: React.FC<VideoHeroProps> = ({
               />
             ) : (
               <video
+                ref={videoRef}
                 src={videos[currentIndex]}
                 poster={posterFor(videos[currentIndex])}
-                preload="auto"
+                preload={videoAllowed ? "auto" : "none"}
                 onPlaying={() => setPlaying(true)}
-                autoPlay
+                autoPlay={videoAllowed}
                 muted
                 loop
                 playsInline

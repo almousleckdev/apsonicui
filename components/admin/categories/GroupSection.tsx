@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { ArrowDown, ArrowUp, Edit2, ImageIcon, Plus, Trash2 } from 'lucide-react';
-import { isSafeImagePath } from '@/lib/media/safe-path';
+import { bypassImageOptimizer, isSafeImagePath } from '@/lib/media/safe-path';
 import type { ProductMenuGroup } from '@/lib/product-menu/groups';
 import type { CategoryItem } from '@/services/category';
 import { CategoryRow } from './CategoryRow';
@@ -39,7 +39,7 @@ export function GroupSection({ group, categories, totalCount, canMoveUp, canMove
       <header className="flex flex-wrap items-center gap-3 border-b border-zinc-100 bg-zinc-50/70 px-3 py-2.5">
         <div className="relative h-11 w-16 shrink-0 overflow-hidden rounded-lg border border-zinc-200 bg-white flex items-center justify-center">
           {group.image && isSafeImagePath(group.image) ? (
-            <Image src={group.image} alt="" fill sizes="64px" unoptimized className="object-contain p-0.5" />
+            <Image src={group.image} alt="" fill sizes="64px" unoptimized={bypassImageOptimizer(group.image)} className="object-contain p-0.5" />
           ) : (
             <ImageIcon className="h-4 w-4 text-zinc-300" />
           )}
