@@ -2,6 +2,7 @@
 
 import React, { useRef, useState } from 'react';
 import Image from 'next/image';
+import { bypassImageOptimizer } from '@/lib/media/safe-path';
 import { Film, ImageIcon, Link2, Loader2, Upload, X } from 'lucide-react';
 import { mediaService } from '@/services/media';
 import { useToast } from '@/components/ui/Toast';
@@ -63,7 +64,7 @@ export function CompactMediaField({ label, value, onChange, accept = 'image/*', 
           {value && isVideo(value) ? (
             <Film className="w-5 h-5 text-zinc-400" />
           ) : value && isRenderable(value) ? (
-            <Image src={value} alt="" fill sizes="64px" unoptimized className="object-contain p-0.5" />
+            <Image src={value} alt="" fill sizes="64px" unoptimized={bypassImageOptimizer(value)} className="object-contain p-0.5" />
           ) : (
             <ImageIcon className="w-5 h-5 text-zinc-300" />
           )}

@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { Edit2, ImageIcon, Trash2 } from 'lucide-react';
-import { isSafeImagePath } from '@/lib/media/safe-path';
+import { bypassImageOptimizer, isSafeImagePath } from '@/lib/media/safe-path';
 import type { CategoryItem } from '@/services/category';
 import { useAdminText } from '@/context/AdminTextContext';
 
@@ -24,7 +24,7 @@ export function CategoryRow({ category: c, canDelete, onToggleActive, onEdit, on
     <li className="grid grid-cols-[auto_minmax(0,1fr)_auto] md:grid-cols-[auto_minmax(0,1.3fr)_minmax(0,1.5fr)_auto_auto_auto] items-center gap-x-3 gap-y-1 px-3 py-2">
       <div className="relative h-10 w-14 shrink-0 overflow-hidden rounded-lg border border-zinc-100 bg-zinc-50 flex items-center justify-center">
         {c.imageUrl && isSafeImagePath(c.imageUrl) ? (
-          <Image src={c.imageUrl} alt="" fill sizes="56px" unoptimized className="object-contain p-0.5" />
+          <Image src={c.imageUrl} alt="" fill sizes="56px" unoptimized={bypassImageOptimizer(c.imageUrl)} className="object-contain p-0.5" />
         ) : (
           <ImageIcon className="h-4 w-4 text-zinc-300" />
         )}
