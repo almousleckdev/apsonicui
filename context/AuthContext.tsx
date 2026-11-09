@@ -60,6 +60,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (!token) {
         try {
           token = await refreshSession();
+          // The refresh response already carries the profile: one round trip instead of two.
+          const refreshedUser = tokenStorage.getUser();
+          if (refreshedUser) {
+            if (isMounted) {
+              setUserState(refreshedUser);
+              setIsLoading(false);
+            }
+            return;
+          }
         } catch {
           // Refresh cookie absent or expired: the visitor is simply signed out.
         }

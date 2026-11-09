@@ -80,6 +80,25 @@ describe('apiClient', () => {
     expect(tokenStorage.getAccessToken()).toBe('fresh');
   });
 
+  it('keeps the signed-in user from the refresh response, so no profile request is needed', async () => {
+    stubFetch(() => ok({ accessToken: 'fresh', user: { id: 7, username: 'editor' } }));
+    const { refreshSession, tokenStorage } = await loadClient();
+
+    await refreshSession();
+
+    expect(tokenStorage.getAccessToken()).toBe('fresh');
+    expect(tokenStorage.getUser()).toEqual({ id: 7, username: 'editor' });
+  });
+
+  it('still works when the refresh response has no user (older server)', async () => {
+    stubFetch(() => ok({ accessToken: 'fresh' }));
+    const { refreshSession, tokenStorage } = await loadClient();
+
+    await refreshSession();
+
+    expect(tokenStorage.getUser()).toBeNull();
+  });
+
   it('shares one refresh between parallel 401s (the refresh token rotates, so it must not be sent twice)', async () => {
     const seen = new Set<string>();
     const calls = stubFetch(async (url, init) => {
