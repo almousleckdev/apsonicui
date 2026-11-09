@@ -69,7 +69,7 @@ export const ModelSlideContainer: React.FC<ModelSlideContainerProps> = ({
         </div>
 
         <div className="relative w-[90%] h-[90%] z-10 flex items-center justify-center overflow-visible">
-          <AnimatePresence mode="popLayout" custom={direction}>
+          <AnimatePresence mode="popLayout" custom={direction} initial={false}>
             <motion.div
               key={`${currentModel.id}_${activeImage}`}
               custom={direction}

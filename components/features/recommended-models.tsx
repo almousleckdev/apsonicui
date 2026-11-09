@@ -73,7 +73,7 @@ export const RecommendedModels: React.FC<RecommendedModelsProps> = ({ className,
         </div>
 
         <div className="text-center mb-8 h-16 relative flex items-center justify-center overflow-hidden">
-          <AnimatePresence mode="popLayout" custom={direction}>
+          <AnimatePresence mode="popLayout" custom={direction} initial={false}>
             <motion.h3
               key={currentModel.id}
               custom={direction}
