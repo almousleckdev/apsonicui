@@ -22,6 +22,7 @@ export function useAdminUsers() {
   const {
     data: users,
     loading,
+    refreshing,
     refetch: fetchUserList,
     error: loadError,
   } = useRemoteList<UserManagementItem>(
@@ -117,6 +118,7 @@ export function useAdminUsers() {
   return {
     users,
     loading,
+    refreshing,
     error,
     searchQuery,
     setSearchQuery,

@@ -15,7 +15,7 @@ import { useAdminText } from '@/context/AdminTextContext';
 export default function AdminNewsPage() {
   const { toast } = useToast();
   const { t } = useAdminText();
-  const { data: newsList, setData: setNewsList, loading, refetch: fetchNews } = useRemoteList<NewsItem>(
+  const { data: newsList, setData: setNewsList, loading, refreshing, refetch: fetchNews } = useRemoteList<NewsItem>(
     ['admin', 'news'],
     () => newsService.getAdminNewsList(),
     () => toast.error(t('news.loadFailed'))
@@ -81,7 +81,7 @@ export default function AdminNewsPage() {
             actionLabel={<T id="news.create" />}
             actionHref="/admin/news/new"
             onRefresh={fetchNews}
-            isRefreshing={loading}
+            isRefreshing={refreshing}
           />
 
           {/* Filters & Search Row */}

@@ -45,7 +45,7 @@ export default function TrashPage() {
 
   const [isClearModalOpen, setIsClearModalOpen] = useState(false);
 
-  const { data: items, setData: setItems, loading: isLoading, refetch: loadData } = useRemoteList<TrashItem>(
+  const { data: items, setData: setItems, loading: isLoading, refreshing, refetch: loadData } = useRemoteList<TrashItem>(
     ['admin', 'trash', activeTab],
     async () => (await fetchTrashItems(activeTab)).data ?? [],
     (e) => console.error('Failed to load trash items', e)
@@ -160,7 +160,7 @@ export default function TrashPage() {
           actionIcon={Trash}
           onActionClick={confirmClearTrash}
           onRefresh={loadData}
-          isRefreshing={isLoading}
+          isRefreshing={refreshing}
           actionVariant="danger"
         />
 

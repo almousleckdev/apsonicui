@@ -49,12 +49,12 @@ export default function AdminCategoriesPage() {
   const { user } = useAuth();
   const allowDelete = canDeleteCatalog(user);
 
-  const { data: categories, loading, refetch, setData } = useRemoteList<CategoryItem>(
+  const { data: categories, refreshing, refetch, setData } = useRemoteList<CategoryItem>(
     ['admin', 'categories'],
     () => categoryService.getAdminCategories(),
     (e) => toast.error(e.message || t('categories.loadFailed'))
   );
-  const { groups, loading: groupsLoading, update: updateGroups } = useProductMenuGroups();
+  const { groups, refreshing: groupsRefreshing, update: updateGroups } = useProductMenuGroups();
 
   const [search, setSearch] = useState('');
   const [brand, setBrand] = useState<(typeof BRANDS)[number]>('all');
@@ -184,7 +184,7 @@ export default function AdminCategoriesPage() {
         actionLabel={<T id="categories.add" />}
         onActionClick={() => openCreateCategory()}
         onRefresh={() => refetch()}
-        isRefreshing={loading || groupsLoading}
+        isRefreshing={refreshing || groupsRefreshing}
       />
 
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white px-3 py-2 rounded-2xl border border-zinc-100 shadow-sm">
