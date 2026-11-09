@@ -12,6 +12,8 @@ import { AdminProviders } from '@/components/admin/AdminProviders';
  * language that is not chosen, so a page that says "zh" in one place and "en" in another hides every label.
  */
 describe('admin language switch', () => {
+  // children are passed as createElement arguments, so the component is typed without the required children prop
+  const Providers = AdminProviders as unknown as React.ComponentType<{ initialMode: 'zh' | 'en' }>;
   let root: Root | undefined;
   let container: HTMLElement | undefined;
   let switchTo: ((mode: 'zh' | 'en') => void) | undefined;
@@ -28,7 +30,7 @@ describe('admin language switch', () => {
     root = createRoot(container);
     act(() => {
       // The same composition the admin layout uses, so the wrapper it renders is part of what is tested.
-      root!.render(React.createElement(AdminProviders, { initialMode: initial, children: React.createElement(Probe) }));
+      root!.render(React.createElement(Providers, { initialMode: initial }, React.createElement(Probe)));
     });
   }
 
