@@ -373,7 +373,7 @@ figcaption {
 }
 
 .site-loader {
-  animation: site-loader-failsafe 0.3s ease 5s forwards;
+  animation: site-loader-failsafe 0.3s ease 2s forwards;
 }
 
 /* Page builder: colors chosen by editors arrive as validated custom properties (--pb-text, --pb-accent, --pb-own).

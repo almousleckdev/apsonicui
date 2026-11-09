@@ -5,7 +5,7 @@ import Image from "next/image";
 import { usePathname, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
-const MIN_VISIBLE_MS = 700;
+const MIN_VISIBLE_MS = 400;
 // A manually triggered loader (language switch) must never outlive a failed navigation.
 const MANUAL_MAX_MS = 4000;
 

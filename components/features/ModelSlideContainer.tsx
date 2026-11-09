@@ -64,7 +64,7 @@ export const ModelSlideContainer: React.FC<ModelSlideContainerProps> = ({
       >
         <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none opacity-[0.04] sm:opacity-[0.06] select-none">
           <div className="relative w-full h-full transform scale-110 sm:scale-125">
-            <Image src="/images/brand/ALOBA底图 (1).png" alt="" fill className="object-contain" priority />
+            <Image src="/images/brand/ALOBA底图 (1).png" alt="" fill sizes="100vw" className="object-contain" />
           </div>
         </div>
 
@@ -84,8 +84,6 @@ export const ModelSlideContainer: React.FC<ModelSlideContainerProps> = ({
                 alt={currentModel.name}
                 fill
                 className="object-contain filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.06)] hover:drop-shadow-[0_20px_32px_rgba(0,0,0,0.12)] transition-shadow duration-300"
-                priority
-                loading="eager"
                 sizes="(max-width: 768px) 100vw, 800px"
               />
             </motion.div>

@@ -133,8 +133,6 @@ export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({ className, i
                             src={category.image}
                             alt={category.name}
                             fill
-                            priority={index < 3}
-                            loading={index < 3 ? "eager" : "lazy"}
                             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 30vw"
                             className="object-contain p-2 transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-105"
                           />
