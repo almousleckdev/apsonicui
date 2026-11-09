@@ -93,6 +93,8 @@ async function performRefresh(): Promise<string> {
     throw new ApiError('Invalid refresh response payload', 401);
   }
   tokenStorage.setAccessToken(newToken);
+  // Newer servers include the signed-in user, which saves the profile request right after a refresh.
+  if (refreshData?.data?.user) tokenStorage.setUser(refreshData.data.user);
   return newToken;
 }
 
