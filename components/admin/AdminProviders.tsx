@@ -14,7 +14,7 @@ export function AdminProviders({ initialMode, children }: { initialMode: AdminTe
   return (
     <NextIntlClientProvider locale="zh" messages={zhMessages}>
       <AdminTextProvider initialMode={initialMode}>
-        <div data-admin-text={initialMode} className="contents">{children}</div>
+        {children}
       </AdminTextProvider>
     </NextIntlClientProvider>
   );

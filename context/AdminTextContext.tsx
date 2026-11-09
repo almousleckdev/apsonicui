@@ -63,7 +63,14 @@ export function AdminTextProvider({ initialMode, children }: { initialMode: Admi
     return { mode, setMode, parts, server, tServer: (english) => joinText(server(english), mode), t: (key, values) => joinText(parts(key, values), mode) };
   }, [mode, setMode]);
 
-  return <AdminTextContext.Provider value={value}>{children}</AdminTextContext.Provider>;
+  // The wrapper carries the CURRENT language, so the language CSS is right on the server's first paint and after a
+  // switch. (It used to be fixed at the first language, so after switching the page matched both languages at once and
+  // hid every label.)
+  return (
+    <AdminTextContext.Provider value={value}>
+      <div data-admin-text={mode} className="contents">{children}</div>
+    </AdminTextContext.Provider>
+  );
 }
 
 export function useAdminText(): AdminTextValue {
