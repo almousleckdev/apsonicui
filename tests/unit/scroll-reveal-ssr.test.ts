@@ -9,10 +9,12 @@ import { ScrollReveal } from '@/components/ui/scroll-reveal';
  */
 describe('ScrollReveal on the server', () => {
   const variants = ['fadeUp', 'fadeIn', 'scaleIn', 'slideLeft', 'slideRight'] as const;
+  // children are passed as createElement arguments, so the component is typed without the required children prop
+  const Reveal = ScrollReveal as unknown as React.ComponentType<{ variant: (typeof variants)[number] }>;
 
   it.each(variants)('renders %s content visible in the server HTML', (variant) => {
     const html = renderToString(
-      React.createElement(ScrollReveal, { variant }, React.createElement('p', null, 'Visible without scripts')),
+      React.createElement(Reveal, { variant }, React.createElement('p', null, 'Visible without scripts')),
     );
 
     expect(html).toContain('Visible without scripts');
