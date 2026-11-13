@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocale } from "next-intl";
-import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import { Link } from "@/lib/i18n/navigation";
 import { DEFAULT_FEATURED_MODELS } from "@/lib/data/featured-models";
@@ -10,6 +9,9 @@ import { useCarousel } from "@/hooks/useCarousel";
 import { ModelSlideContainer } from "./ModelSlideContainer";
 import { cn } from "@/lib/utils";
 import { HomeFeaturedModelItem } from "@/lib/types/homepage";
+import { isSafeImagePath } from "@/lib/media/safe-path";
+
+const AUTOPLAY_MS = 10_000;
 
 interface RecommendedModelsProps {
   className?: string;
@@ -18,44 +20,65 @@ interface RecommendedModelsProps {
 
 export const RecommendedModels: React.FC<RecommendedModelsProps> = ({ className, initialConfig }) => {
   const locale = useLocale();
-  const models = initialConfig && initialConfig.length > 0 ? initialConfig : DEFAULT_FEATURED_MODELS;
+  // A model the editor has added but not yet given a picture cannot be shown.
+  const withPicture = initialConfig?.filter((m) => m.image);
+  const models = withPicture && withPicture.length > 0 ? withPicture : DEFAULT_FEATURED_MODELS;
 
-  const { currentIndex, goToSlide, nextSlide, prevSlide, pause, resume } = useCarousel({
+  // Index and pause state come from the shared hook; the timing is done below so a tick can step through the colours.
+  const { currentIndex, nextSlide, prevSlide, pause, resume, isPaused } = useCarousel({
     itemsCount: models.length,
-    autoPlay: true,
-    interval: 8000,
+    autoPlay: false,
   });
 
   const [selectedColorImages, setSelectedColorImages] = useState<Record<string, string>>({});
-  const [direction, setDirection] = useState<number>(1);
 
   const currentModel = models[currentIndex] || models[0];
   const activeImage = selectedColorImages[currentModel.id] || currentModel.image;
+
+  // Each model has its own background; empty means none. Only safe site paths are used.
+  const backgroundOf = (model: HomeFeaturedModelItem) => (isSafeImagePath(model.background) ? model.background! : "");
 
   const handleColorSelect = (image: string) => {
     setSelectedColorImages((prev) => ({ ...prev, [currentModel.id]: image }));
   };
 
+  // A model always opens on its own first picture, never on a colour chosen the last time it was shown.
+  const resetModelColor = (modelId: string) =>
+    setSelectedColorImages((prev) => {
+      if (!(modelId in prev)) return prev;
+      const rest = { ...prev };
+      delete rest[modelId];
+      return rest;
+    });
+
   const handleNext = () => {
-    setDirection(1);
+    resetModelColor(models[(currentIndex + 1) % models.length].id);
     nextSlide();
   };
 
   const handlePrev = () => {
-    setDirection(-1);
+    resetModelColor(models[(currentIndex - 1 + models.length) % models.length].id);
     prevSlide();
   };
 
-  const handleGoTo = (index: number) => {
-    setDirection(index > currentIndex ? 1 : -1);
-    goToSlide(index);
-  };
+  // What the autoplay shows after this picture: the next colour of this model, or the first picture of the next model.
+  // A colour the editor has added but not yet given a picture cannot be shown.
+  const colors = (currentModel.colors ?? []).filter((c) => c.image);
+  const colorAt = colors.findIndex((c) => c.image === activeImage);
+  const nextColorImage = colors.length > 0 && colorAt < colors.length - 1 ? colors[colorAt + 1].image : undefined;
+  const nextModel = models[(currentIndex + 1) % models.length];
+  const upcomingImage = nextColorImage ?? nextModel.image;
+  const isSingleStill = models.length <= 1 && colors.length <= 1;
 
-  const nameVariants = {
-    enter: (dir: number) => ({ y: dir > 0 ? 20 : -20, opacity: 0 }),
-    center: { y: 0, opacity: 1, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as const } },
-    exit: (dir: number) => ({ y: dir > 0 ? -20 : 20, opacity: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] as const } }),
-  };
+  // Every 10 seconds the picture changes together with its colour dot. Any change (arrow, colour dot, autoplay)
+  // restarts the 10 seconds; hovering the section pauses it.
+  useEffect(() => {
+    if (isPaused || isSingleStill) return;
+    const timer = setTimeout(() => (nextColorImage ? handleColorSelect(nextColorImage) : handleNext()), AUTOPLAY_MS);
+    return () => clearTimeout(timer);
+    // handleNext / handleColorSelect only close over the values listed here.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPaused, isSingleStill, currentIndex, activeImage, nextColorImage]);
 
   if (!currentModel) return null;
 
@@ -72,26 +95,32 @@ export const RecommendedModels: React.FC<RecommendedModelsProps> = ({ className,
           </span>
         </div>
 
+        {/* Every model name stays in the page and only fades, so the name changes together with the picture. */}
         <div className="text-center mb-8 h-16 relative flex items-center justify-center overflow-hidden">
-          <AnimatePresence mode="popLayout" custom={direction} initial={false}>
-            <motion.h3
-              key={currentModel.id}
-              custom={direction}
-              variants={nameVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-zinc-950 uppercase absolute"
-            >
-              {currentModel.name}
-            </motion.h3>
-          </AnimatePresence>
+          {models.map((model) => {
+            const isActive = model.id === currentModel.id;
+            return (
+              <h3
+                key={model.id}
+                aria-hidden={!isActive}
+                data-active={isActive}
+                className={cn(
+                  "absolute text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-zinc-950 uppercase transition-[opacity,transform] duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
+                  isActive ? "opacity-100 translate-y-0" : "pointer-events-none opacity-0 translate-y-3"
+                )}
+              >
+                {model.name}
+              </h3>
+            );
+          })}
         </div>
 
         <ModelSlideContainer
           currentModel={currentModel}
           activeImage={activeImage}
-          direction={direction}
+          preloadImages={[upcomingImage, ...colors.map((c) => c.image)]}
+          background={backgroundOf(currentModel)}
+          preloadBackgrounds={[backgroundOf(nextModel)]}
           onPrev={handlePrev}
           onNext={handleNext}
         />
@@ -105,40 +134,17 @@ export const RecommendedModels: React.FC<RecommendedModelsProps> = ({ className,
           </button>
         </div>
 
-        <div className="flex justify-center gap-4 mt-4 mb-8 h-4 items-center">
-          {models.map((model, idx) => {
-            const isActive = idx === currentIndex;
-            return (
-              <button
-                key={model.id}
-                onClick={() => handleGoTo(idx)}
-                className="relative w-3.5 h-3.5 cursor-pointer outline-none flex items-center justify-center"
-                aria-label={`Go to slide ${idx + 1}`}
-              >
-                <span className={cn("w-2 h-2 rounded-full transition-colors duration-300", isActive ? "bg-transparent" : "bg-zinc-300 hover:bg-zinc-400")} />
-                {isActive && (
-                  <motion.span
-                    layoutId="activeModelDot"
-                    className="absolute h-2 w-5 bg-brand-green rounded-full z-10"
-                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                  />
-                )}
-              </button>
-            );
-          })}
-        </div>
-
-        {currentModel.colors && currentModel.colors.length > 0 && (
-          <div className="flex justify-center gap-3.5 mb-10 mt-4">
-            {currentModel.colors.map((color) => {
+        {colors.length > 0 && (
+          <div className="flex justify-center gap-3.5 mb-10 mt-8">
+            {colors.map((color) => {
               const isSelected = activeImage === color.image;
               return (
                 <button
                   key={color.id}
                   onClick={() => handleColorSelect(color.image)}
                   className={cn(
-                    "relative p-0.5 w-6 h-6 rounded-full flex items-center justify-center transition-transform hover:scale-110 cursor-pointer border border-transparent",
-                    isSelected && "border-zinc-400"
+                    "relative p-0.5 w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 cursor-pointer border border-transparent",
+                    isSelected && "border-zinc-500 scale-110"
                   )}
                   aria-label={`Select ${color.name}`}
                 >

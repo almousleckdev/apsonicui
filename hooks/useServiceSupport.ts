@@ -1,10 +1,10 @@
 // Service Support business logic hook
-import { useState, useMemo, useCallback, useRef } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { STORES, filterStores } from '@/lib/data/stores';
 import type { Store, StoreFilter } from '@/lib/types/store';
 import type { StoreQueryType } from '@/components/service/StoreQueryPanel';
 import { getUserLocation, calculateDistance, reverseGeocode, type Coordinates, type Address } from '@/lib/utils/geolocation';
-import { findCountryFromSearch } from '@/lib/utils/country-search';
+import { findApsonicCountry } from '@/lib/data/apsonic-countries';
 
 export const useServiceSupport = () => {
   const [queryType, setQueryType] = useState<StoreQueryType | null>(null);
@@ -93,119 +93,47 @@ export const useServiceSupport = () => {
     return stores;
   }, [queryType, searchTerm, selectedCountry, userLocation]);
 
-  // Handle explicit selection of country (from map click, dropdown option, etc.)
+  // How long the typing must pause before the map reacts, so it does not fly after every key press.
+  const TYPING_PAUSE_MS = 450;
+  const typingTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => () => clearTimeout(typingTimerRef.current), []);
+
+  // Handle explicit selection of country (from map click, dropdown option, etc.): immediate.
   const handleCountrySelect = (countryName: string) => {
+    clearTimeout(typingTimerRef.current);
     setSelectedCountry(countryName || '');
-    if (countryName) {
-      setSearchTerm(countryName);
-    } else {
-      setSearchTerm('');
-    }
+    setSearchTerm(countryName || '');
     setSelectedStore(undefined);
   };
 
-  // Handle search text entry (updates searchTerm without locking type/delete)
+  // Handle search text entry: the list filters at once, the map reacts when the typing pauses.
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
-    
-    const normalizedVal = value.trim().toLowerCase();
-    if (!normalizedVal) {
+    setSelectedStore(undefined);
+    clearTimeout(typingTimerRef.current);
+
+    const query = value.trim().toLowerCase();
+    if (!query) {
       setSelectedCountry('');
-      setSelectedStore(undefined);
       return;
     }
-    
-    // Comprehensive dictionary mapping localized search entries to canonical country names
-    const mapping: Record<string, string> = {
-      // Ghana
-      ghana: 'Ghana',
-      加纳: 'Ghana',
-      // Togo
-      togo: 'Togo',
-      多哥: 'Togo',
-      // Benin
-      benin: 'Benin',
-      bénin: 'Benin',
-      贝宁: 'Benin',
-      // Mali
-      mali: 'Mali',
-      马里: 'Mali',
-      // Guinea
-      guinea: 'Guinea',
-      guinée: 'Guinea',
-      几内亚: 'Guinea',
-      // Burkina Faso
-      'burkina faso': 'Burkina Faso',
-      burkina: 'Burkina Faso',
-      布基纳法索: 'Burkina Faso',
-      // Ivory Coast
-      'ivory coast': 'Ivory Coast',
-      "côte d'ivoire": 'Ivory Coast',
-      "cote d'ivoire": 'Ivory Coast',
-      科特迪瓦: 'Ivory Coast',
-      // Tanzania
-      tanzania: 'Tanzania',
-      tanzanie: 'Tanzania',
-      坦桑尼亚: 'Tanzania',
-      // Kenya
-      kenya: 'Kenya',
-      肯尼亚: 'Kenya',
-      // Uganda
-      uganda: 'Uganda',
-      ouganda: 'Uganda',
-      乌干达: 'Uganda',
-      // Cameroon
-      cameroon: 'Cameroon',
-      cameroun: 'Cameroon',
-      // Central African Republic
-      'central african republic': 'Central African Republic',
-      car: 'Central African Republic',
-      'république centrafricaine': 'Central African Republic',
-      中非: 'Central African Republic',
-      中非共和国: 'Central African Republic',
-      // Congo
-      congo: 'Congo',
-      刚果: 'Congo',
-      刚果共和国: 'Congo',
-      // Democratic Republic of Congo
-      'democratic republic of congo': 'Democratic Republic of Congo',
-      'dr congo': 'Democratic Republic of Congo',
-      drc: 'Democratic Republic of Congo',
-      'rd congo': 'Democratic Republic of Congo',
-      'république démocratique du congo': 'Democratic Republic of Congo',
-      民主刚果: 'Democratic Republic of Congo',
-      刚果金: 'Democratic Republic of Congo',
-      '刚果(金)': 'Democratic Republic of Congo',
-    };
 
-    const isChinese = /[\u4e00-\u9fa5]/.test(normalizedVal);
-    const minLength = isChinese ? 1 : 2;
+    // "Gabon", "Côte d'Ivoire", "加蓬"... or a partial name that points to one country only.
+    let country = findApsonicCountry(value)?.name ?? '';
 
-    const matchedCountryKey = Object.keys(mapping).find(
-      key => key === normalizedVal || (key.includes(normalizedVal) && normalizedVal.length >= minLength)
-    );
-
-    if (matchedCountryKey) {
-      const canonicalCountry = mapping[matchedCountryKey];
-      setSelectedCountry(canonicalCountry);
-    } else {
-      // Fallback: Check if user searched for a store attribute (e.g. Accra, Bamako) and select its country
-      const matchingStores = STORES.filter(store => 
-        store.name.toLowerCase().includes(normalizedVal) ||
-        store.address.toLowerCase().includes(normalizedVal) ||
-        (store.city && store.city.toLowerCase().includes(normalizedVal)) ||
-        store.country.toLowerCase().includes(normalizedVal)
+    // Otherwise a store detail (a city, a shop name) leads to its country.
+    if (!country) {
+      const store = STORES.find(
+        (s) =>
+          s.name.toLowerCase().includes(query) ||
+          s.address.toLowerCase().includes(query) ||
+          (s.city && s.city.toLowerCase().includes(query)) ||
+          s.country.toLowerCase().includes(query),
       );
-
-      if (matchingStores.length > 0) {
-        const countries = Array.from(new Set(matchingStores.map(s => s.country)));
-        setSelectedCountry(countries[0]);
-      } else {
-        setSelectedCountry('');
-      }
+      country = store?.country ?? '';
     }
-    
-    setSelectedStore(undefined);
+
+    typingTimerRef.current = setTimeout(() => setSelectedCountry(country), TYPING_PAUSE_MS);
   };
 
   return {

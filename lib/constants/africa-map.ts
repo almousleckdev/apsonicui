@@ -12,12 +12,14 @@ const southernCodes = isoCodesForRegion('southern');
 
 export const AFRICA_MAP_CONFIG = {
   bounds: {
-    africa: [-25, -36, 55, 38] as [number, number, number, number],
+    // Mainland Africa and Madagascar, edge to edge: Dakar in the west, the Horn in the east, Cape Agulhas in the south,
+    // Tunisia in the north. The overview frames exactly this.
+    africa: [-18, -35.5, 52, 38] as [number, number, number, number],
   },
   maxBounds: [-30, -40, 65, 45] as [number, number, number, number],
   defaultCenter: [15, 0] as [number, number],
   defaultZoom: 2.8,
-  minZoom: 2.5,
+  minZoom: 1.5,
   maxZoom: 6,
 
   countriesByRegion: {
@@ -40,6 +42,10 @@ export const AFRICA_MAP_CONFIG = {
     default: '#E4E4E7',
   },
 
+  /** APSONIC brand green: the countries where APSONIC is present. */
+  apsonicColor: '#00A651',
+  apsonicHoverColor: '#12C36A',
+  /** The country the visitor searched for, clicked or is in. */
   searchHighlightColor: '#EF4444',
 
   regions: {

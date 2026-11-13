@@ -3,50 +3,37 @@
 import React from "react";
 import Image from "next/image";
 import { Link } from "@/lib/i18n/navigation";
-import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useCrossfadeLayers } from "@/hooks/useCrossfadeLayers";
+import { bypassImageOptimizer } from "@/lib/media/safe-path";
 import type { HomeFeaturedModelItem } from "@/lib/types/homepage";
 
 interface ModelSlideContainerProps {
-  currentModel: Pick<HomeFeaturedModelItem, 'id' | 'name' | 'image' | 'watermark' | 'href'>;
+  currentModel: Pick<HomeFeaturedModelItem, 'id' | 'name' | 'href'>;
   activeImage: string;
-  direction: number;
+  /** Pictures that may be shown next (the next colour, the next model): loaded in advance so the swap is instant. */
+  preloadImages: string[];
+  background: string;
+  preloadBackgrounds: string[];
   onPrev: () => void;
   onNext: () => void;
 }
 
+// One easing and one duration for everything: a slow, soft dissolve with the new picture settling in from slightly larger.
+const FADE =
+  "transition-[opacity,transform] duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none will-change-[opacity,transform]";
+
 export const ModelSlideContainer: React.FC<ModelSlideContainerProps> = ({
   currentModel,
   activeImage,
-  direction,
+  preloadImages,
+  background,
+  preloadBackgrounds,
   onPrev,
   onNext,
 }) => {
-  const bikeVariants = {
-    enter: (dir: number) => ({
-      x: dir > 0 ? 180 : -180,
-      opacity: 0,
-      scale: 0.96,
-    }),
-    center: {
-      x: 0,
-      opacity: 1,
-      scale: 1,
-      transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const },
-    },
-    exit: (dir: number) => ({
-      x: dir > 0 ? -180 : 180,
-      opacity: 0,
-      scale: 0.96,
-      transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as const },
-    }),
-  };
-
-  const isRemoteUpload =
-    activeImage?.startsWith("http://") ||
-    activeImage?.startsWith("https://") ||
-    activeImage?.startsWith("/uploads") ||
-    activeImage?.startsWith("data:");
+  const bikes = useCrossfadeLayers(activeImage, preloadImages);
+  const backgrounds = useCrossfadeLayers(background, preloadBackgrounds);
 
   return (
     <div className="relative w-full max-w-[1100px] mx-auto flex items-center justify-between gap-4 h-[260px] sm:h-[400px] lg:h-[480px]">
@@ -62,32 +49,66 @@ export const ModelSlideContainer: React.FC<ModelSlideContainerProps> = ({
         href={currentModel.href || "/products"}
         className="flex-1 h-full relative flex items-center justify-center cursor-pointer z-10 overflow-visible"
       >
-        <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none opacity-[0.04] sm:opacity-[0.06] select-none">
-          <div className="relative w-full h-full transform scale-110 sm:scale-125">
-            <Image src="/images/brand/ALOBA底图 (1).png" alt="" fill sizes="100vw" className="object-contain" />
-          </div>
+        {/* Background pictures: faint, cross-faded, never removed from the page. */}
+        <div className="absolute inset-0 z-0 pointer-events-none select-none">
+          {backgrounds.mounted.map((src) => {
+            const isShown = src === backgrounds.shown;
+            return (
+              <div
+                key={src}
+                data-layer="background"
+                data-shown={isShown}
+                className={`absolute inset-0 ${FADE} ${isShown ? "opacity-[0.14] sm:opacity-[0.18]" : "opacity-0"}`}
+              >
+                <div className="relative w-full h-full transform scale-110 sm:scale-125">
+                  <Image
+                    src={src}
+                    alt=""
+                    fill
+                    sizes="100vw"
+                    className="object-contain"
+                    unoptimized={bypassImageOptimizer(src)}
+                    onLoad={() => backgrounds.markLoaded(src)}
+                    onError={() => backgrounds.markLoaded(src)}
+                    ref={(el) => {
+                      if (el?.complete) backgrounds.markLoaded(src);
+                    }}
+                  />
+                </div>
+              </div>
+            );
+          })}
         </div>
 
+        {/* A soft, fixed shadow under the bike. It does not animate, so the fade stays smooth (no filter on the picture). */}
+        <div className="pointer-events-none absolute bottom-[9%] left-1/2 z-0 h-5 w-[55%] -translate-x-1/2 rounded-full bg-black/10 blur-2xl" />
+
         <div className="relative w-[90%] h-[90%] z-10 flex items-center justify-center overflow-visible">
-          <AnimatePresence mode="popLayout" custom={direction} initial={false}>
-            <motion.div
-              key={`${currentModel.id}_${activeImage}`}
-              custom={direction}
-              variants={bikeVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              className="absolute inset-0 flex items-center justify-center"
-            >
-              <Image
-                src={activeImage}
-                alt={currentModel.name}
-                fill
-                className="object-contain filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.06)] hover:drop-shadow-[0_20px_32px_rgba(0,0,0,0.12)] transition-shadow duration-300"
-                sizes="(max-width: 768px) 100vw, 800px"
-              />
-            </motion.div>
-          </AnimatePresence>
+          {bikes.mounted.map((src) => {
+            const isShown = src === bikes.shown;
+            return (
+              <div
+                key={src}
+                data-layer="bike"
+                data-shown={isShown}
+                aria-hidden={!isShown}
+                className={`absolute inset-0 ${FADE} ${isShown ? "opacity-100 scale-100" : "opacity-0 scale-[1.03]"}`}
+              >
+                <Image
+                  src={src}
+                  alt={isShown ? currentModel.name : ""}
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 768px) 100vw, 800px"
+                  onLoad={() => bikes.markLoaded(src)}
+                  onError={() => bikes.markLoaded(src)}
+                  ref={(el) => {
+                    if (el?.complete) bikes.markLoaded(src);
+                  }}
+                />
+              </div>
+            );
+          })}
         </div>
       </Link>
 

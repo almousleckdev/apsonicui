@@ -17,6 +17,8 @@ export interface HomeFeaturedModelItem {
   name: string;
   image: string;
   watermark?: string;
+  /** This model's own large faint background picture. Empty means no background. Site-relative path. */
+  background?: string;
   href?: string;
   colors?: {
     id: string;
