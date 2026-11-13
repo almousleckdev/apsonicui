@@ -56,7 +56,7 @@ export const ServiceSupport: React.FC<ServiceSupportProps> = ({ className }) => 
               userLocation={queryType === "nearby" ? userLocation : null}
               showOnlyUserLocation={queryType === "nearby"}
               className="w-full h-full"
-              padding={{ left: 680, top: 40, bottom: 40, right: 40 }}
+              padding={{ left: 660, top: 24, bottom: 24, right: 24 }}
             />
           </div>
 

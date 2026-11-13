@@ -1,38 +1,47 @@
-/* eslint-disable react-hooks/immutability, react-hooks/preserve-manual-memoization */
 'use client';
 
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type { FeatureCollection } from 'geojson';
-import mapboxgl from 'mapbox-gl';
-import { AFRICA_MAP_CONFIG } from '@/lib/constants/africa-map';
 import { useMapInitializer } from './MapInitializer';
 import { useUserLocationMarker } from './UserLocationMarker';
 import { fetchAfricanGeoJSON } from '@/lib/utils/geojson';
 import {
+  COUNTRY_FILL_LAYER,
+  COUNTRY_SOURCE_ID,
+  addCountryLayers,
+  disposeCountryLayers,
+  setSelectedCountry,
   updateGeoJSONSource,
-  addRegionLayers,
-  updateSearchHighlight,
 } from '@/lib/utils/map-layers';
-import { getBoundsFromFeature } from '@/lib/utils/map-bounds';
+import { flyToAfrica, flyToCountry, flyToPoint, type MapPadding } from '@/lib/utils/map-camera';
+import { findFeatureContaining } from '@/lib/utils/map-geometry';
+import { findApsonicCountry } from '@/lib/data/apsonic-countries';
 import { AfricaMapFallback } from './AfricaMapControls';
-import { useAfricaMapHandlers } from './useAfricaMapHandlers';
 import { cn } from '@/lib/utils';
 
 export interface AfricaMapPanelProps {
   selectedCountry?: string;
-  onCountrySelect?: (countryCode: string) => void;
+  onCountrySelect?: (countryName: string) => void;
   userLocation?: { lat: number; lng: number } | null;
   showOnlyUserLocation?: boolean;
   className?: string;
-  padding?: { top?: number; bottom?: number; left?: number; right?: number };
+  padding?: MapPadding;
 }
 
-interface CustomMap extends mapboxgl.Map {
-  _africaClickHandler?: (e: mapboxgl.MapMouseEvent) => void;
-  _africaMouseEnterHandler?: () => void;
-  _africaMouseLeaveHandler?: () => void;
+interface HoverLabel {
+  name: string;
+  apsonic: boolean;
+  x: number;
+  y: number;
 }
 
+/**
+ * The Africa map of the service section.
+ *
+ * - Countries with APSONIC are green. Hovering one lights it up and names it.
+ * - The country the visitor typed, clicked, or is in ("Show Nearby Stores") turns red, and the camera flies to it.
+ * - Clearing the search, unchecking "nearby", or clicking the same country again flies back out to all of Africa.
+ */
 export const AfricaMapPanel: React.FC<AfricaMapPanelProps> = ({
   selectedCountry,
   onCountrySelect,
@@ -42,195 +51,130 @@ export const AfricaMapPanel: React.FC<AfricaMapPanelProps> = ({
   padding,
 }) => {
   const { map, isLoaded, mapContainer, error } = useMapInitializer();
-  const geoJsonDataRef = React.useRef<FeatureCollection | null>(null);
-  const onCountrySelectRef = React.useRef(onCountrySelect);
-  const setupClickHandlersRef = React.useRef<(() => void) | null>(null);
-  const [isGeoJsonLoaded, setIsGeoJsonLoaded] = React.useState(false);
+  const [geoJson, setGeoJson] = useState<FeatureCollection | null>(null);
+  const [hover, setHover] = useState<HoverLabel | null>(null);
 
-  const pendingTimeoutsRef = React.useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
-
-  const scheduleTimeout = useCallback((fn: () => void, delay: number) => {
-    const id = setTimeout(() => {
-      pendingTimeoutsRef.current.delete(id);
-      fn();
-    }, delay);
-    pendingTimeoutsRef.current.add(id);
-    return id;
-  }, []);
-
+  // The latest values, read by map event handlers that are installed only once.
+  const selectedCountryRef = useRef(selectedCountry);
+  const onCountrySelectRef = useRef(onCountrySelect);
+  const paddingRef = useRef(padding);
   useEffect(() => {
-    return () => {
-      pendingTimeoutsRef.current.forEach((id) => clearTimeout(id));
-      pendingTimeoutsRef.current.clear();
-    };
-  }, []);
-
-  React.useEffect(() => {
-    onCountrySelectRef.current = onCountrySelect;
-  }, [onCountrySelect]);
-
-  const selectedCountryRef = React.useRef(selectedCountry);
-  React.useEffect(() => {
     selectedCountryRef.current = selectedCountry;
-  }, [selectedCountry]);
-
-  useUserLocationMarker({
-    map: map.current,
-    userLocation,
-    show: showOnlyUserLocation,
+    onCountrySelectRef.current = onCountrySelect;
+    paddingRef.current = padding;
   });
 
-  const setupClickHandlers = useAfricaMapHandlers(map, selectedCountryRef, onCountrySelectRef);
+  useUserLocationMarker({ map: map.current, userLocation, show: showOnlyUserLocation });
 
-  React.useEffect(() => {
-    setupClickHandlersRef.current = setupClickHandlers;
-  }, [setupClickHandlers]);
-
-  const loadGeoJSONData = useCallback(async () => {
-    if (!map.current || !isLoaded) return;
-
-    const geoJson = await fetchAfricanGeoJSON();
-    if (!geoJson) return;
-
-    geoJsonDataRef.current = geoJson;
-    updateGeoJSONSource(map.current, geoJson);
-    setIsGeoJsonLoaded(true);
-
-    scheduleTimeout(() => {
-      if (map.current && map.current.getSource('africa-countries')) {
-        addRegionLayers(map.current);
-
-        scheduleTimeout(() => {
-          if (onCountrySelectRef.current && map.current) {
-            setupClickHandlers();
-          }
-        }, 200);
-      }
-    }, 100);
-  }, [map, isLoaded, setupClickHandlers, scheduleTimeout]);
-
+  // 1. Once the map style is ready: load the country shapes and draw the layers.
   useEffect(() => {
     if (!isLoaded) return;
-    let isCancelled = false;
-
-    const initGeoJSON = async () => {
-      if (!isCancelled) {
-        await loadGeoJSONData();
-      }
-    };
-    initGeoJSON();
-
+    let cancelled = false;
+    fetchAfricanGeoJSON().then((data) => {
+      const current = map.current;
+      if (cancelled || !data || !current) return;
+      updateGeoJSONSource(current, data);
+      addCountryLayers(current);
+      setGeoJson(data);
+    });
     return () => {
-      isCancelled = true;
+      cancelled = true;
     };
-  }, [isLoaded, loadGeoJSONData]);
+  }, [isLoaded, map]);
 
+  // 2. Hover and click on the countries.
   useEffect(() => {
-    const currentMap = map.current;
-    if (!currentMap || !isLoaded || !onCountrySelectRef.current) return;
+    const current = map.current;
+    if (!current || !geoJson) return;
+    let hoveredId: string | null = null;
+    let frame = 0;
 
-    let retryCount = 0;
-    const maxRetries = 30;
-
-    const checkAndSetup = () => {
-      if (!currentMap) return;
-
-      if (currentMap.getLayer('africa-countries-fill')) {
-        setupClickHandlers();
-      } else if (retryCount < maxRetries) {
-        retryCount++;
-        scheduleTimeout(checkAndSetup, 200);
-      }
+    const clearHover = () => {
+      if (hoveredId !== null) current.setFeatureState({ source: COUNTRY_SOURCE_ID, id: hoveredId }, { hover: false });
+      hoveredId = null;
+      current.getCanvas().style.cursor = '';
+      setHover(null);
     };
 
-    checkAndSetup();
+    const onMove = (e: mapboxgl.MapMouseEvent) => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const feature = current.queryRenderedFeatures(e.point, { layers: [COUNTRY_FILL_LAYER] })[0];
+        const id = (feature?.properties?.isoCode as string | undefined) ?? null;
+        if (!feature || !id) return clearHover();
 
+        const apsonic = feature.properties?.apsonic === true || feature.properties?.apsonic === 'true';
+        if (hoveredId !== id) {
+          if (hoveredId !== null) current.setFeatureState({ source: COUNTRY_SOURCE_ID, id: hoveredId }, { hover: false });
+          current.setFeatureState({ source: COUNTRY_SOURCE_ID, id }, { hover: true });
+          hoveredId = id;
+        }
+        // Only the countries with APSONIC can be chosen.
+        current.getCanvas().style.cursor = apsonic ? 'pointer' : '';
+        setHover({ name: String(feature.properties?.name ?? ''), apsonic, x: e.point.x, y: e.point.y });
+      });
+    };
+
+    const onClick = (e: mapboxgl.MapMouseEvent) => {
+      const select = onCountrySelectRef.current;
+      if (!select) return;
+      const feature = current.queryRenderedFeatures(e.point, { layers: [COUNTRY_FILL_LAYER] })[0];
+      if (!feature) return select(''); // the sea or empty land: back to all of Africa
+      if (feature.properties?.apsonic !== true && feature.properties?.apsonic !== 'true') return;
+      const name = String(feature.properties?.name ?? '');
+      const same = name.toLowerCase() === (selectedCountryRef.current ?? '').trim().toLowerCase();
+      select(same ? '' : name);
+    };
+
+    current.on('mousemove', onMove);
+    current.on('mouseout', clearHover);
+    current.on('click', onClick);
     return () => {
-      if (currentMap) {
-        const customMap = currentMap as unknown as CustomMap;
-        if (customMap._africaClickHandler) {
-          customMap.off('click', customMap._africaClickHandler);
-          delete customMap._africaClickHandler;
-        }
-        if (customMap._africaMouseEnterHandler) {
-          customMap.off('mouseenter', 'africa-countries-fill', customMap._africaMouseEnterHandler);
-          delete customMap._africaMouseEnterHandler;
-        }
-        if (customMap._africaMouseLeaveHandler) {
-          customMap.off('mouseleave', 'africa-countries-fill', customMap._africaMouseLeaveHandler);
-          delete customMap._africaMouseLeaveHandler;
-        }
-      }
+      cancelAnimationFrame(frame);
+      current.off('mousemove', onMove);
+      current.off('mouseout', clearHover);
+      current.off('click', onClick);
     };
-  }, [map, isLoaded, setupClickHandlers, scheduleTimeout]);
+  }, [map, geoJson]);
+
+  // 3. Which country is in focus: the chosen one, or (with "Show Nearby Stores") the one the visitor is standing in.
+  const focusIso3 = useMemo(() => {
+    const chosen = selectedCountry?.trim() ? findApsonicCountry(selectedCountry)?.iso3 : undefined;
+    if (chosen) return chosen;
+    if (showOnlyUserLocation && userLocation && geoJson) {
+      const inside = findFeatureContaining(geoJson, userLocation.lng, userLocation.lat);
+      return (inside?.properties?.isoCode as string | undefined) || undefined;
+    }
+    return undefined;
+  }, [selectedCountry, showOnlyUserLocation, userLocation, geoJson]);
+
+  const firstFrameDone = useRef(false);
+
+  // 4. Colour the country red and fly there, or fly back out to Africa.
+  useEffect(() => {
+    const current = map.current;
+    if (!current || !geoJson) return;
+
+    const feature = focusIso3 ? geoJson.features.find((f) => f.properties?.isoCode === focusIso3) : undefined;
+    setSelectedCountry(current, feature ? focusIso3! : null);
+
+    if (feature) {
+      flyToCountry(current, feature, paddingRef.current);
+    } else if (showOnlyUserLocation && userLocation) {
+      // Standing somewhere we have no country shape for: show the place itself.
+      flyToPoint(current, userLocation.lng, userLocation.lat, paddingRef.current);
+    } else {
+      flyToAfrica(current, paddingRef.current, !firstFrameDone.current);
+    }
+    firstFrameDone.current = true;
+  }, [map, geoJson, focusIso3, showOnlyUserLocation, userLocation]);
 
   useEffect(() => {
-    if (!map.current || !isLoaded || !geoJsonDataRef.current) return;
-
-    const updatedGeoJson = updateSearchHighlight(
-      map.current,
-      geoJsonDataRef.current,
-      selectedCountry?.trim() || null
-    );
-
-    geoJsonDataRef.current = updatedGeoJson;
-    updateGeoJSONSource(map.current, updatedGeoJson);
-
-    if (onCountrySelectRef.current) {
-      scheduleTimeout(() => {
-        if (
-          map.current &&
-          map.current.getLayer('africa-countries-fill') &&
-          setupClickHandlersRef.current
-        ) {
-          setupClickHandlersRef.current();
-        }
-      }, 200);
-    }
-
-    if (selectedCountry?.trim() && geoJsonDataRef.current) {
-      const searchedFeature = geoJsonDataRef.current.features.find(
-        (f) =>
-          (f.properties?.name as string)?.toLowerCase() ===
-          selectedCountry.toLowerCase()
-      );
-
-      if (searchedFeature) {
-        const bounds = getBoundsFromFeature(searchedFeature);
-        if (bounds && map.current) {
-          map.current.fitBounds(bounds, {
-            padding: padding || 50,
-            duration: AFRICA_MAP_CONFIG.animation.duration,
-            easing: (t: number) => t * (2 - t),
-          });
-        }
-      }
-    } else if (!selectedCountry?.trim()) {
-      map.current.fitBounds(AFRICA_MAP_CONFIG.bounds.africa, {
-        padding: padding || 10,
-        duration: 1000,
-        easing: (t: number) => t * (2 - t),
-      });
-    }
-  }, [selectedCountry, isLoaded, map, padding, isGeoJsonLoaded]);
-
-  useEffect(() => {
-    if (!map.current || !isLoaded) return;
-
-    if (!showOnlyUserLocation && map.current) {
-      map.current.fitBounds(AFRICA_MAP_CONFIG.bounds.africa, {
-        padding: padding || { top: 10, bottom: 10, left: 10, right: 10 },
-        duration: 1000,
-        easing: (t: number) => t * (2 - t),
-      });
-    } else if (userLocation) {
-      map.current.flyTo({
-        center: [userLocation.lng, userLocation.lat],
-        zoom: 10,
-        duration: 1500,
-      });
-    }
-  }, [showOnlyUserLocation, userLocation, isLoaded, map, padding]);
+    const current = map.current;
+    return () => {
+      if (current) disposeCountryLayers(current);
+    };
+  }, [map]);
 
   if (error) {
     return (
@@ -243,6 +187,24 @@ export const AfricaMapPanel: React.FC<AfricaMapPanelProps> = ({
     );
   }
 
-  return <div ref={mapContainer} className={cn('w-full h-full overflow-hidden', className)} />;
+  return (
+    <div className={cn('relative w-full h-full overflow-hidden', className)}>
+      {/* Full size on purpose: Mapbox's own CSS makes its container position:relative, which would defeat absolute. */}
+      <div ref={mapContainer} className="h-full w-full" />
+      {hover && hover.name && (
+        <div
+          className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-[130%] whitespace-nowrap rounded-lg border border-white/10 bg-zinc-950/85 px-3 py-1.5 text-xs font-bold text-white shadow-xl backdrop-blur-md"
+          style={{ left: hover.x, top: hover.y }}
+        >
+          {hover.name}
+          {hover.apsonic && (
+            <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider text-brand-green">
+              <span className="h-1.5 w-1.5 rounded-full bg-brand-green" />
+              APSONIC
+            </span>
+          )}
+        </div>
+      )}
+    </div>
+  );
 };
-
