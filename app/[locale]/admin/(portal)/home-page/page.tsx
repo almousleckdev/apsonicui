@@ -112,7 +112,10 @@ export default function AdminHomePage() {
         <HeroSectionEditor hero={config.hero} onChange={(hero) => setConfig({ ...config, hero })} />
 
         {/* 2. Featured Models Section Management */}
-        <FeaturedModelsEditor models={config.recommendedModels} onChange={(recommendedModels) => setConfig({ ...config, recommendedModels })} />
+        <FeaturedModelsEditor
+          models={config.recommendedModels}
+          onChange={(recommendedModels) => setConfig((current) => ({ ...current, recommendedModels }))}
+        />
 
         {/* 3. Category Lineup Section Management */}
         <LineupCategoriesEditor categories={config.categories} onChange={(categories) => setConfig({ ...config, categories })} />
